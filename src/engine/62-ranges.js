@@ -31,6 +31,7 @@ const STYLES = {
   rock: { zh: '岩石', loose: 0.62, aggr: 0.35, bluff: 0.03, sticky: -0.02, note: '很少玩，一下大注通常是大牌' },
   station: { zh: '跟注站', loose: 1.9, aggr: 0.15, bluff: 0.03, sticky: 0.12, note: '什麼都跟，很少棄牌，也很少加注' },
   maniac: { zh: '瘋子', loose: 2.3, aggr: 0.9, bluff: 0.35, sticky: 0.05, note: '一直加注，常常是詐唬' },
+  gto: { zh: 'GTO', loose: 1.15, aggr: 0.62, bluff: 0.14, sticky: 0.0, note: '翻牌前照圖表打；單挑的轉牌、河牌照求解器的解打' },
 };
 /* 各位置建議開牌的範圍（前百分之幾），以緊凶為準 */
 const OPEN_PCT = { early: 0.15, middle: 0.2, late: 0.33, sb: 0.3, bb: 0.3 };

@@ -297,6 +297,16 @@ body.intable .brand p { display: none; }
 .linkbtn { background: none; border: 0; color: var(--brass); text-decoration: underline; cursor: pointer; padding: 0 0 0 8px; font-size: inherit; }
 .btn.big { font-size: 19px; padding: 12px 36px; border-radius: 12px; }
 .homego { display: flex; gap: 12px; margin: 28px 0 14px; flex-wrap: wrap; }
+.hchk { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: #c9d6cf; margin: 10px 0; cursor: pointer; }
+.hchk input { margin-top: 4px; }
+.traincard { margin-top: 26px; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; background: rgba(255,255,255,.03); }
+.gtob { border: 1px solid #6aa58a; background: #eef6f0; border-radius: 10px; padding: 8px 10px; margin: 4px 0 10px; font-size: 14px; }
+.gtob table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+.gtob td { padding: 2px 4px; }
+.gtob td.r { text-align: right; }
+.gtob .sw, .ctrlmsg .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 5px; vertical-align: -1px; }
+.ctrlmsg .hchip { margin-right: 10px; white-space: nowrap; }
+.srcg { font-size: 11px; background: #d7ebdf; color: #23573a; border-radius: 4px; padding: 0 5px; font-weight: 700; }
 
 /* ===== 牌桌 ===== */
 .tv { display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 16px; max-width: 1280px; margin: 0 auto; padding: 12px 20px 24px; align-items: start; }
@@ -575,12 +585,19 @@ body.noexplain .xp, body.noexplain .how { display: none; }
       </div>
     </div>
     <div class="field"><div class="flabel">電腦出牌的速度</div><div class="pills" id="hS"></div></div>
-    <div class="field"><div class="flabel">對手強度</div><div class="pills" id="hL"></div></div>
+    <div class="field"><div class="flabel">對手強度（GTO：單挑的轉牌、河牌照求解器的解打）</div><div class="pills" id="hL"></div></div>
+    <label class="hchk"><input type="checkbox" id="hGto"> GTO 教練：單挑打到轉牌、河牌時，用求解器告訴你 GTO 怎麼打、按完評分（少賺多少）</label>
     <div class="homego">
       <button class="btn main big" id="bStart">開始發牌</button>
       <button class="btn big" id="bResume" hidden>回到牌局</button>
     </div>
     <p class="note" id="homeStats"></p>
+    <div class="traincard">
+      <div><b>GTO 訓練（單挑）</b><span class="note">　跟 GTO 電腦一對一，轉牌、河牌每個決定都用求解器評分，累計少賺多少。</span></div>
+      <label class="hchk"><input type="checkbox" id="hAutoPre"> 翻牌前、翻牌照教練的建議自動打（只練轉牌、河牌）</label>
+      <div class="homego" style="margin:8px 0 4px"><button class="btn big" id="bTrain">開始 GTO 訓練</button></div>
+      <p class="note" id="trainStats"></p>
+    </div>
     <p class="note">想自己查勝率、用 GTO 工作室分析一手牌：右上角「工具」。<button type="button" class="linkbtn" id="bResetTips">重新顯示新手說明</button></p>
   </div>
 </section>

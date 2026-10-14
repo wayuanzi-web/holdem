@@ -1,7 +1,7 @@
 /* ===== 50-game：牌局（首頁、牌桌、教練框、上一步／下一步、動作列、一手結束的檢討與重看） ===== */
 const SAVE_KEY = 'dezhou-game-1';
 /* flow：auto 電腦自己出牌、輪到你才停（預設）；step 每一件事都停，按「下一步」。speed：1 慢、2 中、3 快 */
-const GS = { n: 6, flow: 'auto', speed: 2, level: 2, peek: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false };
+const GS = { n: 6, flow: 'auto', speed: 2, level: 2, peek: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false, gtoCoach: true, train: false, autoPre: false, trainStats: null };
 function gsLoad() {
   try { Object.assign(GS, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) { /* 沒有存檔 */ }
   if (GS.flow !== 'auto' && GS.flow !== 'step') GS.flow = 'auto';     // 舊版的 teach／play 都改成自動
@@ -11,8 +11,8 @@ function gsSave() {
   if (G.ctx) GS.seen = [...G.ctx.seen];
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(GS)); } catch (e) { /* 存不了也能玩 */ }
 }
-const G = { T: null, H: null, steps: [], view: -1, ctx: null, rng: null, timer: 0, waitingHero: false, adv: null, review: [], replay: false, over: false, pendingAI: null, lastRender: null, oddsTok: 0, paused: false, flash: null };
-const LEVEL_ZH = { 1: '新手', 2: '普通', 3: '高手' };
+const G = { T: null, H: null, steps: [], view: -1, ctx: null, rng: null, timer: 0, waitingHero: false, adv: null, review: [], replay: false, over: false, pendingAI: null, lastRender: null, oddsTok: 0, paused: false, flash: null, gto: null, gtoAdv: null, waitAI: null };
+const LEVEL_ZH = { 1: '新手', 2: '普通', 3: '高手', 4: 'GTO' };
 
 /* 文字裡的 {c數字} 換成有顏色的牌 */
 function rich(s) { return esc(s).replace(/\{c(\d+)\}/g, (m, c) => cardSpan(+c)); }
@@ -34,10 +34,12 @@ function renderHome() {
   let h = '';
   for (let k = 2; k <= 9; k++) h += '<button type="button" data-n="' + k + '" aria-pressed="' + (k === GS.n) + '">' + k + '</button>';
   $('hN').innerHTML = h;
-  $('hL').innerHTML = [1, 2, 3].map((k) => '<button type="button" data-l="' + k + '" aria-pressed="' + (k === GS.level) + '">' + LEVEL_ZH[k] + '</button>').join('');
+  $('hL').innerHTML = [1, 2, 3, 4].map((k) => '<button type="button" data-l="' + k + '" aria-pressed="' + (k === GS.level) + '">' + LEVEL_ZH[k] + '</button>').join('');
   $('hMode').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === GS.flow)));
   $('hS').innerHTML = [[1, '慢'], [2, '中'], [3, '快']].map(([k, t]) => '<button type="button" data-s="' + k + '" aria-pressed="' + (k === GS.speed) + '">' + t + '</button>').join('');
   $('bResume').hidden = !G.H;
+  $('hGto').checked = GS.gtoCoach; $('hAutoPre').checked = GS.autoPre;
+  $('trainStats').textContent = trainStatsText();
   $('homeStats').textContent = GS.hands ? '你總共打了 ' + GS.hands + ' 手，' + (GS.net >= 0 ? '贏了 ' : '輸了 ') + Math.abs(GS.net) + ' 籌碼（' + (GS.net / GAME_BB >= 0 ? '+' : '') + (GS.net / GAME_BB).toFixed(0) + ' 個大盲）。' : '';
 }
 function initHome() {
@@ -45,15 +47,20 @@ function initHome() {
   $('hL').addEventListener('click', (e) => { const b = e.target.closest('button[data-l]'); if (!b) return; GS.level = +b.dataset.l; gsSave(); renderHome(); });
   $('hMode').addEventListener('click', (e) => { const b = e.target.closest('button[data-m]'); if (!b) return; GS.flow = b.dataset.m; gsSave(); renderHome(); });
   $('hS').addEventListener('click', (e) => { const b = e.target.closest('button[data-s]'); if (!b) return; GS.speed = +b.dataset.s; gsSave(); renderHome(); });
-  $('bStart').addEventListener('click', newGame);
+  $('bStart').addEventListener('click', () => newGame(false));
+  $('bTrain').addEventListener('click', () => newGame(true));
+  $('hGto').addEventListener('change', (e) => { GS.gtoCoach = e.target.checked; gsSave(); });
+  $('hAutoPre').addEventListener('change', (e) => { GS.autoPre = e.target.checked; gsSave(); });
   $('bResume').addEventListener('click', () => { showView('table'); renderCur(); scheduleAuto(); });
 }
 
 /* ===== 開新的一桌、新的一手 ===== */
-function newGame() {
+function newGame(train) {
   G.rng = makeRng((Date.now() ^ (Math.random() * 1e9)) >>> 0);
-  const opp = makeOpponents(GS.n, GS.level, G.rng);
-  G.T = newTable({ n: GS.n, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level: GS.level, button: (G.rng() * GS.n) | 0 });
+  GS.train = !!train; gsSave();
+  const n = train ? 2 : GS.n, level = train ? 4 : GS.level;
+  const opp = makeOpponents(n, level, G.rng);
+  G.T = newTable({ n, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level, button: (G.rng() * n) | 0 });
   G.ctx = { hero: 0, seen: new Set(GS.seen) };
   showView('table');
   nextHand();
@@ -77,6 +84,7 @@ function eventStep(ev, extra) {
 function produce() {
   const H = G.H;
   if (H.phase === 'done') {
+    gtoReset();
     endHand(G.T, H);
     const net = H.result.net[0];
     GS.hands++; GS.net += net; if (net > 0) GS.won++;
@@ -87,18 +95,23 @@ function produce() {
   }
   const r = gameStep(H);
   if (r.need === undefined) {
-    if (r.k === 'street' && !H.players[0].folded) G.ctx.info = heroInfo(H, 0); else if (r.k === 'deal') G.ctx.info = null;
+    if (r.k === 'street' && !H.players[0].folded) G.ctx.info = heroInfo(H, 0); else if (r.k === 'deal') { G.ctx.info = null; gtoReset(); }
     pushStep(eventStep(r));
+    if (r.k === 'street') gtoOnStreet(r);
     return;
   }
   if (r.need === 0) {
     G.adv = coachAdvice(H, G.rng);
-    G.waitingHero = true;
+    G.waitingHero = true; G.gtoAdv = null;
     pushStep({ kind: 'hero', adv: G.adv, title: '輪到你', lines: [] });
+    gtoHeroTurn(false);
+    if (GS.train && GS.autoPre && H.street <= 1) G.autoHero = setTimeout(() => { if (G.waitingHero && atHead() && !G.replay) heroAct(G.adv.act, true); }, 350);
     return;
   }
+  if (gtoBotWait(H.toAct)) return;
   const decide = () => { if (G.pendingAI && G.pendingAI.seat === H.toAct) { const a = G.pendingAI.a; G.pendingAI = null; return a; } return aiDecide(H, G.rng, G.T.level); };
   const ev = applyAction(H, decide());
+  gtoOnAct(ev);
   if (ev.t === 'f') {
     const folds = [ev.seat];
     while (H.phase === 'bet' && H.toAct > 0) {
@@ -138,28 +151,33 @@ function stepDelay(st) {
 }
 function scheduleAuto() {
   clearTimeout(G.timer);
-  if (!isRunning() || $('vTable').hidden) return;
+  if (!isRunning() || $('vTable').hidden || G.waitAI) return;
   G.timer = setTimeout(() => { forward(); }, stepDelay(G.steps[G.view]));
 }
 /* 跳過：一路做到輪到你或這一手結束 */
 function skipAhead() {
   clearTimeout(G.timer);
   let guard = 0;
-  while (!G.over && !G.waitingHero && guard++ < 400) produce();
+  while (!G.over && !G.waitingHero && !G.waitAI && guard++ < 400) produce();
   G.view = G.steps.length - 1;
   renderCur(); scheduleAuto();
 }
 /* 你按了動作 */
-function heroAct(a) {
+function heroAct(a, auto) {
   if (!G.waitingHero || !atHead() || G.replay) return;
+  clearTimeout(G.autoHero);
   const H = G.H, adv = G.adv;
   const ev = applyAction(H, a);
-  const g = gradeAction(adv, ev);
-  G.review.push({ street: ev.street, label: actWord(ev, H), grade: g, adv: adv.label });
+  const gg = gtoGrade(ev);
+  const g = gg || gradeAction(adv, ev);
+  gtoOnAct(ev);
+  G.gtoAdv = null;
+  if (gg && GS.train) { trainAdd(gg); gsSave(); }
+  if (!auto) G.review.push({ street: ev.street, label: actWord(ev, H), grade: g, adv: gg ? gg.adv : adv.label });
   G.waitingHero = false;
-  pushStep(eventStep(ev, { grade: g, adv }));
+  pushStep(eventStep(ev, auto ? {} : { grade: g, adv: gg ? { label: gg.adv } : adv }));
   G.view = G.steps.length - 1;
-  G.flash = { mark: g.mark, text: g.text, adv: adv.label, view: G.view };
+  G.flash = auto ? null : { mark: g.mark, text: g.text, adv: gg ? gg.adv : adv.label, view: G.view, src: g.src };
   G.sizerStep = -1;
   renderCur();
   scheduleAuto();
@@ -247,7 +265,7 @@ function renderTable(st) {
 /* ===== 教練框 ===== */
 function renderCoach(st) {
   const S = st.snap;
-  $('handNo').textContent = '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
+  $('handNo').textContent = (GS.train ? 'GTO 訓練・' : '') + '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
   $('peekWrap').hidden = G.replay;
   $('peekChk').checked = GS.peek;
   let h = '';
@@ -285,7 +303,8 @@ function heroHTML(st, S) {
   const adv = st.adv, L = legalSnapshot(S);
   let h = '<h3>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '：可以過牌') + '</h3>';
   const used = new Set();
-  h += '<div class="adv"><div class="rec">建議：' + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  h += gtoBoxHTML();
+  h += '<div class="adv"><div class="rec">' + (gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
   if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
   if (EXPLAIN.on && atHead() && !G.replay && !GS.seenTermHint) h += '<p class="note">底下有虛線的詞可以點，會跳出解釋；不需要的話，右上角「深入說明」可以關掉。</p>';
   h += '</div>';
@@ -304,7 +323,7 @@ function summaryHTML(S) {
     h += '<p style="margin-top:10px"><b>這一手你的每個決定</b></p><ul class="review">';
     for (const x of G.review) {
       const mk = { good: '✓', ok: '△', bad: '✗' }[x.grade.mark];
-      h += '<li class="' + x.grade.mark + '"><span class="mk">' + mk + '</span><div><b>' + STREET_NAME[x.street] + '　' + esc(x.label) + '</b><br>' + esc(x.grade.text) + (x.grade.mark !== 'good' ? '（建議：' + esc(x.adv) + '）' : '') + '</div></li>';
+      h += '<li class="' + x.grade.mark + '"><span class="mk">' + mk + '</span><div><b>' + STREET_NAME[x.street] + '　' + esc(x.label) + '</b>' + (x.grade.src === 'GTO' ? ' <span class="srcg">GTO 評分</span>' : '') + '<br>' + esc(x.grade.text) + (x.grade.mark !== 'good' ? '（' + (x.grade.src === 'GTO' ? 'GTO 最常' : '建議') + '：' + esc(x.adv) + '）' : '') + '</div></li>';
     }
     h += '</ul>';
   } else h += '<p class="note">這一手你不用做決定。</p>';
@@ -340,7 +359,7 @@ function renderCtrl(st) {
   $('actBtns').hidden = !heroTurn;
   let m = '', b = '';
   // 你剛做完決定：評分留在控制列上，直到下一次輪到你
-  const fl = G.flash && !G.replay && G.flash.view === G.view ? '<span class="flash ' + G.flash.mark + '"><b>' + MK[G.flash.mark] + '</b> ' + esc(G.flash.text) + (G.flash.mark !== 'good' ? '（建議：' + esc(G.flash.adv) + '）' : '') + '</span>' : '';
+  const fl = G.flash && !G.replay && G.flash.view === G.view ? '<span class="flash ' + G.flash.mark + '"><b>' + MK[G.flash.mark] + '</b> ' + esc(G.flash.text) + (G.flash.mark !== 'good' ? '（' + (G.flash.src === 'GTO' ? 'GTO 最常' : '建議') + '：' + esc(G.flash.adv) + '）' : '') + '</span>' : '';
   if (G.replay) {
     m = '重看：第 ' + (G.view + 1) + ' 步／共 ' + G.steps.length + ' 步。' + (st.title ? rich(st.title) : '');
     b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀ 上一步</button><button class="btn main" data-c="next" id="bNext"' + (atHead() ? ' disabled' : '') + '>下一步 ▶</button><button class="btn" data-c="endreplay">結束重看</button>';
@@ -348,17 +367,21 @@ function renderCtrl(st) {
     const adv = st.adv, L = legalSnapshot(st.snap);
     const e = adv.eff === undefined ? adv.eq : adv.eff;
     const why = adv.need > 0 ? '你的勝率約 ' + PCT0(e) + (e < adv.eq - 0.005 ? '（打折後）' : '') + '，跟注要 ' + PCT0(adv.need) + ' 以上' : '你的勝率約 ' + PCT0(e);
-    m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　建議 <b class="rec">' + esc(adv.label) + '</b><span class="why">（' + why + '）</span><button type="button" class="linkbtn" data-c="why">為什麼？</button>';
+    if (gtoAdvUsable()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<b class="rec">GTO</b> ' + gtoLine() + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
+    else m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　建議 <b class="rec">' + esc(adv.label) + '</b><span class="why">（' + why + '）</span>'
+      + (G.gto && !G.gto.lost && G.gto.seats.indexOf(0) >= 0 && GS.gtoCoach ? '<span class="why">　GTO 計算中…</span>' : '') + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
   } else if (G.over && atHead()) {
     const net = st.snap.result ? st.snap.result.net[0] : 0;
     const marks = G.review.map((x) => MK[x.grade.mark]).join('');
-    m = '<b>' + (net > 0 ? '你贏了 ' + net + '！' : net < 0 ? '你輸了 ' + (-net) : '沒輸沒贏') + '</b>' + (marks ? '　你的決定：' + marks : '') + '<button type="button" class="linkbtn" data-c="why">檢討</button>';
+    m = '<b>' + (net > 0 ? '你贏了 ' + net + '！' : net < 0 ? '你輸了 ' + (-net) : '沒輸沒贏') + '</b>' + (marks ? '　你的決定：' + marks : '') + '<button type="button" class="linkbtn" data-c="why">檢討</button>'
+      + (GS.train ? '<div class="why">' + esc(trainStatsText()) + '</div>' : '');
     b = '<button class="btn main" data-c="nexthand" id="bNext">再來一手 ▶</button><button class="btn" data-c="replay">重看這一手</button>' + (studioBest() ? '<button class="btn" data-c="gto">GTO 分析</button>' : '');
   } else if (!atHead()) {
     m = '你在看前面的步驟（第 ' + (G.view + 1) + ' 步）。';
     b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀</button><button class="btn main" data-c="next" id="bNext">下一步 ▶</button><button class="btn" data-c="now">回到現在</button>';
   } else {
     m = fl || rich(st.title || '');
+    if (G.waitAI) m = esc(G.H.players[G.waitAI.seat].name) + ' 思考中…（GTO 計算中）';
     const folded = st.snap.players[0].folded;
     if (isRunning()) b = '<button class="btn" data-c="pause">⏸ 暫停</button><button class="btn" data-c="skip">⏭ ' + (folded ? '跳到這一手結束' : '跳到輪到你') + '</button>';
     else b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀</button><button class="btn main" data-c="next" id="bNext">下一步 ▶</button><button class="btn" data-c="play">▶ 自動</button>';
@@ -371,8 +394,14 @@ function renderCtrl(st) {
 }
 function renderActBtns(st) {
   const H = G.H, L = legalActions(H), adv = G.adv, p = H.players[0];
-  const recF = adv.act.t === 'f', recP = adv.act.t === 'x' || adv.act.t === 'c', recA = adv.act.t === 'r';
-  const allinRec = recA && adv.act.to >= L.maxTo;
+  let recF = adv.act.t === 'f', recP = adv.act.t === 'x' || adv.act.t === 'c', recA = adv.act.t === 'r';
+  let allinRec = recA && adv.act.to >= L.maxTo;
+  G.recTo = recA ? adv.act.to : 0;
+  if (gtoAdvUsable()) {                                     // GTO 最常用的動作
+    const ta = G.gtoAdv.acts[gtoBest()], b = gtoActBtn(ta, L);
+    recF = b === 'f'; recP = b === 'x' || b === 'c'; recA = b === 'size' || b === 'allin'; allinRec = b === 'allin';
+    G.recTo = b === 'size' ? Math.max(L.minTo, Math.min(L.maxTo, Math.round(ta.to))) : 0;
+  }
   let h = '';
   if (!L.canCheck) h += '<button type="button" class="fold' + (recF ? ' rec' : '') + '" data-a="f">棄牌</button>';
   h += '<button type="button" class="' + (recP ? 'rec' : '') + '" data-a="' + (L.canCheck ? 'x' : 'c') + '">' + (L.canCheck ? '過牌' : (L.callAmt >= p.stack ? '全下跟注 ' : '跟注 ') + L.callAmt) + '</button>';
@@ -380,7 +409,15 @@ function renderActBtns(st) {
     if (L.maxTo > L.minTo) h += '<button type="button" class="' + (recA && !allinRec ? 'rec' : '') + '" data-a="size">' + (L.isBet ? '下注…' : '加注…') + '</button>';
     h += '<button type="button" class="' + (allinRec ? 'rec' : '') + '" data-a="allin">全下 ' + L.maxTo + '</button>';
   }
-  $('actBtns').innerHTML = h;
+  // 內容一樣就不重畫（GTO 算好時只換「建議」的框，按到一半的按鈕不會不見）
+  const box = $('actBtns');
+  if (box.dataset.h !== h) {
+    const tmp = document.createElement('div'); tmp.innerHTML = h;
+    const nw = [...tmp.children], old = [...box.children];
+    if (old.length === nw.length && old.every((b, i) => b.dataset.a === nw[i].dataset.a)) old.forEach((b, i) => { b.className = nw[i].className; b.textContent = nw[i].textContent; });
+    else box.innerHTML = h;
+    box.dataset.h = h;
+  }
   if (G.sizerStep === G.view) { const v = +$('sizeRange').value; openSizer(); if (v) { $('sizeRange').value = v; sizerLabel(); } }   // 重畫時保持打開
   else $('sizer').hidden = true;
 }
@@ -404,7 +441,7 @@ function openSizer() {
   const opts = [];
   if (L.isBet) for (const f of [0.33, 0.5, 0.66, 1]) opts.push([Math.round(f * 100) + '% 底池', Math.round(pot * f)]);
   else { opts.push(['最小', L.minTo]); opts.push(['2.5 倍', Math.round(H.curBet * 2.5)]); opts.push(['3 倍', H.curBet * 3]); opts.push(['底池', H.curBet + pot + L.toCall]); }
-  const recTo = adv.act.t === 'r' ? adv.act.to : 0;
+  const recTo = G.recTo !== undefined ? G.recTo : adv.act.t === 'r' ? adv.act.to : 0;
   const clamp = (x) => Math.max(L.minTo, Math.min(L.maxTo, Math.round(x)));
   let h = opts.map(([t, v]) => '<button type="button" data-to="' + clamp(v) + '">' + t + '：' + clamp(v) + '</button>').join('');
   if (recTo) h += '<button type="button" class="rec" data-to="' + recTo + '">建議：' + recTo + '</button>';

@@ -16,4 +16,5 @@ node test/studio.js 300 2 5 | tail -1
 node test/solver-iso.js | tail -1
 node test/solver-par.js | tail -1
 node test/par-threads.js 2 3 flop3bet
+node test/gto-game.js 120 7 10 | tail -1
 echo 全部通過

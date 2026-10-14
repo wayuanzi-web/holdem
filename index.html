@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1d19"><meta name="description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="德州軍師"><meta property="og:type" content="website"><meta property="og:title" content="德州軍師"><meta property="og:description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><meta property="og:image" content="https://wayuanzi-web.github.io/holdem/og.png"><meta property="og:url" content="https://wayuanzi-web.github.io/holdem/"><meta name="twitter:card" content="summary_large_image"><title>德州軍師</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%A6%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%9F%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A4%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BD%86%E4%BD%8D%E4%BD%8E%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%99%E5%82%B3%E5%83%8F%E5%83%B9%E5%84%B2%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AC%E5%85%B1%E5%85%B6%E5%85%B7%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%BE%E5%8C%85%E5%8C%AF%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%AB%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%9F%E5%96%AE%E5%99%A8%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%8B%E5%9F%B7%E5%9F%BA%E5%A1%97%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%8D%E5%B0%8F%E5%B0%91%E5%B0%B1%E5%B0%BA%E5%B1%80%E5%B1%95%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%AB%E5%BB%BA%E5%BC%84%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%97%E5%BF%A0%E5%BF%AB%E6%80%8E%E6%80%95%E6%80%9D%E6%83%85%E6%83%B3%E6%84%8F%E6%85%A2%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%88%90%E6%88%91%E6%88%96%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%BE%E6%8A%8A%E6%8A%95%E6%8A%98%E6%8B%96%E6%8B%BF%E6%8C%87%E6%8C%89%E6%8C%91%E6%8D%A8%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A8%E6%8F%9B%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%B4%E6%95%B8%E6%96%87%E6%96%99%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9C%80%E6%9C%83%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9F%90%E6%9F%A5%E6%A0%B8%E6%A0%BC%E6%A1%86%E6%A1%8C%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%B5%E6%A6%82%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A3%E6%AD%A5%E6%AE%B5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%88%BE%E7%89%88%E7%89%8C%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%90%86%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%99%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%B3%E7%A2%BA%E7%A2%BC%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A8%B1%E7%A9%8D%E7%A9%BA%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%84%E7%B4%9A%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B6%93%E7%B6%B2%E7%B7%8A%E7%B7%92%E7%B7%9A%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8E%8A%E8%90%AC%E8%91%97%E8%91%AB%E8%92%99%E8%98%86%E8%99%9B%E8%99%A7%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%BD%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%98%E8%A8%AD%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AB%8B%E8%AB%96%E8%AD%B0%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B7%91%E8%B7%9B%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8E%E9%81%93%E9%81%A9%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%9D%E9%88%95%E9%8C%A2%E9%8C%AF%E9%8E%96%E9%90%98%E9%95%B7%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%BF%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%90%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8F%E9%A1%9E%E9%A1%AF%E9%A6%96%E9%A9%9F%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%A6%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%9F%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A4%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BD%86%E4%BD%8D%E4%BD%8E%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%99%E5%82%B3%E5%83%8F%E5%83%B9%E5%84%B2%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AC%E5%85%B1%E5%85%B6%E5%85%B7%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%BE%E5%8C%85%E5%8C%AF%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%AB%E5%91%8A%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%9F%E5%96%AE%E5%99%A8%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%8B%E5%9F%B7%E5%9F%BA%E5%A1%97%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%8D%E5%B0%8F%E5%B0%91%E5%B0%B1%E5%B0%BA%E5%B1%80%E5%B1%95%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%AB%E5%BB%BA%E5%BC%84%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%97%E5%BF%A0%E5%BF%AB%E6%80%8E%E6%80%95%E6%80%9D%E6%83%85%E6%83%B3%E6%84%8F%E6%85%A2%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%88%90%E6%88%91%E6%88%96%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%BE%E6%8A%8A%E6%8A%95%E6%8A%98%E6%8B%96%E6%8B%BF%E6%8C%87%E6%8C%89%E6%8C%91%E6%8D%A8%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A8%E6%8F%9B%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%B4%E6%95%B8%E6%96%87%E6%96%99%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%99%AF%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9C%80%E6%9C%83%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9F%90%E6%9F%A5%E6%A0%B8%E6%A0%BC%E6%A1%86%E6%A1%8C%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%B5%E6%A6%82%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A3%E6%AD%A5%E6%AE%B5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%88%BE%E7%89%88%E7%89%8C%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%90%86%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%99%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%B3%E7%A2%BA%E7%A2%BC%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A8%B1%E7%A9%8D%E7%A9%BA%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%80%E7%B4%84%E7%B4%9A%E7%B4%AF%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B6%93%E7%B6%B2%E7%B7%8A%E7%B7%92%E7%B7%9A%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%8C%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8E%8A%E8%90%AC%E8%91%97%E8%91%AB%E8%92%99%E8%98%86%E8%99%9B%E8%99%A7%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A1%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%8F%E8%A6%BD%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%93%E8%A8%98%E8%A8%AD%E8%A8%B4%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AB%8B%E8%AB%96%E8%AD%B0%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B7%91%E8%B7%9B%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8E%E9%81%93%E9%81%A9%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%9D%E9%88%95%E9%8C%84%E9%8C%A2%E9%8C%AF%E9%8E%96%E9%90%98%E9%95%B7%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%BF%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%90%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8F%E9%A1%9E%E9%A1%AF%E9%A6%96%E9%A9%9F%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
 <style>
 :root {
   --ink: #0e1d19;        /* 牌桌陰影裡的深綠 */
@@ -298,6 +298,16 @@ body.intable .brand p { display: none; }
 .linkbtn { background: none; border: 0; color: var(--brass); text-decoration: underline; cursor: pointer; padding: 0 0 0 8px; font-size: inherit; }
 .btn.big { font-size: 19px; padding: 12px 36px; border-radius: 12px; }
 .homego { display: flex; gap: 12px; margin: 28px 0 14px; flex-wrap: wrap; }
+.hchk { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: #c9d6cf; margin: 10px 0; cursor: pointer; }
+.hchk input { margin-top: 4px; }
+.traincard { margin-top: 26px; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; background: rgba(255,255,255,.03); }
+.gtob { border: 1px solid #6aa58a; background: #eef6f0; border-radius: 10px; padding: 8px 10px; margin: 4px 0 10px; font-size: 14px; }
+.gtob table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+.gtob td { padding: 2px 4px; }
+.gtob td.r { text-align: right; }
+.gtob .sw, .ctrlmsg .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 5px; vertical-align: -1px; }
+.ctrlmsg .hchip { margin-right: 10px; white-space: nowrap; }
+.srcg { font-size: 11px; background: #d7ebdf; color: #23573a; border-radius: 4px; padding: 0 5px; font-weight: 700; }
 
 /* ===== 牌桌 ===== */
 .tv { display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 16px; max-width: 1280px; margin: 0 auto; padding: 12px 20px 24px; align-items: start; }
@@ -577,12 +587,19 @@ body.noexplain .xp, body.noexplain .how { display: none; }
       </div>
     </div>
     <div class="field"><div class="flabel">電腦出牌的速度</div><div class="pills" id="hS"></div></div>
-    <div class="field"><div class="flabel">對手強度</div><div class="pills" id="hL"></div></div>
+    <div class="field"><div class="flabel">對手強度（GTO：單挑的轉牌、河牌照求解器的解打）</div><div class="pills" id="hL"></div></div>
+    <label class="hchk"><input type="checkbox" id="hGto"> GTO 教練：單挑打到轉牌、河牌時，用求解器告訴你 GTO 怎麼打、按完評分（少賺多少）</label>
     <div class="homego">
       <button class="btn main big" id="bStart">開始發牌</button>
       <button class="btn big" id="bResume" hidden>回到牌局</button>
     </div>
     <p class="note" id="homeStats"></p>
+    <div class="traincard">
+      <div><b>GTO 訓練（單挑）</b><span class="note">　跟 GTO 電腦一對一，轉牌、河牌每個決定都用求解器評分，累計少賺多少。</span></div>
+      <label class="hchk"><input type="checkbox" id="hAutoPre"> 翻牌前、翻牌照教練的建議自動打（只練轉牌、河牌）</label>
+      <div class="homego" style="margin:8px 0 4px"><button class="btn big" id="bTrain">開始 GTO 訓練</button></div>
+      <p class="note" id="trainStats"></p>
+    </div>
     <p class="note">想自己查勝率、用 GTO 工作室分析一手牌：右上角「工具」。<button type="button" class="linkbtn" id="bResetTips">重新顯示新手說明</button></p>
   </div>
 </section>
@@ -2467,6 +2484,64 @@ function matchAct(acts, step) {
   return best;
 }
 
+/* ===== 牌局裡的 GTO（第五步）：單挑的轉牌、河牌，一發牌就建好局面交給背景執行緒去算（邊算邊用） =====
+   carry：前一條街的解在這張牌之後的雙方範圍（Float32Array(1326)，順序同 seats）；沒有就照每個人的動作估。
+   單位是籌碼，跟牌局一樣。 */
+const GTO_TREE = {
+  2: { bet: { turn: [[66], [66]], river: [[75], [75]] }, raise: { turn: [['a'], ['a']], river: [['a'], ['a']] }, cap: 2, target: 1, maxIters: 400 },
+  3: { bet: { river: [[33, 75], [33, 75]] }, raise: { river: [['2.5x'], ['2.5x']] }, cap: 3, target: 0.3, maxIters: 800 },
+};
+function gtoStreetSetup(H, street, carry) {
+  if (street < 2 || street > 3) return null;
+  let idx = -1;
+  for (let i = H.log.length - 1; i >= 0; i--) if (H.log[i].k === 'street' && H.log[i].street === street) { idx = i; break; }
+  if (idx < 0) return null;
+  const n = H.n, put = new Array(n).fill(0), folded = new Array(n).fill(false);
+  for (let i = 0; i < idx; i++) {
+    const e = H.log[i];
+    if (e.k === 'blinds') { put[e.sb.seat] += e.sb.amt; put[e.bb.seat] += e.bb.amt; }
+    else if (e.k === 'act') { if (e.t === 'f') folded[e.seat] = true; if (e.add) put[e.seat] += e.add; }
+  }
+  const live = [];
+  for (let k = 0; k < n; k++) if (!folded[k]) live.push(k);
+  if (live.length !== 2) return null;
+  const left = live.map((k) => H.players[k].start - put[k]);
+  if (Math.min(left[0], left[1]) <= 0) return null;
+  const dist = (k) => ((k - H.button + n) % n) || n;
+  const seats = dist(live[0]) < dist(live[1]) ? live : [live[1], live[0]];
+  const board = H.board.slice(0, street === 2 ? 4 : 5);
+  const dead = new Set(board);
+  const ranges = seats.map((k, p) => {
+    const pl = H.players[k];
+    const w = carry ? carry[p] : rangeWeights(H, k, k === 0 ? 'tag' : pl.style, idx);
+    let mx = 0;
+    for (let c = 0; c < NCOMBO; c++) if (!dead.has(COMBO_A[c]) && !dead.has(COMBO_B[c]) && w[c] > mx) mx = w[c];
+    const q = new Float32Array(NCOMBO);
+    for (let c = 0; c < NCOMBO; c++) {
+      if (dead.has(COMBO_A[c]) || dead.has(COMBO_B[c]) || !mx) continue;
+      const x = w[c] / mx;
+      if (x >= (carry ? 0.01 : 0.06)) q[c] = Math.round(x * 100) / 100 || 0.01;
+    }
+    const own = comboOf(pl.cards[0], pl.cards[1]);
+    if (!(q[own] >= 0.02)) q[own] = 0.02;                      // 自己的牌一定要在範圍裡（權重很小，幾乎不影響）
+    return q;
+  });
+  const T = GTO_TREE[street];
+  const cfg = { board, pot: put.reduce((s, x) => s + x, 0), stack: Math.min(left[0], left[1]), ranges,
+    bet: T.bet, raise: T.raise, cap: T.cap, allin: 0.67, addAllin: true, target: T.target, maxIters: T.maxIters };
+  return { cfg, seats, street, idx };
+}
+/* 牌局的一個動作 → 樹上的動作編號（尺寸不一樣就找最接近的） */
+function gtoMapAct(nd, ev) {
+  if (!nd || nd.kind !== N_ACT) return -1;
+  let st;
+  if (ev.t === 'f') st = { t: 'f' };
+  else if (ev.t === 'x') st = { t: 'x' };
+  else if (ev.t === 'c' || (ev.t === 'a' && !(ev.to > ev.curBefore))) st = { t: 'c' };
+  else st = { t: ev.t === 'a' ? 'a' : ev.curBefore === 0 ? 'b' : 'r', to: ev.to };
+  return matchAct(nd.acts, st);
+}
+
 /* ===== 60-game：無限注德州撲克的一手牌（2–9 人、盲注、下注輪、邊池、攤牌） =====
    一手牌是一連串的「階段」，每呼叫一次 gameStep 只做一件事、回傳一個事件（教學模式一步一步播就是靠這個）：
      blinds（下盲注）→ deal（發手牌）→ bet（下注輪，要等某個人的動作：applyAction）→ street（發翻牌／轉牌／河牌）
@@ -2745,6 +2820,7 @@ const STYLES = {
   rock: { zh: '岩石', loose: 0.62, aggr: 0.35, bluff: 0.03, sticky: -0.02, note: '很少玩，一下大注通常是大牌' },
   station: { zh: '跟注站', loose: 1.9, aggr: 0.15, bluff: 0.03, sticky: 0.12, note: '什麼都跟，很少棄牌，也很少加注' },
   maniac: { zh: '瘋子', loose: 2.3, aggr: 0.9, bluff: 0.35, sticky: 0.05, note: '一直加注，常常是詐唬' },
+  gto: { zh: 'GTO', loose: 1.15, aggr: 0.62, bluff: 0.14, sticky: 0.0, note: '翻牌前照圖表打；單挑的轉牌、河牌照求解器的解打' },
 };
 /* 各位置建議開牌的範圍（前百分之幾），以緊凶為準 */
 const OPEN_PCT = { early: 0.15, middle: 0.2, late: 0.33, sb: 0.3, bb: 0.3 };
@@ -2924,6 +3000,7 @@ const AI_LEVEL = {
   1: { noise: 0.09, iters: 500, mistake: 0.10 },
   2: { noise: 0.05, iters: 900, mistake: 0.04 },
   3: { noise: 0.025, iters: 1500, mistake: 0.01 },
+  4: { noise: 0.02, iters: 1500, mistake: 0.0 },            // GTO 桌：求解器用不到的地方（翻牌前、翻牌、多人）照高手打
 };
 function gauss(rng) { let u = 0, v = 0; while (u === 0) u = rng(); v = rng(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
 
@@ -3009,7 +3086,7 @@ function lastToActSeat(H) {
 const AI_NAMES = ['阿忠', '小美', '老王', '阿明', '大頭', '阿芬', '小陳', '阿德', '美玲', '志明', '春嬌', '阿伯'];
 function makeOpponents(n, level, rng) {
   const pool = level === 1 ? ['station', 'station', 'rock', 'maniac', 'tag', 'lag']
-    : level === 3 ? ['tag', 'tag', 'lag', 'lag', 'tag', 'rock'] : ['tag', 'lag', 'rock', 'station', 'maniac', 'tag'];
+    : level === 3 ? ['tag', 'tag', 'lag', 'lag', 'tag', 'rock'] : level === 4 ? ['gto'] : ['tag', 'lag', 'rock', 'station', 'maniac', 'tag'];
   const names = AI_NAMES.slice();
   for (let i = names.length - 1; i > 0; i--) { const j = (rng() * (i + 1)) | 0; const t = names[i]; names[i] = names[j]; names[j] = t; }
   const out = [];
@@ -3030,6 +3107,7 @@ const STYLE_READ = {
   rock: { open: '岩石型很少玩，他加注多半是大牌', bet: '岩石型下注幾乎都是真的有牌', raise: '岩石型加注要非常小心' },
   station: { open: '跟注站很少加注，他加注要小心', bet: '跟注站很少主動下注，他下注通常是好牌', raise: '跟注站加注幾乎一定是很大的牌' },
   maniac: { open: '瘋子什麼牌都會加注，不用太怕', bet: '瘋子常常亂下注，很多是詐唬', raise: '瘋子加注很常是詐唬' },
+  gto: { open: 'GTO 電腦照圖表開局，牌不算緊', bet: 'GTO 電腦下注有價值也有詐唬，比例剛好讓你很難應對', raise: 'GTO 電腦加注是平衡的：大牌和詐唬都有' },
 };
 function styleZh(k) { return (STYLES[k] || STYLES.tag).zh; }
 function sortedCards(cards) { return cards.slice().sort((a, b) => (b >> 2) - (a >> 2) || (a & 3) - (b & 3)); }
@@ -3168,12 +3246,12 @@ function coachAdvice(H, rng) {
     }
     if (I.pct < 0.056 && L.canRaise && raises === 1) {
       const to = Math.min(L.maxTo, Math.round(H.curBet * (pc === 'bb' || pc === 'sb' ? 3.5 : 3)));
-      R.push(who + '加注了；' + (ag ? STYLE_READ[ag.style].open + '，' : '') + '他的範圍大約是前 ' + PCT0(agTop) + '。你的牌比他絕大部分的牌都好。');
+      R.push(who + '加注了；' + (ag ? (STYLE_READ[ag.style] || STYLE_READ.tag).open + '，' : '') + '他的範圍大約是前 ' + PCT0(agTop) + '。你的牌比他絕大部分的牌都好。');
       R.push('照大家的動作估，你的勝率約 ' + PCT0(I.est) + '。再加注（3-bet）到 ' + to + '，讓比你差的牌付更多錢。');
       return mk({ t: 'r', to }, '加注到 ' + to);
     }
     R.push('要跟 ' + L.callAmt + '，跟完底池是 ' + (pot + L.callAmt) + '：勝率要 ' + L.callAmt + '÷' + (pot + L.callAmt) + '＝' + PCT0(need) + ' 以上才划算。');
-    R.push(who + '加注了（' + (ag ? STYLE_READ[ag.style].open : '') + '），照他的動作估範圍大約是前 ' + PCT0(agTop) + '；你對這個範圍的勝率約 ' + PCT0(I.est) + '（對隨機手牌是 ' + PCT0(I.rand) + '）。');
+    R.push(who + '加注了（' + (ag ? (STYLE_READ[ag.style] || STYLE_READ.tag).open : '') + '），照他的動作估範圍大約是前 ' + PCT0(agTop) + '；你對這個範圍的勝率約 ' + PCT0(I.est) + '（對隨機手牌是 ' + PCT0(I.rand) + '）。');
     R.push('但勝率要打折：' + (ip ? '翻牌後你比他晚說話（有位置）' : '翻牌後你要比他先說話（沒位置），很難把勝率打出來') + (play < 0.9 ? '，而且這手牌不同花、不相連，中牌的方式少' : '') + '。打折後大約 ' + PCT0(eff) + '。');
     if (I.pct < 0.6 && (eff >= need + 0.02 || eff + implied >= need + 0.02)) {
       if (eff < need + 0.02) R.push('打折後差一點，但你的牌（對子、同花連張）中了大牌時常常能贏很多，這叫「隱含賠率」，可以跟。');
@@ -3483,6 +3561,57 @@ async function doView(m) {
   v.P0 = SOL.P0; v.stack = SOL.cfg.stack;
   postMessage(v);
 }
+/* ===== 牌局用的解（第五步）：另外一個背景執行緒專門算，邊算邊回答「這手牌在這裡怎麼打」 ===== */
+let GSOL = null;
+async function gStart(m) {
+  const me = GSOL = { key: m.key, s: null, pct: 999, done: false, target: m.cfg.target, maxIters: m.cfg.maxIters };
+  try { me.s = new Solver(m.cfg); } catch (e) { postMessage({ cmd: 'g-progress', key: m.key, error: e.message }); return; }
+  const s = me.s;
+  let last = nowMs();
+  const t0 = nowMs();
+  while (GSOL === me && !me.done) {
+    s.iterate(1);
+    if (s.t === 5 || s.t % 10 === 0) {
+      const ex = s.exploit();
+      me.pct = ex.pct;
+      if (ex.pct <= me.target || s.t >= me.maxIters) me.done = true;
+      postMessage({ cmd: 'g-progress', key: me.key, t: s.t, pct: ex.pct, done: me.done, ms: nowMs() - t0 });
+    }
+    if (nowMs() - last > 50) { await tick(); last = nowMs(); }
+  }
+}
+/* 問：path 走到的節點，第 p 個人拿 combo 這手牌的策略（ev:true 再加每個動作的 EV）；reach:true 回傳雙方的範圍 */
+function gQuery(m) {
+  const me = GSOL, base = { cmd: 'g-ans', req: m.req, key: m.key };
+  if (!me || me.key !== m.key || !me.s || me.s.t < 1) { postMessage(Object.assign(base, { none: true, why: 'notready' })); return; }
+  const s = me.s, L = s.locate(m.path);
+  if (L.used !== m.path.length) { postMessage(Object.assign(base, { none: true, why: 'path' })); return; }
+  const info = { t: s.t, pct: me.pct, done: me.done };
+  if (m.reach) {
+    const out = [0, 1].map((p) => { const r = s.unperm(p, L.sig, L.reach[p]), w = new Float32Array(NCOMBO); for (let h = 0; h < s.n[p]; h++) w[s.H[p][h]] = r[h]; return w; });
+    postMessage(Object.assign(base, info, { reach: out }));
+    return;
+  }
+  const nd = L.nd;
+  if (nd.kind !== N_ACT || nd.p !== m.p) { postMessage(Object.assign(base, { none: true, why: 'node' })); return; }
+  const p = nd.p, h = s.idx[p][m.combo];
+  if (h < 0) { postMessage(Object.assign(base, { none: true, why: 'combo' })); return; }
+  const acts = nd.acts.map((a) => ({ t: a.t, add: a.add, to: a.to, label: actLabel(a) }));
+  const k = nd.k, n = nd.nh;
+  let freq, ev = null;
+  if (m.ev) {
+    const v = s.viewAt(L);
+    freq = []; ev = [];
+    for (let a = 0; a < k; a++) { freq.push(v.strat[a * n + h]); ev.push(v.evA[a * n + h] + v.inv[p]); }
+    info.eq = v.eq[h];
+  } else {
+    const buf = new Float32Array(k * n), hc = s.permFor(p, L.sig)[h];
+    s.avgStrat(nd, L.inst, buf);
+    freq = []; for (let a = 0; a < k; a++) freq.push(buf[a * n + hc]);
+  }
+  postMessage(Object.assign(base, info, { p, acts, freq, ev, pot: s.P0 + nd.inv0 + nd.inv1 }));
+}
+
 function doLock(m) {
   if (!SOL) return;
   const ok = SOL.setLock(m.id, m.strat ? Float32Array.from(m.strat) : null);
@@ -3522,6 +3651,9 @@ onmessage = (e) => {
     else if (m.cmd === 'view') doView(m).catch((err) => postMessage({ cmd: 'error', req: m.req, of: 'view', msg: String((err && err.message) || err) }));
     else if (m.cmd === 'runouts') doRunouts(m).catch((err) => postMessage({ cmd: 'error', req: m.req, of: 'runouts', msg: String((err && err.message) || err) }));
     else if (m.cmd === 'lock') doLock(m);
+    else if (m.cmd === 'g-start') gStart(m).catch((err) => postMessage({ cmd: 'g-progress', key: m.key, error: String((err && err.message) || err) }));
+    else if (m.cmd === 'g-query') gQuery(m);
+    else if (m.cmd === 'g-stop') GSOL = null;
     else if (m.cmd === 'ports') setPorts(m.ports);
     else if (m.cmd === 'helper') beHelper(m.port);
     else if (m.cmd === 'bench') doBench(m);
@@ -3592,6 +3724,19 @@ const W = (function makeWorker() {
     },
   };
 })();
+
+/* 牌局用的 GTO 背景執行緒（第五步）：跟上面那個分開，不會跟勝率計算機、工作室搶 */
+let GW_ = null;
+function GW() {
+  if (GW_) return GW_;
+  const src = $('engine').textContent + '\n' + $('workersrc').textContent;
+  const w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  const subs = {};
+  w.onmessage = (e) => { const m = e.data; (subs[m.cmd] || []).forEach((f) => f(m)); };
+  w.onerror = (e) => { console.error(e); };
+  GW_ = { on(cmd, f) { (subs[cmd] = subs[cmd] || []).push(f); }, send(m) { w.postMessage(m); } };
+  return GW_;
+}
 
 /* 動作的顏色：棄牌藍、過牌／跟注綠、下注依大小由黃到深紅 */
 const BET_COLS = ['#e2a23b', '#dc7132', '#c9462e', '#a8302c', '#7d2230'];
@@ -4857,7 +5002,7 @@ function eqHowHTML(o) {
 /* ===== 50-game：牌局（首頁、牌桌、教練框、上一步／下一步、動作列、一手結束的檢討與重看） ===== */
 const SAVE_KEY = 'dezhou-game-1';
 /* flow：auto 電腦自己出牌、輪到你才停（預設）；step 每一件事都停，按「下一步」。speed：1 慢、2 中、3 快 */
-const GS = { n: 6, flow: 'auto', speed: 2, level: 2, peek: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false };
+const GS = { n: 6, flow: 'auto', speed: 2, level: 2, peek: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false, gtoCoach: true, train: false, autoPre: false, trainStats: null };
 function gsLoad() {
   try { Object.assign(GS, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) { /* 沒有存檔 */ }
   if (GS.flow !== 'auto' && GS.flow !== 'step') GS.flow = 'auto';     // 舊版的 teach／play 都改成自動
@@ -4867,8 +5012,8 @@ function gsSave() {
   if (G.ctx) GS.seen = [...G.ctx.seen];
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(GS)); } catch (e) { /* 存不了也能玩 */ }
 }
-const G = { T: null, H: null, steps: [], view: -1, ctx: null, rng: null, timer: 0, waitingHero: false, adv: null, review: [], replay: false, over: false, pendingAI: null, lastRender: null, oddsTok: 0, paused: false, flash: null };
-const LEVEL_ZH = { 1: '新手', 2: '普通', 3: '高手' };
+const G = { T: null, H: null, steps: [], view: -1, ctx: null, rng: null, timer: 0, waitingHero: false, adv: null, review: [], replay: false, over: false, pendingAI: null, lastRender: null, oddsTok: 0, paused: false, flash: null, gto: null, gtoAdv: null, waitAI: null };
+const LEVEL_ZH = { 1: '新手', 2: '普通', 3: '高手', 4: 'GTO' };
 
 /* 文字裡的 {c數字} 換成有顏色的牌 */
 function rich(s) { return esc(s).replace(/\{c(\d+)\}/g, (m, c) => cardSpan(+c)); }
@@ -4890,10 +5035,12 @@ function renderHome() {
   let h = '';
   for (let k = 2; k <= 9; k++) h += '<button type="button" data-n="' + k + '" aria-pressed="' + (k === GS.n) + '">' + k + '</button>';
   $('hN').innerHTML = h;
-  $('hL').innerHTML = [1, 2, 3].map((k) => '<button type="button" data-l="' + k + '" aria-pressed="' + (k === GS.level) + '">' + LEVEL_ZH[k] + '</button>').join('');
+  $('hL').innerHTML = [1, 2, 3, 4].map((k) => '<button type="button" data-l="' + k + '" aria-pressed="' + (k === GS.level) + '">' + LEVEL_ZH[k] + '</button>').join('');
   $('hMode').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === GS.flow)));
   $('hS').innerHTML = [[1, '慢'], [2, '中'], [3, '快']].map(([k, t]) => '<button type="button" data-s="' + k + '" aria-pressed="' + (k === GS.speed) + '">' + t + '</button>').join('');
   $('bResume').hidden = !G.H;
+  $('hGto').checked = GS.gtoCoach; $('hAutoPre').checked = GS.autoPre;
+  $('trainStats').textContent = trainStatsText();
   $('homeStats').textContent = GS.hands ? '你總共打了 ' + GS.hands + ' 手，' + (GS.net >= 0 ? '贏了 ' : '輸了 ') + Math.abs(GS.net) + ' 籌碼（' + (GS.net / GAME_BB >= 0 ? '+' : '') + (GS.net / GAME_BB).toFixed(0) + ' 個大盲）。' : '';
 }
 function initHome() {
@@ -4901,15 +5048,20 @@ function initHome() {
   $('hL').addEventListener('click', (e) => { const b = e.target.closest('button[data-l]'); if (!b) return; GS.level = +b.dataset.l; gsSave(); renderHome(); });
   $('hMode').addEventListener('click', (e) => { const b = e.target.closest('button[data-m]'); if (!b) return; GS.flow = b.dataset.m; gsSave(); renderHome(); });
   $('hS').addEventListener('click', (e) => { const b = e.target.closest('button[data-s]'); if (!b) return; GS.speed = +b.dataset.s; gsSave(); renderHome(); });
-  $('bStart').addEventListener('click', newGame);
+  $('bStart').addEventListener('click', () => newGame(false));
+  $('bTrain').addEventListener('click', () => newGame(true));
+  $('hGto').addEventListener('change', (e) => { GS.gtoCoach = e.target.checked; gsSave(); });
+  $('hAutoPre').addEventListener('change', (e) => { GS.autoPre = e.target.checked; gsSave(); });
   $('bResume').addEventListener('click', () => { showView('table'); renderCur(); scheduleAuto(); });
 }
 
 /* ===== 開新的一桌、新的一手 ===== */
-function newGame() {
+function newGame(train) {
   G.rng = makeRng((Date.now() ^ (Math.random() * 1e9)) >>> 0);
-  const opp = makeOpponents(GS.n, GS.level, G.rng);
-  G.T = newTable({ n: GS.n, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level: GS.level, button: (G.rng() * GS.n) | 0 });
+  GS.train = !!train; gsSave();
+  const n = train ? 2 : GS.n, level = train ? 4 : GS.level;
+  const opp = makeOpponents(n, level, G.rng);
+  G.T = newTable({ n, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level, button: (G.rng() * n) | 0 });
   G.ctx = { hero: 0, seen: new Set(GS.seen) };
   showView('table');
   nextHand();
@@ -4933,6 +5085,7 @@ function eventStep(ev, extra) {
 function produce() {
   const H = G.H;
   if (H.phase === 'done') {
+    gtoReset();
     endHand(G.T, H);
     const net = H.result.net[0];
     GS.hands++; GS.net += net; if (net > 0) GS.won++;
@@ -4943,18 +5096,23 @@ function produce() {
   }
   const r = gameStep(H);
   if (r.need === undefined) {
-    if (r.k === 'street' && !H.players[0].folded) G.ctx.info = heroInfo(H, 0); else if (r.k === 'deal') G.ctx.info = null;
+    if (r.k === 'street' && !H.players[0].folded) G.ctx.info = heroInfo(H, 0); else if (r.k === 'deal') { G.ctx.info = null; gtoReset(); }
     pushStep(eventStep(r));
+    if (r.k === 'street') gtoOnStreet(r);
     return;
   }
   if (r.need === 0) {
     G.adv = coachAdvice(H, G.rng);
-    G.waitingHero = true;
+    G.waitingHero = true; G.gtoAdv = null;
     pushStep({ kind: 'hero', adv: G.adv, title: '輪到你', lines: [] });
+    gtoHeroTurn(false);
+    if (GS.train && GS.autoPre && H.street <= 1) G.autoHero = setTimeout(() => { if (G.waitingHero && atHead() && !G.replay) heroAct(G.adv.act, true); }, 350);
     return;
   }
+  if (gtoBotWait(H.toAct)) return;
   const decide = () => { if (G.pendingAI && G.pendingAI.seat === H.toAct) { const a = G.pendingAI.a; G.pendingAI = null; return a; } return aiDecide(H, G.rng, G.T.level); };
   const ev = applyAction(H, decide());
+  gtoOnAct(ev);
   if (ev.t === 'f') {
     const folds = [ev.seat];
     while (H.phase === 'bet' && H.toAct > 0) {
@@ -4994,28 +5152,33 @@ function stepDelay(st) {
 }
 function scheduleAuto() {
   clearTimeout(G.timer);
-  if (!isRunning() || $('vTable').hidden) return;
+  if (!isRunning() || $('vTable').hidden || G.waitAI) return;
   G.timer = setTimeout(() => { forward(); }, stepDelay(G.steps[G.view]));
 }
 /* 跳過：一路做到輪到你或這一手結束 */
 function skipAhead() {
   clearTimeout(G.timer);
   let guard = 0;
-  while (!G.over && !G.waitingHero && guard++ < 400) produce();
+  while (!G.over && !G.waitingHero && !G.waitAI && guard++ < 400) produce();
   G.view = G.steps.length - 1;
   renderCur(); scheduleAuto();
 }
 /* 你按了動作 */
-function heroAct(a) {
+function heroAct(a, auto) {
   if (!G.waitingHero || !atHead() || G.replay) return;
+  clearTimeout(G.autoHero);
   const H = G.H, adv = G.adv;
   const ev = applyAction(H, a);
-  const g = gradeAction(adv, ev);
-  G.review.push({ street: ev.street, label: actWord(ev, H), grade: g, adv: adv.label });
+  const gg = gtoGrade(ev);
+  const g = gg || gradeAction(adv, ev);
+  gtoOnAct(ev);
+  G.gtoAdv = null;
+  if (gg && GS.train) { trainAdd(gg); gsSave(); }
+  if (!auto) G.review.push({ street: ev.street, label: actWord(ev, H), grade: g, adv: gg ? gg.adv : adv.label });
   G.waitingHero = false;
-  pushStep(eventStep(ev, { grade: g, adv }));
+  pushStep(eventStep(ev, auto ? {} : { grade: g, adv: gg ? { label: gg.adv } : adv }));
   G.view = G.steps.length - 1;
-  G.flash = { mark: g.mark, text: g.text, adv: adv.label, view: G.view };
+  G.flash = auto ? null : { mark: g.mark, text: g.text, adv: gg ? gg.adv : adv.label, view: G.view, src: g.src };
   G.sizerStep = -1;
   renderCur();
   scheduleAuto();
@@ -5103,7 +5266,7 @@ function renderTable(st) {
 /* ===== 教練框 ===== */
 function renderCoach(st) {
   const S = st.snap;
-  $('handNo').textContent = '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
+  $('handNo').textContent = (GS.train ? 'GTO 訓練・' : '') + '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
   $('peekWrap').hidden = G.replay;
   $('peekChk').checked = GS.peek;
   let h = '';
@@ -5141,7 +5304,8 @@ function heroHTML(st, S) {
   const adv = st.adv, L = legalSnapshot(S);
   let h = '<h3>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '：可以過牌') + '</h3>';
   const used = new Set();
-  h += '<div class="adv"><div class="rec">建議：' + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  h += gtoBoxHTML();
+  h += '<div class="adv"><div class="rec">' + (gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
   if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
   if (EXPLAIN.on && atHead() && !G.replay && !GS.seenTermHint) h += '<p class="note">底下有虛線的詞可以點，會跳出解釋；不需要的話，右上角「深入說明」可以關掉。</p>';
   h += '</div>';
@@ -5160,7 +5324,7 @@ function summaryHTML(S) {
     h += '<p style="margin-top:10px"><b>這一手你的每個決定</b></p><ul class="review">';
     for (const x of G.review) {
       const mk = { good: '✓', ok: '△', bad: '✗' }[x.grade.mark];
-      h += '<li class="' + x.grade.mark + '"><span class="mk">' + mk + '</span><div><b>' + STREET_NAME[x.street] + '　' + esc(x.label) + '</b><br>' + esc(x.grade.text) + (x.grade.mark !== 'good' ? '（建議：' + esc(x.adv) + '）' : '') + '</div></li>';
+      h += '<li class="' + x.grade.mark + '"><span class="mk">' + mk + '</span><div><b>' + STREET_NAME[x.street] + '　' + esc(x.label) + '</b>' + (x.grade.src === 'GTO' ? ' <span class="srcg">GTO 評分</span>' : '') + '<br>' + esc(x.grade.text) + (x.grade.mark !== 'good' ? '（' + (x.grade.src === 'GTO' ? 'GTO 最常' : '建議') + '：' + esc(x.adv) + '）' : '') + '</div></li>';
     }
     h += '</ul>';
   } else h += '<p class="note">這一手你不用做決定。</p>';
@@ -5196,7 +5360,7 @@ function renderCtrl(st) {
   $('actBtns').hidden = !heroTurn;
   let m = '', b = '';
   // 你剛做完決定：評分留在控制列上，直到下一次輪到你
-  const fl = G.flash && !G.replay && G.flash.view === G.view ? '<span class="flash ' + G.flash.mark + '"><b>' + MK[G.flash.mark] + '</b> ' + esc(G.flash.text) + (G.flash.mark !== 'good' ? '（建議：' + esc(G.flash.adv) + '）' : '') + '</span>' : '';
+  const fl = G.flash && !G.replay && G.flash.view === G.view ? '<span class="flash ' + G.flash.mark + '"><b>' + MK[G.flash.mark] + '</b> ' + esc(G.flash.text) + (G.flash.mark !== 'good' ? '（' + (G.flash.src === 'GTO' ? 'GTO 最常' : '建議') + '：' + esc(G.flash.adv) + '）' : '') + '</span>' : '';
   if (G.replay) {
     m = '重看：第 ' + (G.view + 1) + ' 步／共 ' + G.steps.length + ' 步。' + (st.title ? rich(st.title) : '');
     b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀ 上一步</button><button class="btn main" data-c="next" id="bNext"' + (atHead() ? ' disabled' : '') + '>下一步 ▶</button><button class="btn" data-c="endreplay">結束重看</button>';
@@ -5204,17 +5368,21 @@ function renderCtrl(st) {
     const adv = st.adv, L = legalSnapshot(st.snap);
     const e = adv.eff === undefined ? adv.eq : adv.eff;
     const why = adv.need > 0 ? '你的勝率約 ' + PCT0(e) + (e < adv.eq - 0.005 ? '（打折後）' : '') + '，跟注要 ' + PCT0(adv.need) + ' 以上' : '你的勝率約 ' + PCT0(e);
-    m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　建議 <b class="rec">' + esc(adv.label) + '</b><span class="why">（' + why + '）</span><button type="button" class="linkbtn" data-c="why">為什麼？</button>';
+    if (gtoAdvUsable()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<b class="rec">GTO</b> ' + gtoLine() + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
+    else m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　建議 <b class="rec">' + esc(adv.label) + '</b><span class="why">（' + why + '）</span>'
+      + (G.gto && !G.gto.lost && G.gto.seats.indexOf(0) >= 0 && GS.gtoCoach ? '<span class="why">　GTO 計算中…</span>' : '') + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
   } else if (G.over && atHead()) {
     const net = st.snap.result ? st.snap.result.net[0] : 0;
     const marks = G.review.map((x) => MK[x.grade.mark]).join('');
-    m = '<b>' + (net > 0 ? '你贏了 ' + net + '！' : net < 0 ? '你輸了 ' + (-net) : '沒輸沒贏') + '</b>' + (marks ? '　你的決定：' + marks : '') + '<button type="button" class="linkbtn" data-c="why">檢討</button>';
+    m = '<b>' + (net > 0 ? '你贏了 ' + net + '！' : net < 0 ? '你輸了 ' + (-net) : '沒輸沒贏') + '</b>' + (marks ? '　你的決定：' + marks : '') + '<button type="button" class="linkbtn" data-c="why">檢討</button>'
+      + (GS.train ? '<div class="why">' + esc(trainStatsText()) + '</div>' : '');
     b = '<button class="btn main" data-c="nexthand" id="bNext">再來一手 ▶</button><button class="btn" data-c="replay">重看這一手</button>' + (studioBest() ? '<button class="btn" data-c="gto">GTO 分析</button>' : '');
   } else if (!atHead()) {
     m = '你在看前面的步驟（第 ' + (G.view + 1) + ' 步）。';
     b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀</button><button class="btn main" data-c="next" id="bNext">下一步 ▶</button><button class="btn" data-c="now">回到現在</button>';
   } else {
     m = fl || rich(st.title || '');
+    if (G.waitAI) m = esc(G.H.players[G.waitAI.seat].name) + ' 思考中…（GTO 計算中）';
     const folded = st.snap.players[0].folded;
     if (isRunning()) b = '<button class="btn" data-c="pause">⏸ 暫停</button><button class="btn" data-c="skip">⏭ ' + (folded ? '跳到這一手結束' : '跳到輪到你') + '</button>';
     else b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀</button><button class="btn main" data-c="next" id="bNext">下一步 ▶</button><button class="btn" data-c="play">▶ 自動</button>';
@@ -5227,8 +5395,14 @@ function renderCtrl(st) {
 }
 function renderActBtns(st) {
   const H = G.H, L = legalActions(H), adv = G.adv, p = H.players[0];
-  const recF = adv.act.t === 'f', recP = adv.act.t === 'x' || adv.act.t === 'c', recA = adv.act.t === 'r';
-  const allinRec = recA && adv.act.to >= L.maxTo;
+  let recF = adv.act.t === 'f', recP = adv.act.t === 'x' || adv.act.t === 'c', recA = adv.act.t === 'r';
+  let allinRec = recA && adv.act.to >= L.maxTo;
+  G.recTo = recA ? adv.act.to : 0;
+  if (gtoAdvUsable()) {                                     // GTO 最常用的動作
+    const ta = G.gtoAdv.acts[gtoBest()], b = gtoActBtn(ta, L);
+    recF = b === 'f'; recP = b === 'x' || b === 'c'; recA = b === 'size' || b === 'allin'; allinRec = b === 'allin';
+    G.recTo = b === 'size' ? Math.max(L.minTo, Math.min(L.maxTo, Math.round(ta.to))) : 0;
+  }
   let h = '';
   if (!L.canCheck) h += '<button type="button" class="fold' + (recF ? ' rec' : '') + '" data-a="f">棄牌</button>';
   h += '<button type="button" class="' + (recP ? 'rec' : '') + '" data-a="' + (L.canCheck ? 'x' : 'c') + '">' + (L.canCheck ? '過牌' : (L.callAmt >= p.stack ? '全下跟注 ' : '跟注 ') + L.callAmt) + '</button>';
@@ -5236,7 +5410,15 @@ function renderActBtns(st) {
     if (L.maxTo > L.minTo) h += '<button type="button" class="' + (recA && !allinRec ? 'rec' : '') + '" data-a="size">' + (L.isBet ? '下注…' : '加注…') + '</button>';
     h += '<button type="button" class="' + (allinRec ? 'rec' : '') + '" data-a="allin">全下 ' + L.maxTo + '</button>';
   }
-  $('actBtns').innerHTML = h;
+  // 內容一樣就不重畫（GTO 算好時只換「建議」的框，按到一半的按鈕不會不見）
+  const box = $('actBtns');
+  if (box.dataset.h !== h) {
+    const tmp = document.createElement('div'); tmp.innerHTML = h;
+    const nw = [...tmp.children], old = [...box.children];
+    if (old.length === nw.length && old.every((b, i) => b.dataset.a === nw[i].dataset.a)) old.forEach((b, i) => { b.className = nw[i].className; b.textContent = nw[i].textContent; });
+    else box.innerHTML = h;
+    box.dataset.h = h;
+  }
   if (G.sizerStep === G.view) { const v = +$('sizeRange').value; openSizer(); if (v) { $('sizeRange').value = v; sizerLabel(); } }   // 重畫時保持打開
   else $('sizer').hidden = true;
 }
@@ -5260,7 +5442,7 @@ function openSizer() {
   const opts = [];
   if (L.isBet) for (const f of [0.33, 0.5, 0.66, 1]) opts.push([Math.round(f * 100) + '% 底池', Math.round(pot * f)]);
   else { opts.push(['最小', L.minTo]); opts.push(['2.5 倍', Math.round(H.curBet * 2.5)]); opts.push(['3 倍', H.curBet * 3]); opts.push(['底池', H.curBet + pot + L.toCall]); }
-  const recTo = adv.act.t === 'r' ? adv.act.to : 0;
+  const recTo = G.recTo !== undefined ? G.recTo : adv.act.t === 'r' ? adv.act.to : 0;
   const clamp = (x) => Math.max(L.minTo, Math.min(L.maxTo, Math.round(x)));
   let h = opts.map(([t, v]) => '<button type="button" data-to="' + clamp(v) + '">' + t + '：' + clamp(v) + '</button>').join('');
   if (recTo) h += '<button type="button" class="rec" data-to="' + recTo + '">建議：' + recTo + '</button>';
@@ -5395,6 +5577,194 @@ function initGame() {
   showView('home');
 }
 
+/* ===== 55-gamegto：牌局裡的 GTO（第五步） =====
+   單挑的轉牌、河牌：一發牌就在另一個背景執行緒（GW）開始求解，邊算邊用。
+   - 你：輪到你時顯示 GTO 用你這手牌怎麼打、每個動作的 EV；按完用 GTO 評分（少賺多少）
+   - GTO 電腦（風格 gto）：照解抽一個動作；解還太粗就多等一下，等太久就照原本的打法
+   - 河牌的範圍從轉牌的解接過來（雙方都照解打的話，到河牌各自還剩哪些牌） */
+const GT = { key: 0, req: 0, cbs: new Map() };
+function gtoActive() { return G.gto && !G.gto.lost && G.gto.ready; }
+function gtoReset() { if (G.gto) GW().send({ cmd: 'g-stop' }); G.gto = null; G.gtoAdv = null; G.waitAI = null; }
+function gtoAsk(msg, cb) { const req = ++GT.req; GT.cbs.set(req, cb); GW().send(Object.assign({ cmd: 'g-query', req }, msg)); }
+function gtoInit() {
+  GW().on('g-ans', (m) => { const f = GT.cbs.get(m.req); if (f) { GT.cbs.delete(m.req); f(m); } });
+  GW().on('g-progress', (m) => {
+    const g = G.gto;
+    if (!g || g.key !== m.key) return;
+    if (m.error) { g.lost = true; return; }
+    g.t = m.t; g.pct = m.pct; g.done = m.done; g.ready = true;
+    // 輪到你：還沒有可用的建議、或剛算完，才重新問（不要一直重畫動作鈕）
+    if (G.waitingHero && atHead() && !G.replay && g.seats.indexOf(0) >= 0 && (!gtoAdvUsable() || m.done)) gtoHeroTurn(true);
+  });
+}
+/* 需要 GTO 嗎：單挑、你在裡面（而且開著 GTO 教練）或有 GTO 電腦 */
+function gtoWanted(seats) {
+  if (seats.indexOf(0) >= 0 && GS.gtoCoach) return true;
+  return seats.some((k) => G.H.players[k].style === 'gto');
+}
+/* 發了轉牌或河牌 */
+function gtoOnStreet(ev) {
+  const H = G.H, prev = G.gto;
+  G.gtoAdv = null; G.waitAI = null;
+  if (ev.street < 2 || ev.runout) { gtoReset(); return; }
+  const start = (carry) => {
+    const S = gtoStreetSetup(H, ev.street, carry);
+    if (!S || !gtoWanted(S.seats)) { gtoReset(); return; }
+    const key = ++GT.key;
+    G.gto = { key, street: ev.street, seats: S.seats, tree: buildTree(S.cfg), path: [], nd: null, t: 0, pct: 999, done: false, ready: false, lost: false, carried: !!carry, pot: S.cfg.pot };
+    G.gto.nd = G.gto.tree.root;
+    GW().send({ cmd: 'g-start', key, cfg: S.cfg });
+  };
+  // 河牌：前一條街的解如果一路對得上，就把那裡的雙方範圍接過來
+  if (prev && !prev.lost && prev.street === ev.street - 1 && prev.nd && prev.nd.kind === N_CHANCE && prev.ready) {
+    const key = prev.key;
+    gtoAsk({ key, path: prev.path.concat([{ c: ev.cards[0] }]), reach: true }, (m) => {
+      if (G.H !== H || H.street !== ev.street) return;
+      start(m.none ? null : m.reach);
+    });
+    return;
+  }
+  start(null);
+}
+/* 某個人做了動作：在樹上往下走 */
+function gtoOnAct(ev) {
+  const g = G.gto;
+  if (!g || g.lost || ev.street !== g.street) return;
+  const p = g.seats.indexOf(ev.seat);
+  if (p < 0 || !g.nd || g.nd.kind !== N_ACT || g.nd.p !== p) { g.lost = true; return; }
+  const a = gtoMapAct(g.nd, ev);
+  if (a < 0) { g.lost = true; return; }
+  const ta = g.nd.acts[a];
+  g.approx = (ta.t === 'b' || ta.t === 'r') && Math.abs(ta.to - ev.to) > 0.12 * (g.pot + 1) ? { tree: ta.to, real: ev.to } : null;
+  g.path.push({ a }); g.nd = g.nd.kids[a];
+}
+
+/* ===== 你 ===== */
+function gtoHeroTurn(refresh) {
+  const g = G.gto, H = G.H;
+  if (!g || g.lost || !g.ready || g.seats.indexOf(0) < 0 || !GS.gtoCoach) return;
+  const pathLen = g.path.length, view = G.view;
+  const combo = comboOf(H.players[0].cards[0], H.players[0].cards[1]);
+  if (refresh && G.gtoAdv && G.gtoAdv.pathLen === pathLen && G.gtoAdv.done) return;
+  if (g.asking) return;
+  g.asking = true;
+  gtoAsk({ key: g.key, path: g.path.slice(), p: g.seats.indexOf(0), combo, ev: true }, (m) => {
+    g.asking = false;
+    if (G.gto !== g || !G.waitingHero || g.path.length !== pathLen || m.none) return;
+    G.gtoAdv = { pathLen, acts: m.acts, freq: m.freq, ev: m.ev, pct: m.pct, t: m.t, done: m.done, eq: m.eq, street: g.street };
+    if (G.view === view || atHead()) { renderCtrl(G.steps[G.view]); if (G.steps[G.view].kind === 'hero') renderCoach(G.steps[G.view]); }
+  });
+}
+/* GTO 的建議夠不夠準可以拿來用、評分 */
+function gtoAdvUsable() {
+  const a = G.gtoAdv, g = G.gto;
+  return a && g && !g.lost && a.pathLen === g.path.length && (a.done || a.pct <= 3);
+}
+/* GTO 最常用的動作 → 動作列的哪一顆 */
+function gtoBest() {
+  const a = G.gtoAdv;
+  let b = 0;
+  for (let i = 1; i < a.freq.length; i++) if (a.freq[i] > a.freq[b]) b = i;
+  return b;
+}
+function gtoActBtn(ta, L) {
+  if (ta.t === 'f') return 'f';
+  if (ta.t === 'x') return 'x';
+  if (ta.t === 'c') return 'c';
+  if (ta.t === 'a' || Math.round(ta.to) >= L.maxTo) return 'allin';
+  return 'size';
+}
+function gtoLine() {
+  const a = G.gtoAdv, cols = actColors(a.acts);
+  return a.acts.map((t, i) => ({ t, i, f: a.freq[i] })).filter((x) => x.f >= 0.005).sort((x, y) => y.f - x.f)
+    .map((x) => '<span class="hchip"><i class="sw" style="background:' + cols[x.i] + '"></i>' + esc(gtoLabel(x.t)) + ' ' + pct(x.f, 0) + '%</span>').join(' ');
+}
+function gtoLabel(t) { return t.t === 'b' ? '下注 ' + Math.round(t.add) : t.t === 'r' ? '加注到 ' + Math.round(t.to) : t.t === 'a' ? '全下' : actLabel(t); }
+/* 你按完：用 GTO 評分（有的話） */
+function gtoGrade(ev) {
+  if (!gtoAdvUsable()) return null;
+  const g = G.gto, a = G.gtoAdv, i = gtoMapAct(g.nd, ev);
+  if (i < 0) return null;
+  let best = 0;
+  for (let q = 1; q < a.ev.length; q++) if (a.ev[q] > a.ev[best]) best = q;
+  const f = a.freq[i], loss = Math.max(0, a.ev[best] - a.ev[i]), pot = potTotal(G.H) - (ev.add || 0);
+  const mark = f >= 0.25 || loss <= 0.01 * pot ? 'good' : loss <= 0.04 * pot ? 'ok' : 'bad';
+  const mine = gtoLabel(a.acts[i]), top = gtoLabel(a.acts[gtoBest()]);
+  const text = mark === 'good' ? '這手牌 GTO 有 ' + pct(f, 0) + '% 的時候' + mine + '，打得好。'
+    : mark === 'ok' ? '這手牌 GTO 很少' + mine + '（' + pct(f, 0) + '%），不過只少賺 ' + fmt(loss, 1) + '，差不多。'
+      : '這手牌 GTO 幾乎不會' + mine + '（' + pct(f, 0) + '%），平均少賺 ' + fmt(loss, 1) + ' 籌碼（約 ' + fmt(loss / GAME_BB, 1) + ' 個大盲）。';
+  return { mark, text, src: 'GTO', loss, adv: top, freq: f };
+}
+/* 教練框裡的 GTO 區塊 */
+function gtoBoxHTML() {
+  const g = G.gto;
+  if (!g || g.lost || g.seats.indexOf(0) < 0 || !GS.gtoCoach) return '';
+  if (!G.gtoAdv) return '<div class="gtob"><b>GTO 求解</b>：計算中…（單挑的' + STREET_NAME[g.street] + '，在另一個背景執行緒算）</div>';
+  const a = G.gtoAdv, cols = actColors(a.acts);
+  let h = '<div class="gtob"><b>GTO 求解</b>（' + glossify('可剝削度') + ' ' + (a.pct < 900 ? fmt(a.pct, 1) + '%' : '—') + (a.done ? '' : '，還在算') + (g.carried ? '；範圍接著上一條街的解' : '') + '）<table>';
+  a.acts.forEach((t, i) => {
+    h += '<tr><td><i class="sw" style="background:' + cols[i] + '"></i>' + esc(gtoLabel(t)) + '</td><td class="r num">' + pct(a.freq[i], 0) + '%</td><td class="r num">EV ' + fmt(Math.abs(a.ev[i]) < 0.05 ? 0 : a.ev[i], 1) + '</td></tr>';
+  });
+  h += '</table><div class="note">EV：從現在算、平均拿回多少籌碼。' + (gtoAdvUsable() ? '動作鈕的「建議」照 GTO 最常用的動作。' : '還不夠準，先照教練的建議。') + (g.approx ? '（有人下的大小不在樹上，照最接近的 ' + Math.round(g.approx.tree) + ' 算）' : '') + '</div></div>';
+  return h;
+}
+
+/* ===== GTO 電腦 ===== */
+/* 輪到 GTO 電腦而且有解可以用：先問解（非同步），回來再出牌。回傳 true＝要等 */
+function gtoBotWait(seat) {
+  const H = G.H, pl = H.players[seat], g = G.gto;
+  if (pl.style !== 'gto' || !g || g.lost || g.seats.indexOf(seat) < 0) return false;
+  if (G.pendingAI && G.pendingAI.seat === seat) return false;
+  const cap = [0, 4000, 2500, 1500][GS.speed || 2];
+  if (!G.waitAI || G.waitAI.seat !== seat) G.waitAI = { seat, since: Date.now() };
+  const W8 = G.waitAI;
+  if (W8.asking) return true;
+  const fallback = () => { G.pendingAI = { seat, a: aiDecide(H, G.rng, G.T.level), why: 'rule' }; G.waitAI = null; afterBot(); };
+  if (!g.ready) {
+    if (Date.now() - W8.since > cap) { fallback(); return false; }
+    setTimeout(() => { if (G.waitAI === W8) afterBot(); }, 300);
+    return true;
+  }
+  W8.asking = true;
+  const p = g.seats.indexOf(seat), combo = comboOf(pl.cards[0], pl.cards[1]), pathLen = g.path.length;
+  gtoAsk({ key: g.key, path: g.path.slice(), p, combo }, (m) => {
+    W8.asking = false;
+    if (G.waitAI !== W8 || G.gto !== g || g.path.length !== pathLen) return;
+    const good = !m.none && (m.done || m.pct <= 5 || m.t >= 60);
+    if (!good && Date.now() - W8.since < cap && !m.none) { setTimeout(() => { if (G.waitAI === W8) afterBot(); }, 350); return; }
+    if (m.none) { fallback(); return; }
+    // 照解抽一個動作
+    let r = G.rng(), i = 0;
+    for (; i < m.freq.length - 1; i++) { r -= m.freq[i]; if (r <= 0) break; }
+    const ta = m.acts[i], L = legalActions(H);
+    let a;
+    if (ta.t === 'f') a = { t: L.canCheck ? 'x' : 'f' };
+    else if (ta.t === 'x' || ta.t === 'c') a = { t: L.canCheck ? 'x' : 'c' };
+    else a = { t: 'r', to: ta.t === 'a' ? L.maxTo : Math.max(L.minTo, Math.min(L.maxTo, Math.round(ta.to))) };
+    G.pendingAI = { seat, a, why: 'gto' };
+    G.waitAI = null;
+    afterBot();
+  });
+  return true;
+}
+/* 解回來了（或等太久）：自動模式就接著往下 */
+function afterBot() {
+  if ($('vTable').hidden || !G.H) return;
+  if (atHead() && !G.replay && !G.over && (isRunning() || GS.flow === 'step')) { clearTimeout(G.timer); forward(); }   // 是「下一步」或自動播放叫它出牌的，就接著出
+  else renderCtrl(G.steps[G.view]);
+}
+
+/* ===== GTO 訓練（單挑）：累計評分 ===== */
+function trainStatsText() {
+  const t = GS.trainStats || { n: 0, good: 0, ok: 0, bad: 0, loss: 0 };
+  if (!t.n) return 'GTO 評分還沒有紀錄（轉牌、河牌單挑時才有）。';
+  return 'GTO 評分 ' + t.n + ' 次：✓ ' + t.good + '、△ ' + t.ok + '、✗ ' + t.bad + '；一共少賺 ' + fmt(t.loss / GAME_BB, 1) + ' 個大盲（平均每次 ' + fmt(t.loss / GAME_BB / t.n, 2) + '）';
+}
+function trainAdd(gr) {
+  const t = GS.trainStats || (GS.trainStats = { n: 0, good: 0, ok: 0, bad: 0, loss: 0 });
+  t.n++; t[gr.mark]++; t.loss += gr.loss || 0;
+}
+
 /* ===== 85-main：分頁、開始 ===== */
 function showTab(id) {
   for (const [t, p] of [['tCalc', 'pCalc'], ['tSolve', 'pSolve'], ['tBench', 'pBench']]) {
@@ -5416,6 +5786,7 @@ initStudio();
 initBench();
 try { const t = localStorage.getItem('dz-tab'); if (t && $(t)) showTab(t); } catch (e) { /* 忽略 */ }
 initGame();
+gtoInit();
 studioFromHash();
 
 /* ===== 90-web：只有公開網頁 App 版才有的東西：分享、安裝到主畫面、離線快取 ===== */

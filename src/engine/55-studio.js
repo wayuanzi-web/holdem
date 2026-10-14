@@ -234,3 +234,61 @@ function matchAct(acts, step) {
   });
   return best;
 }
+
+/* ===== 牌局裡的 GTO（第五步）：單挑的轉牌、河牌，一發牌就建好局面交給背景執行緒去算（邊算邊用） =====
+   carry：前一條街的解在這張牌之後的雙方範圍（Float32Array(1326)，順序同 seats）；沒有就照每個人的動作估。
+   單位是籌碼，跟牌局一樣。 */
+const GTO_TREE = {
+  2: { bet: { turn: [[66], [66]], river: [[75], [75]] }, raise: { turn: [['a'], ['a']], river: [['a'], ['a']] }, cap: 2, target: 1, maxIters: 400 },
+  3: { bet: { river: [[33, 75], [33, 75]] }, raise: { river: [['2.5x'], ['2.5x']] }, cap: 3, target: 0.3, maxIters: 800 },
+};
+function gtoStreetSetup(H, street, carry) {
+  if (street < 2 || street > 3) return null;
+  let idx = -1;
+  for (let i = H.log.length - 1; i >= 0; i--) if (H.log[i].k === 'street' && H.log[i].street === street) { idx = i; break; }
+  if (idx < 0) return null;
+  const n = H.n, put = new Array(n).fill(0), folded = new Array(n).fill(false);
+  for (let i = 0; i < idx; i++) {
+    const e = H.log[i];
+    if (e.k === 'blinds') { put[e.sb.seat] += e.sb.amt; put[e.bb.seat] += e.bb.amt; }
+    else if (e.k === 'act') { if (e.t === 'f') folded[e.seat] = true; if (e.add) put[e.seat] += e.add; }
+  }
+  const live = [];
+  for (let k = 0; k < n; k++) if (!folded[k]) live.push(k);
+  if (live.length !== 2) return null;
+  const left = live.map((k) => H.players[k].start - put[k]);
+  if (Math.min(left[0], left[1]) <= 0) return null;
+  const dist = (k) => ((k - H.button + n) % n) || n;
+  const seats = dist(live[0]) < dist(live[1]) ? live : [live[1], live[0]];
+  const board = H.board.slice(0, street === 2 ? 4 : 5);
+  const dead = new Set(board);
+  const ranges = seats.map((k, p) => {
+    const pl = H.players[k];
+    const w = carry ? carry[p] : rangeWeights(H, k, k === 0 ? 'tag' : pl.style, idx);
+    let mx = 0;
+    for (let c = 0; c < NCOMBO; c++) if (!dead.has(COMBO_A[c]) && !dead.has(COMBO_B[c]) && w[c] > mx) mx = w[c];
+    const q = new Float32Array(NCOMBO);
+    for (let c = 0; c < NCOMBO; c++) {
+      if (dead.has(COMBO_A[c]) || dead.has(COMBO_B[c]) || !mx) continue;
+      const x = w[c] / mx;
+      if (x >= (carry ? 0.01 : 0.06)) q[c] = Math.round(x * 100) / 100 || 0.01;
+    }
+    const own = comboOf(pl.cards[0], pl.cards[1]);
+    if (!(q[own] >= 0.02)) q[own] = 0.02;                      // 自己的牌一定要在範圍裡（權重很小，幾乎不影響）
+    return q;
+  });
+  const T = GTO_TREE[street];
+  const cfg = { board, pot: put.reduce((s, x) => s + x, 0), stack: Math.min(left[0], left[1]), ranges,
+    bet: T.bet, raise: T.raise, cap: T.cap, allin: 0.67, addAllin: true, target: T.target, maxIters: T.maxIters };
+  return { cfg, seats, street, idx };
+}
+/* 牌局的一個動作 → 樹上的動作編號（尺寸不一樣就找最接近的） */
+function gtoMapAct(nd, ev) {
+  if (!nd || nd.kind !== N_ACT) return -1;
+  let st;
+  if (ev.t === 'f') st = { t: 'f' };
+  else if (ev.t === 'x') st = { t: 'x' };
+  else if (ev.t === 'c' || (ev.t === 'a' && !(ev.to > ev.curBefore))) st = { t: 'c' };
+  else st = { t: ev.t === 'a' ? 'a' : ev.curBefore === 0 ? 'b' : 'r', to: ev.to };
+  return matchAct(nd.acts, st);
+}

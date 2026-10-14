@@ -11,6 +11,7 @@ const STYLE_READ = {
   rock: { open: '岩石型很少玩，他加注多半是大牌', bet: '岩石型下注幾乎都是真的有牌', raise: '岩石型加注要非常小心' },
   station: { open: '跟注站很少加注，他加注要小心', bet: '跟注站很少主動下注，他下注通常是好牌', raise: '跟注站加注幾乎一定是很大的牌' },
   maniac: { open: '瘋子什麼牌都會加注，不用太怕', bet: '瘋子常常亂下注，很多是詐唬', raise: '瘋子加注很常是詐唬' },
+  gto: { open: 'GTO 電腦照圖表開局，牌不算緊', bet: 'GTO 電腦下注有價值也有詐唬，比例剛好讓你很難應對', raise: 'GTO 電腦加注是平衡的：大牌和詐唬都有' },
 };
 function styleZh(k) { return (STYLES[k] || STYLES.tag).zh; }
 function sortedCards(cards) { return cards.slice().sort((a, b) => (b >> 2) - (a >> 2) || (a & 3) - (b & 3)); }
@@ -149,12 +150,12 @@ function coachAdvice(H, rng) {
     }
     if (I.pct < 0.056 && L.canRaise && raises === 1) {
       const to = Math.min(L.maxTo, Math.round(H.curBet * (pc === 'bb' || pc === 'sb' ? 3.5 : 3)));
-      R.push(who + '加注了；' + (ag ? STYLE_READ[ag.style].open + '，' : '') + '他的範圍大約是前 ' + PCT0(agTop) + '。你的牌比他絕大部分的牌都好。');
+      R.push(who + '加注了；' + (ag ? (STYLE_READ[ag.style] || STYLE_READ.tag).open + '，' : '') + '他的範圍大約是前 ' + PCT0(agTop) + '。你的牌比他絕大部分的牌都好。');
       R.push('照大家的動作估，你的勝率約 ' + PCT0(I.est) + '。再加注（3-bet）到 ' + to + '，讓比你差的牌付更多錢。');
       return mk({ t: 'r', to }, '加注到 ' + to);
     }
     R.push('要跟 ' + L.callAmt + '，跟完底池是 ' + (pot + L.callAmt) + '：勝率要 ' + L.callAmt + '÷' + (pot + L.callAmt) + '＝' + PCT0(need) + ' 以上才划算。');
-    R.push(who + '加注了（' + (ag ? STYLE_READ[ag.style].open : '') + '），照他的動作估範圍大約是前 ' + PCT0(agTop) + '；你對這個範圍的勝率約 ' + PCT0(I.est) + '（對隨機手牌是 ' + PCT0(I.rand) + '）。');
+    R.push(who + '加注了（' + (ag ? (STYLE_READ[ag.style] || STYLE_READ.tag).open : '') + '），照他的動作估範圍大約是前 ' + PCT0(agTop) + '；你對這個範圍的勝率約 ' + PCT0(I.est) + '（對隨機手牌是 ' + PCT0(I.rand) + '）。');
     R.push('但勝率要打折：' + (ip ? '翻牌後你比他晚說話（有位置）' : '翻牌後你要比他先說話（沒位置），很難把勝率打出來') + (play < 0.9 ? '，而且這手牌不同花、不相連，中牌的方式少' : '') + '。打折後大約 ' + PCT0(eff) + '。');
     if (I.pct < 0.6 && (eff >= need + 0.02 || eff + implied >= need + 0.02)) {
       if (eff < need + 0.02) R.push('打折後差一點，但你的牌（對子、同花連張）中了大牌時常常能贏很多，這叫「隱含賠率」，可以跟。');

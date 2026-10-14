@@ -6,6 +6,7 @@ const AI_LEVEL = {
   1: { noise: 0.09, iters: 500, mistake: 0.10 },
   2: { noise: 0.05, iters: 900, mistake: 0.04 },
   3: { noise: 0.025, iters: 1500, mistake: 0.01 },
+  4: { noise: 0.02, iters: 1500, mistake: 0.0 },            // GTO 桌：求解器用不到的地方（翻牌前、翻牌、多人）照高手打
 };
 function gauss(rng) { let u = 0, v = 0; while (u === 0) u = rng(); v = rng(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
 
@@ -91,7 +92,7 @@ function lastToActSeat(H) {
 const AI_NAMES = ['阿忠', '小美', '老王', '阿明', '大頭', '阿芬', '小陳', '阿德', '美玲', '志明', '春嬌', '阿伯'];
 function makeOpponents(n, level, rng) {
   const pool = level === 1 ? ['station', 'station', 'rock', 'maniac', 'tag', 'lag']
-    : level === 3 ? ['tag', 'tag', 'lag', 'lag', 'tag', 'rock'] : ['tag', 'lag', 'rock', 'station', 'maniac', 'tag'];
+    : level === 3 ? ['tag', 'tag', 'lag', 'lag', 'tag', 'rock'] : level === 4 ? ['gto'] : ['tag', 'lag', 'rock', 'station', 'maniac', 'tag'];
   const names = AI_NAMES.slice();
   for (let i = names.length - 1; i > 0; i--) { const j = (rng() * (i + 1)) | 0; const t = names[i]; names[i] = names[j]; names[j] = t; }
   const out = [];

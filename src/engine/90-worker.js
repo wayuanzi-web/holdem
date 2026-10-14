@@ -123,6 +123,57 @@ async function doView(m) {
   v.P0 = SOL.P0; v.stack = SOL.cfg.stack;
   postMessage(v);
 }
+/* ===== 牌局用的解（第五步）：另外一個背景執行緒專門算，邊算邊回答「這手牌在這裡怎麼打」 ===== */
+let GSOL = null;
+async function gStart(m) {
+  const me = GSOL = { key: m.key, s: null, pct: 999, done: false, target: m.cfg.target, maxIters: m.cfg.maxIters };
+  try { me.s = new Solver(m.cfg); } catch (e) { postMessage({ cmd: 'g-progress', key: m.key, error: e.message }); return; }
+  const s = me.s;
+  let last = nowMs();
+  const t0 = nowMs();
+  while (GSOL === me && !me.done) {
+    s.iterate(1);
+    if (s.t === 5 || s.t % 10 === 0) {
+      const ex = s.exploit();
+      me.pct = ex.pct;
+      if (ex.pct <= me.target || s.t >= me.maxIters) me.done = true;
+      postMessage({ cmd: 'g-progress', key: me.key, t: s.t, pct: ex.pct, done: me.done, ms: nowMs() - t0 });
+    }
+    if (nowMs() - last > 50) { await tick(); last = nowMs(); }
+  }
+}
+/* 問：path 走到的節點，第 p 個人拿 combo 這手牌的策略（ev:true 再加每個動作的 EV）；reach:true 回傳雙方的範圍 */
+function gQuery(m) {
+  const me = GSOL, base = { cmd: 'g-ans', req: m.req, key: m.key };
+  if (!me || me.key !== m.key || !me.s || me.s.t < 1) { postMessage(Object.assign(base, { none: true, why: 'notready' })); return; }
+  const s = me.s, L = s.locate(m.path);
+  if (L.used !== m.path.length) { postMessage(Object.assign(base, { none: true, why: 'path' })); return; }
+  const info = { t: s.t, pct: me.pct, done: me.done };
+  if (m.reach) {
+    const out = [0, 1].map((p) => { const r = s.unperm(p, L.sig, L.reach[p]), w = new Float32Array(NCOMBO); for (let h = 0; h < s.n[p]; h++) w[s.H[p][h]] = r[h]; return w; });
+    postMessage(Object.assign(base, info, { reach: out }));
+    return;
+  }
+  const nd = L.nd;
+  if (nd.kind !== N_ACT || nd.p !== m.p) { postMessage(Object.assign(base, { none: true, why: 'node' })); return; }
+  const p = nd.p, h = s.idx[p][m.combo];
+  if (h < 0) { postMessage(Object.assign(base, { none: true, why: 'combo' })); return; }
+  const acts = nd.acts.map((a) => ({ t: a.t, add: a.add, to: a.to, label: actLabel(a) }));
+  const k = nd.k, n = nd.nh;
+  let freq, ev = null;
+  if (m.ev) {
+    const v = s.viewAt(L);
+    freq = []; ev = [];
+    for (let a = 0; a < k; a++) { freq.push(v.strat[a * n + h]); ev.push(v.evA[a * n + h] + v.inv[p]); }
+    info.eq = v.eq[h];
+  } else {
+    const buf = new Float32Array(k * n), hc = s.permFor(p, L.sig)[h];
+    s.avgStrat(nd, L.inst, buf);
+    freq = []; for (let a = 0; a < k; a++) freq.push(buf[a * n + hc]);
+  }
+  postMessage(Object.assign(base, info, { p, acts, freq, ev, pot: s.P0 + nd.inv0 + nd.inv1 }));
+}
+
 function doLock(m) {
   if (!SOL) return;
   const ok = SOL.setLock(m.id, m.strat ? Float32Array.from(m.strat) : null);
@@ -162,6 +213,9 @@ onmessage = (e) => {
     else if (m.cmd === 'view') doView(m).catch((err) => postMessage({ cmd: 'error', req: m.req, of: 'view', msg: String((err && err.message) || err) }));
     else if (m.cmd === 'runouts') doRunouts(m).catch((err) => postMessage({ cmd: 'error', req: m.req, of: 'runouts', msg: String((err && err.message) || err) }));
     else if (m.cmd === 'lock') doLock(m);
+    else if (m.cmd === 'g-start') gStart(m).catch((err) => postMessage({ cmd: 'g-progress', key: m.key, error: String((err && err.message) || err) }));
+    else if (m.cmd === 'g-query') gQuery(m);
+    else if (m.cmd === 'g-stop') GSOL = null;
     else if (m.cmd === 'ports') setPorts(m.ports);
     else if (m.cmd === 'helper') beHelper(m.port);
     else if (m.cmd === 'bench') doBench(m);

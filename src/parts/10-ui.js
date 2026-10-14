@@ -59,6 +59,19 @@ const W = (function makeWorker() {
   };
 })();
 
+/* 牌局用的 GTO 背景執行緒（第五步）：跟上面那個分開，不會跟勝率計算機、工作室搶 */
+let GW_ = null;
+function GW() {
+  if (GW_) return GW_;
+  const src = $('engine').textContent + '\n' + $('workersrc').textContent;
+  const w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  const subs = {};
+  w.onmessage = (e) => { const m = e.data; (subs[m.cmd] || []).forEach((f) => f(m)); };
+  w.onerror = (e) => { console.error(e); };
+  GW_ = { on(cmd, f) { (subs[cmd] = subs[cmd] || []).push(f); }, send(m) { w.postMessage(m); } };
+  return GW_;
+}
+
 /* 動作的顏色：棄牌藍、過牌／跟注綠、下注依大小由黃到深紅 */
 const BET_COLS = ['#e2a23b', '#dc7132', '#c9462e', '#a8302c', '#7d2230'];
 function actColors(acts) {
