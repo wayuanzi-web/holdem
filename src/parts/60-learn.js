@@ -274,9 +274,10 @@ function dictHTML() {
   return h;
 }
 function freqChip(pos, f) { const c = f >= 0.75 ? 'y' : f >= 0.25 ? 'm' : 'n'; return '<span class="fc ' + c + '">' + esc(POS_ZH[pos] || pos) + (f > 0 && f < 0.99 ? ' ' + Math.round(f * 100) + '%' : '') + '</span>'; }
+function topPct(i) { const x = i.pct + i.combos / NCOMBO / 2; return x < 0.1 ? pct(x, 1) : pct(x, 0); }
 function handDetailHTML(g) {
   const i = handInfo(g), ord = rankOrder(), k = i.rank - 1, prev = k > 0 ? ord[k - 1] : -1, next = k < 168 ? ord[k + 1] : -1;
-  let h = '<div class="hdtop"><span class="hc">' + classCards(g).map((c) => cardHTML(c)).join('') + '</span><div><h3>' + NAMEZH(g) + '<small>' + esc(i.words) + '</small></h3><p><b>第 ' + i.rank + ' 名</b>（前 ' + pct(i.pct + i.combos / NCOMBO / 2, 0) + '%）・<span class="tierb t' + i.tier + '">' + TIER_NAME[i.tier] + (i.tier === 5 ? (i.marginal ? '：邊緣' : '：垃圾') : '') + '</span>・' + i.combos + ' 個組合</p></div></div>';
+  let h = '<div class="hdtop"><span class="hc">' + classCards(g).map((c) => cardHTML(c)).join('') + '</span><div><h3>' + NAMEZH(g) + '<small>' + (i.name.length === 2 ? '口袋對子' : i.name[2] === 's' ? '同花' : '不同花') + '</small></h3><p><b>第 ' + i.rank + ' 名</b>（前 ' + topPct(i) + '%）・<span class="tierb t' + i.tier + '">' + TIER_NAME[i.tier] + (i.tier === 5 ? (i.marginal ? '：邊緣' : '：垃圾') : '') + '</span>・' + i.combos + ' 個組合</p></div></div>';
   h += '<table class="stt"><tr><td>對 1 家隨機牌</td><td class="r num"><b>' + pct(i.eq1, 1) + '%</b></td></tr><tr><td>對 3 家隨機牌</td><td class="r num">' + pct(i.eq3, 1) + '%</td></tr><tr><td>對「前 22% 的好牌」</td><td class="r num">' + pct(i.eqTop22, 1) + '%</td></tr><tr><td>對「前 10% 的強牌」</td><td class="r num">' + pct(i.eqTop10, 1) + '%</td></tr></table>';
   h += '<h4 class="lnh4">沒人加注時開不開</h4><p class="hl">' + esc(openLine(i)) + '</p><div class="fcs"><span class="note">6 人桌</span>' + i.r6.map((x) => freqChip(x.pos, x.f)).join('') + '</div><div class="fcs"><span class="note">9 人桌</span>' + i.r9.map((x) => freqChip(x.pos, x.f)).join('') + '</div>';
   const row = (lbl, x) => (x ? '<tr><td>' + lbl + '</td><td class="r num">' + (x.r > 0.004 ? '<span class="rz">3-bet ' + Math.round(x.r * 100) + '%</span> ' : '') + (x.c > 0.004 ? '<span class="cz">跟 ' + Math.round(x.c * 100) + '%</span> ' : '') + (x.f > 0.004 ? '<span class="fz">棄 ' + Math.round(x.f * 100) + '%</span>' : '') + '</td></tr>' : '');
