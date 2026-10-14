@@ -18,3 +18,4 @@ initCalc();
 initSolver();
 initBench();
 try { const t = localStorage.getItem('dz-tab'); if (t && $(t)) showTab(t); } catch (e) { /* 忽略 */ }
+initGame();

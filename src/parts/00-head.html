@@ -149,6 +149,198 @@ h3 { font-size: 14px; margin: 0 0 6px; color: var(--mute); font-weight: 500; }
 .bench .sub { color: var(--mute); font-size: 13px; }
 .dev { margin-top: 12px; font-size: 13px; color: var(--mute); word-break: break-all; }
 
+
+/* ===== 頁首（共用） ===== */
+button.seal { border: 0; cursor: pointer; }
+.topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+body.intable .brand p { display: none; }
+
+/* ===== 首頁 ===== */
+.home { max-width: 760px; margin: 26px auto 60px; padding: 0 20px; }
+.hometitle { font-family: var(--serif); font-weight: 900; font-size: 34px; line-height: 1.25; margin: 0 0 10px; letter-spacing: .02em; }
+.homelede { color: #c4d4cc; margin: 0 0 22px; max-width: 34em; font-size: 16px; }
+.field { margin: 20px 0; }
+.flabel { font-size: 14px; color: var(--mute); margin-bottom: 8px; }
+.pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.pills button { min-width: 48px; padding: 8px 15px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.03); cursor: pointer; font-size: 16px; }
+.pills button[aria-pressed="true"] { background: var(--brass); color: #1b1608; border-color: var(--brass); font-weight: 700; }
+.modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modes button { text-align: left; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--felt2); cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+.modes button b { font-size: 17px; }
+.modes button span { color: var(--mute); font-size: 13px; }
+.modes button[aria-pressed="true"] { border-color: var(--brass); box-shadow: inset 0 0 0 1px var(--brass); }
+.modes button[aria-pressed="true"] b::before { content: '●'; color: var(--brass); margin-right: 6px; font-size: 13px; vertical-align: 2px; }
+.linkbtn { background: none; border: 0; color: var(--brass); text-decoration: underline; cursor: pointer; padding: 0 0 0 8px; font-size: inherit; }
+.btn.big { font-size: 19px; padding: 12px 36px; border-radius: 12px; }
+.homego { display: flex; gap: 12px; margin: 28px 0 14px; flex-wrap: wrap; }
+
+/* ===== 牌桌 ===== */
+.tv { display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 16px; max-width: 1280px; margin: 0 auto; padding: 12px 20px 24px; align-items: start; }
+.streetbar { list-style: none; display: flex; gap: 4px; margin: 0 0 10px; padding: 0; flex-wrap: wrap; font-size: 13px; }
+.streetbar li { padding: 3px 11px; border-radius: 999px; color: var(--mute); background: rgba(255,255,255,.04); }
+.streetbar li.done { color: #cfe0d8; }
+.streetbar li.on { background: var(--brass); color: #1b1608; font-weight: 700; }
+.felt { position: relative; width: 100%; aspect-ratio: 16 / 10.5; max-height: 66vh; margin: 0 auto; }
+.rail { position: absolute; inset: 9% 7%; border-radius: 50%; background: radial-gradient(ellipse at 50% 38%, #2f7259 0%, #205442 52%, #173f33 100%);
+  box-shadow: inset 0 0 0 9px #4a2d18, inset 0 0 0 12px rgba(201,162,74,.55), inset 0 10px 40px rgba(0,0,0,.35), 0 18px 40px rgba(0,0,0,.45); }
+.seat { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; width: 108px; z-index: 2; }
+.seat .hc { display: flex; gap: 3px; min-height: 42px; align-items: flex-end; }
+.seat .plate { background: rgba(8,18,15,.9); border: 1px solid #3a6a5a; border-radius: 10px; padding: 3px 8px 4px; text-align: center; min-width: 92px; line-height: 1.25; }
+.seat .plate b { display: block; font-size: 14px; white-space: nowrap; }
+.seat .plate .sty { font-size: 11px; color: var(--mute); }
+.seat .plate .stk { font-size: 13px; color: var(--brass); font-weight: 700; }
+.seat.toact .plate { border-color: var(--brass); box-shadow: 0 0 0 2px var(--brass), 0 0 18px rgba(208,168,78,.55); }
+.seat.folded { opacity: .42; }
+.seat.won .plate { border-color: #ffd75e; box-shadow: 0 0 0 2px #ffd75e, 0 0 20px rgba(255,215,94,.6); }
+.seat .bubble { font-size: 12px; background: #fff8e2; color: #3d2f0a; padding: 1px 8px; border-radius: 8px; white-space: nowrap; font-weight: 600; }
+.seat .ptag { font-size: 11px; color: #cfe0d8; }
+.seat.hero { width: 150px; }
+.seat.hero .hc { min-height: 66px; }
+.seat.hero .plate { border-color: var(--brass); }
+.dealer { position: absolute; width: 24px; height: 24px; border-radius: 50%; background: #fff; color: #111; font-weight: 900; display: grid; place-items: center; font-size: 13px; transform: translate(-50%, -50%); box-shadow: 0 1px 3px rgba(0,0,0,.6); z-index: 3; font-family: var(--serif); }
+.betchip { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; z-index: 2; background: rgba(0,0,0,.28); padding: 1px 7px 1px 3px; border-radius: 999px; }
+.betchip i { width: 15px; height: 15px; border-radius: 50%; background: radial-gradient(circle, #d93b2e 38%, #fff 40%, #fff 52%, #d93b2e 54%); border: 1px solid #7a1e17; }
+.center { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; }
+.board { display: flex; gap: 5px; }
+.board .cd { --w: 46px; }
+.board .slot { width: 46px; height: 64px; border-radius: 6px; border: 2px dashed rgba(230,238,233,.18); }
+.pot { font-size: 15px; font-weight: 700; background: rgba(0,0,0,.3); padding: 2px 14px; border-radius: 999px; }
+.live { font-size: 12px; color: #d6e5de; background: rgba(0,0,0,.2); padding: 1px 10px; border-radius: 999px; }
+.cd.back { background: repeating-linear-gradient(45deg, #7d2a22 0 4px, #93352b 4px 8px); box-shadow: inset 0 0 0 2px #f2e6cf, 0 2px 0 rgba(0,0,0,.35); }
+.cd.small { --w: 30px; }
+.cd.mid { --w: 38px; }
+.cd.heroc { --w: 50px; }
+.cd.small .s, .cd.small .big { display: none; }
+.cd.small .r { font-size: 15px; }
+.cd.small::after { content: attr(data-s); position: absolute; left: 3px; bottom: 2px; font-size: 13px; font-family: var(--sans); }
+@keyframes dealIn { from { transform: translateY(-26px) rotate(-10deg) scale(.6); opacity: 0; } }
+.cd.deal { animation: dealIn .38s ease-out both; }
+.cd.best { box-shadow: 0 0 0 3px #ffd75e, 0 0 14px rgba(255,215,94,.9); }
+.cd.dim { filter: brightness(.55); }
+
+/* 動作列 */
+.actbar { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.acts2 { display: flex; gap: 8px; flex-wrap: wrap; }
+.acts2 button { flex: 1 1 120px; padding: 12px 10px; font-size: 17px; border-radius: 12px; border: 1px solid var(--line); background: var(--felt2); cursor: pointer; position: relative; font-weight: 600; }
+.acts2 button:hover { border-color: var(--brass); }
+.acts2 button.rec { border-color: var(--brass); box-shadow: inset 0 0 0 2px var(--brass); }
+.acts2 button.rec::after { content: '建議'; position: absolute; top: -10px; right: 10px; background: var(--brass); color: #1b1608; font-size: 11px; padding: 0 7px; border-radius: 6px; font-weight: 700; }
+.acts2 button.fold { background: #1d3550; }
+.sizer { background: rgba(0,0,0,.25); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+.presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.presets button { border: 1px solid var(--line); background: var(--felt2); border-radius: 8px; padding: 5px 10px; cursor: pointer; font-size: 14px; }
+.presets button.rec { border-color: var(--brass); }
+.sizerow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.sizerow input[type=range] { flex: 1 1 160px; accent-color: var(--brass); }
+
+/* 教練框 */
+.coach { background: #f8f2e2; color: #2b2410; border-radius: 14px; padding: 12px 14px; position: sticky; top: 10px; display: flex; flex-direction: column; max-height: calc(100vh - 20px); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+.chead { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e3d7b7; padding-bottom: 8px; flex-wrap: wrap; }
+.cname { font-family: var(--serif); font-weight: 900; font-size: 19px; }
+.coach .note { color: #7a6c48; }
+.coach .tog { margin-left: auto; }
+.cbody { overflow-y: auto; padding: 10px 2px 6px; flex: 1 1 auto; min-height: 140px; font-size: 15px; }
+.cbody h3 { color: #2b2410; font-size: 18px; margin: 0 0 8px; font-weight: 800; }
+.cbody p { margin: 0 0 8px; }
+.cbody .tip { background: #efe3bf; border-left: 4px solid var(--brass); padding: 8px 10px; border-radius: 6px; font-size: 14px; margin: 8px 0; }
+.cbody .tip b { display: block; font-size: 12px; color: #7a5a14; margin-bottom: 2px; }
+.adv { border: 2px solid var(--brass); border-radius: 10px; padding: 10px 12px; background: #fffaf0; margin: 4px 0 8px; }
+.adv .rec { font-size: 18px; font-weight: 800; color: #6b4a06; }
+.adv ol { padding-left: 1.3em; margin: 6px 0 4px; }
+.adv li { margin: 5px 0; }
+.adv details summary { cursor: pointer; color: #7a5a14; font-size: 14px; }
+.grade { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border-radius: 8px; margin: 6px 0; }
+.grade.good { background: #def0e1; } .grade.ok { background: #f8ebc8; } .grade.bad { background: #f6d8d3; }
+.grade .mk { font-size: 20px; line-height: 1.1; font-weight: 900; }
+.grade.good .mk { color: #23773f; } .grade.ok .mk { color: #a86b06; } .grade.bad .mk { color: #b62d24; }
+.review { list-style: none; padding: 0; margin: 6px 0; }
+.review li { display: flex; gap: 8px; padding: 5px 0; border-bottom: 1px solid #e8dcbc; font-size: 14px; }
+.review .mk { font-weight: 900; width: 1.2em; flex: none; }
+.review .good .mk { color: #23773f; } .review .ok .mk { color: #a86b06; } .review .bad .mk { color: #b62d24; }
+.endbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.coach .ct.c0 { color: #1c2333; } .coach .ct.c1 { color: #b62d24; } .coach .ct.c2 { color: #1f58b8; } .coach .ct.c3 { color: #23773f; }
+.coach .btn { background: #efe3bf; border-color: #d9c99c; color: #2b2410; }
+.coach .btn.main { background: var(--brass); border-color: var(--brass); color: #1b1608; }
+.coach .btn:disabled { opacity: .4; }
+.codds { border-top: 1px solid #e3d7b7; padding: 4px 0; font-size: 14px; }
+.codds summary { cursor: pointer; font-weight: 700; padding: 4px 0; color: #6b4a06; }
+.codds table { width: 100%; border-collapse: collapse; }
+.codds td { padding: 2px 0; }
+.codds td.r { text-align: right; font-variant-numeric: tabular-nums; }
+.codds .bar { background: #e8dcbc; margin: 0 8px; height: 8px; }
+.codds .bar i { background: #a8822e; }
+.codds tr.hl td { font-weight: 800; }
+.cnav { display: flex; gap: 8px; align-items: center; padding-top: 10px; border-top: 1px solid #e3d7b7; flex-wrap: wrap; }
+.cnav #bNext { flex: 1 1 auto; font-size: 17px; }
+.tog { font-size: 13px; display: flex; gap: 5px; align-items: center; cursor: pointer; user-select: none; }
+
+/* 牌型大小 */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: grid; place-items: center; z-index: 40; padding: 16px; }
+.mbox { background: #f8f2e2; color: #2b2410; border-radius: 14px; padding: 18px 20px; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.mbox h2 { color: #2b2410; }
+.rk { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #e8dcbc; }
+.rk .nm { width: 6.5em; font-weight: 800; flex: none; }
+.rk .cds { display: flex; gap: 3px; }
+.rk .cd { --w: 28px; }
+.mbox .note { color: #7a6c48; }
+
+@media (max-width: 1000px) {
+  .tv { grid-template-columns: 1fr; padding: 8px 12px 20px; }
+  .coach { position: static; max-height: none; }
+  .cbody { max-height: none; }
+  .modes { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .felt { aspect-ratio: 1 / 1.08; max-height: none; }
+  .rail { inset: 12% 7% 13%; }
+  .seat { width: 80px; }
+  .seat .plate { min-width: 70px; padding: 2px 5px 3px; }
+  .seat .plate b { font-size: 12px; }
+  .seat .plate .stk { font-size: 12px; }
+  .seat .hc { min-height: 34px; }
+  .cd.small { --w: 24px; }
+  .cd.small .r { font-size: 12px; }
+  .cd.small::after { font-size: 11px; }
+  .seat.hero { width: 120px; }
+  .seat.hero .hc { min-height: 56px; }
+  .cd.heroc { --w: 42px; }
+  .board .cd { --w: 36px; } .board .slot { width: 36px; height: 50px; }
+  .center { top: 44%; }
+  .hometitle { font-size: 27px; }
+  .acts2 button { font-size: 16px; padding: 11px 8px; flex-basis: 30%; }
+  .topnav .chip { padding: 4px 10px; font-size: 13px; }
+}
+@media (max-height: 520px) and (min-width: 640px) {
+  body.intable .top { display: none; }
+  .tv { grid-template-columns: minmax(0, 1fr) 300px; padding: 4px 8px; gap: 8px; }
+  .streetbar { margin-bottom: 2px; font-size: 11px; }
+  .streetbar li { padding: 1px 8px; }
+  .felt { aspect-ratio: auto; height: calc(100vh - 82px); max-height: none; }
+  .rail { inset: 8% 5%; }
+  .seat { width: 78px; gap: 1px; }
+  .seat:not(.hero) .cd.back { display: none; }
+  .seat:not(.hero) .hc { min-height: 0; }
+  .seat .plate { min-width: 70px; padding: 1px 5px 2px; line-height: 1.15; }
+  .seat .plate b { font-size: 12px; }
+  .seat .plate .sty { font-size: 10px; }
+  .seat .plate .stk { font-size: 11px; }
+  .seat .bubble { font-size: 10px; padding: 0 5px; }
+  .seat.hero { width: 110px; }
+  .seat.hero .hc { min-height: 44px; }
+  .cd.heroc { --w: 32px; }
+  .cd.small { --w: 22px; }
+  .board .cd { --w: 32px; } .board .slot { width: 32px; height: 45px; }
+  .pot { font-size: 12px; padding: 0 10px; }
+  .live { display: none; }
+  .actbar { margin-top: 4px; }
+  .acts2 button { padding: 6px; font-size: 14px; border-radius: 9px; }
+  .coach { position: sticky; top: 4px; max-height: calc(100vh - 8px); padding: 8px 10px; }
+  .cbody { font-size: 13.5px; min-height: 60px; }
+  .cbody h3 { font-size: 15px; }
+  .cnav .btn { padding: 5px 10px; font-size: 14px; }
+  .cnav #bNext { font-size: 15px; }
+}
+
 @media (max-width: 900px) {
   .calc, .sview { grid-template-columns: 1fr; }
   .calc { display: flex; flex-direction: column; gap: 16px; }
@@ -182,11 +374,76 @@ h3 { font-size: 14px; margin: 0 0 6px; color: var(--mute); font-weight: 500; }
 </style>
 <div id="app">
 <header class="top">
-  <div class="seal" aria-hidden="true"><b>德</b><b>州</b><b>軍</b><b>師</b></div>
-  <div class="brand"><h1>德州軍師</h1><p>引擎實驗室（第一步）：勝率、牌型機率、GTO 求解器</p></div>
+  <button class="seal" id="bHomeSeal" aria-label="回首頁"><b>德</b><b>州</b><b>軍</b><b>師</b></button>
+  <div class="brand"><h1>德州軍師</h1><p id="subTitle">德州撲克教練：一步一步帶你打</p></div>
+  <nav class="topnav" aria-label="主選單">
+    <button class="chip" id="nHome">首頁</button>
+    <button class="chip" id="nGame" hidden>回到牌局</button>
+    <button class="chip" id="nRanks">牌型大小</button>
+    <button class="chip" id="nTools">工具</button>
+  </nav>
   <div class="webbar" id="webbar"></div>
 </header>
-<nav class="tabs" role="tablist" aria-label="功能">
+
+<section id="vHome" class="view">
+  <div class="home">
+    <h2 class="hometitle">坐下來，打一手德州撲克</h2>
+    <p class="homelede">發牌、下注、比大小，教練每一步都會說明現在發生什麼、你的牌有多強、該怎麼做和為什麼。</p>
+    <div class="field"><div class="flabel">幾個人一起玩（含你）</div><div class="pills" id="hN"></div></div>
+    <div class="field"><div class="flabel">模式</div>
+      <div class="modes" id="hMode">
+        <button type="button" data-m="teach"><b>教學模式</b><span>建議新手。每一步都停下來，按「下一步」才繼續</span></button>
+        <button type="button" data-m="play"><b>一般對局</b><span>只有輪到你時才停，教練在旁邊提示</span></button>
+      </div>
+    </div>
+    <div class="field"><div class="flabel">對手強度</div><div class="pills" id="hL"></div></div>
+    <div class="homego">
+      <button class="btn main big" id="bStart">開始發牌</button>
+      <button class="btn big" id="bResume" hidden>回到牌局</button>
+    </div>
+    <p class="note" id="homeStats"></p>
+    <p class="note">想自己查勝率、看 GTO 求解器：右上角「工具」。<button type="button" class="linkbtn" id="bResetTips">重新顯示新手說明</button></p>
+  </div>
+</section>
+
+<section id="vTable" class="view" hidden>
+  <div class="tv">
+    <div class="tleft">
+      <ol class="streetbar" id="streetBar" aria-label="這一手進行到哪裡"></ol>
+      <div class="felt" id="felt"><div class="rail"></div><div id="seats"></div>
+        <div class="center"><div class="pot num" id="potTxt"></div><div class="board" id="board"></div><div class="live" id="liveTxt"></div></div>
+      </div>
+      <div class="actbar" id="actBar" hidden>
+        <div class="acts2" id="actBtns"></div>
+        <div class="sizer" id="sizer" hidden>
+          <div class="presets" id="presets"></div>
+          <div class="sizerow"><input type="range" id="sizeRange" aria-label="下注大小"><button class="btn main" id="bBetGo"></button><button class="btn" id="bBetCancel">取消</button></div>
+        </div>
+      </div>
+    </div>
+    <aside class="coach" id="coach" aria-live="polite">
+      <div class="chead">
+        <span class="cname">教練</span><span class="note num" id="handNo"></span>
+        <label class="tog" id="peekWrap"><input type="checkbox" id="peekChk">偷看對手的牌</label>
+      </div>
+      <div class="cbody" id="cBody"></div>
+      <details class="codds" id="cOdds"><summary>看勝率表</summary><div id="oddsBox"></div></details>
+      <div class="cnav" id="cNav">
+        <button class="btn" id="bPrev">◀ 上一步</button>
+        <button class="btn main" id="bNext">下一步 ▶</button>
+        <button class="btn" id="bSkip" hidden>跳到這一手結束</button>
+        <label class="tog"><input type="checkbox" id="autoChk">自動播放</label>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<div id="ranksModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="ranksTitle">
+  <div class="mbox"><h2 id="ranksTitle">牌型大小（由大到小）</h2><div id="ranksList"></div><p class="note">用自己 2 張＋公牌 5 張裡最好的 5 張比。同牌型再比點數，A 最大（A2345 的順子 A 當 1）。花色不分大小。</p><button class="btn main" id="ranksClose">知道了</button></div>
+</div>
+
+<section id="vTools" class="view" hidden>
+<nav class="tabs" role="tablist" aria-label="工具">
   <button role="tab" id="tCalc" aria-controls="pCalc" aria-selected="true">勝率計算機</button>
   <button role="tab" id="tSolve" aria-controls="pSolve" aria-selected="false">求解器</button>
   <button role="tab" id="tBench" aria-controls="pBench" aria-selected="false">效能測試</button>
@@ -276,4 +533,5 @@ h3 { font-size: 14px; margin: 0 0 6px; color: var(--mute); font-weight: 500; }
     </div>
   </section>
 </main>
+</section>
 </div>

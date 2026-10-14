@@ -17,7 +17,7 @@
   const say = (msg, ms) => { toast.textContent = msg; toast.style.display = 'block'; clearTimeout(tt); tt = setTimeout(() => { toast.style.display = 'none'; }, ms || 4000); };
 
   $('btnShare').addEventListener('click', async () => {
-    const data = { title: '德州軍師', text: '德州撲克勝率計算機和 GTO 求解器，手機點開就能用：', url: shareUrl };
+    const data = { title: '德州軍師', text: '跟電腦打德州撲克，教練一步一步教你怎麼打，手機點開就能用：', url: shareUrl };
     try { if (navigator.share) { await navigator.share(data); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
     try { await navigator.clipboard.writeText(shareUrl); say('連結已複製，貼給朋友就能用。'); }
     catch (e) { say('把這個網址傳給朋友：' + shareUrl, 9000); }

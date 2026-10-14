@@ -61,7 +61,7 @@ print('built', len(page) // 1024, 'KB; engine', len(engine_js) // 1024, 'KB;', l
 if len(sys.argv) > 1:
     url = sys.argv[1].rstrip('/') + '/'
     site = root.parent
-    desc = '德州撲克的勝率計算機：每一手對 1 到 8 家的勝率、到河牌的牌型機率、出牌數，隨公牌即時更新；還有 GTO 求解器。手機點開就能用。'
+    desc = '跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。'
     meta = ('<meta name="theme-color" content="#0e1d19">'
             f'<meta name="description" content="{desc}">'
             '<link rel="manifest" href="manifest.webmanifest">'

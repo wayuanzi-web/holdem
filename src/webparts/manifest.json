@@ -1,7 +1,7 @@
 {
   "name": "德州軍師",
   "short_name": "德州軍師",
-  "description": "德州撲克的勝率計算機、牌型機率和 GTO 求解器。不用帳號，點開就能用。",
+  "description": "跟電腦打德州撲克，教練一步一步解說每個決定；另有勝率計算機和 GTO 求解器。不用帳號，點開就能用。",
   "lang": "zh-Hant",
   "start_url": "./",
   "scope": "./",

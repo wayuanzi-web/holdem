@@ -31,11 +31,13 @@ const W = (function makeWorker() {
   const src = $('engine').textContent + '\n' + $('workersrc').textContent;
   const w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
   const subs = {};
+  let calcSeq = 0;
   w.onmessage = (e) => { const m = e.data; (subs[m.cmd] || []).forEach((f) => f(m)); };
   w.onerror = (e) => { console.error(e); };
   return {
     on(cmd, f) { (subs[cmd] = subs[cmd] || []).push(f); },
     send(m) { w.postMessage(m); },
+    nextCalc() { return ++calcSeq; },     // 勝率計算機和牌局的勝率表共用同一個背景執行緒：各自記住自己的編號
   };
 })();
 

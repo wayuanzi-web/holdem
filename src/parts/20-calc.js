@@ -49,7 +49,7 @@ function calcChanged() {
   CALC.res = null; CALC.mc = null;
   if (!hero) { calcMsg('先放兩張手牌。'); return; }
   if (board.length === 1 || board.length === 2) { calcMsg('公牌要放到 3 張（翻牌）才能算翻牌後的機率。'); return; }
-  CALC.sent++;
+  CALC.sent = W.nextCalc();
   W.send({ cmd: 'calc', hero, board, maxOpp: 8 });
   $('bigEq').textContent = '…';
 }

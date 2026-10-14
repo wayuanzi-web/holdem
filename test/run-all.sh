@@ -8,4 +8,8 @@ python3 test/py/treys_dump.py 200000 "$T/treys.txt" && node test/eval-treys.js "
 node test/equity-check.js
 node test/solver-toy.js
 for w in river turn; do node test/solver-dump.js $w "$T/dump-$w.json" && python3 test/py/br_check.py "$T/dump-$w.json"; done
+node test/game-cases.js > /dev/null && echo 牌局規則情境 OK
+node test/game-random.js 20000
+node test/ai-sim.js 600 6 2 | head -1
+node test/coach-sim.js 150 0 | tail -1
 echo 全部通過

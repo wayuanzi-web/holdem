@@ -64,8 +64,8 @@ async def main():
     f_big = ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSerifCJK-Black.ttc', 84, index=0)
     f_sm = ImageFont.truetype('/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', 30, index=0)
     d.text((60, 340), '德州軍師', font=f_big, fill='#e6eee9')
-    d.text((62, 460), '每一手的勝率、牌型機率', font=f_sm, fill='#c9d6cf')
-    d.text((62, 504), 'GTO 求解器，手機點開就能用', font=f_sm, fill='#c9d6cf')
+    d.text((62, 460), '跟電腦打德州撲克', font=f_sm, fill='#c9d6cf')
+    d.text((62, 504), '教練一步一步教你怎麼打', font=f_sm, fill='#c9d6cf')
     og.save(out / 'og.png')
     print('icons and og.png written')
 
