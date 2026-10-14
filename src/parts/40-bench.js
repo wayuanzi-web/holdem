@@ -50,6 +50,7 @@ function initBench() {
   $('devInfo').textContent = devText();
   $('bBench').addEventListener('click', () => {
     if (BENCH.running) return;
+    if (ST.running) { $('benchMsg').textContent = 'GTO 工作室正在算（求解或多翻牌報告）：先等它算完或停下來，測出來的速度才準。'; return; }
     BENCH.running = true; BENCH.res = []; BENCH.t0 = Date.now();
     renderBench();
     $('bBench').disabled = true; $('bCopy').disabled = true;

@@ -113,7 +113,7 @@ function gtoGrade(ev) {
   const mine = gtoLabel(a.acts[i]), top = gtoLabel(a.acts[gtoBest()]);
   const text = mark === 'good' ? '這手牌 GTO 有 ' + pct(f, 0) + '% 的時候' + mine + '，打得好。'
     : mark === 'ok' ? '這手牌 GTO 很少' + mine + '（' + pct(f, 0) + '%），不過只少賺 ' + fmt(loss, 1) + '，差不多。'
-      : '這手牌 GTO 幾乎不會' + mine + '（' + pct(f, 0) + '%），平均少賺 ' + fmt(loss, 1) + ' 籌碼（約 ' + fmt(loss / GAME_BB, 1) + ' 個大盲）。';
+      : '這手牌 GTO 幾乎不會' + mine + '（' + pct(f, 0) + '%），平均少賺 ' + fmt(loss, 1) + ' 籌碼（約 ' + fmt(loss / G.H.bb, 1) + ' 個大盲）。';
   return { mark, text, src: 'GTO', loss, adv: top, freq: f };
 }
 /* 教練框裡的 GTO 區塊 */
@@ -183,5 +183,5 @@ function trainStatsText() {
 }
 function trainAdd(gr) {
   const t = GS.trainStats || (GS.trainStats = { n: 0, good: 0, ok: 0, bad: 0, loss: 0 });
-  t.n++; t[gr.mark]++; t.loss += gr.loss || 0;
+  t.n++; t[gr.mark]++; t.loss += (gr.loss || 0) * GAME_BB / ((G.H && G.H.bb) || GAME_BB); /* 換算成標準盲注的籌碼 */
 }

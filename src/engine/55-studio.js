@@ -292,3 +292,101 @@ function gtoMapAct(nd, ev) {
   else st = { t: ev.t === 'a' ? 'a' : ev.curBefore === 0 ? 'b' : 'r', to: ev.to };
   return matchAct(nd.acts, st);
 }
+
+/* ===== 多翻牌報告（像 Pio 的 aggregated report）=====
+   同一組範圍、下注選項，套到一組有代表性的翻牌，每個翻牌算到低精度，彙整「誰下注多少、勝率、EV」。
+   權重：全部 22,100 種翻牌，各自歸給「同花結構、有沒有對子一樣，點數最接近」的代表翻牌 */
+const BATCH_SETS = {
+  small: { name: '精簡 12 個', flops: ['AsKd7c', 'Ks9d4c', 'Js7d3c', '6s5d2c', 'Ad9s6s', 'KdTs5s', 'JsTd8s', '7s5d3s', 'Ks8s4s', 'KsKd4c', '7s7d2c', 'As5d5s'] },
+  std: {
+    name: '標準 25 個',
+    flops: ['AsKd7c', 'As8d3c', 'As5d4c', 'KsQd6c', 'Ks9d4c', 'QsJd8c', 'Js7d3c', 'Ts9d6c', '6s5d2c',
+      'AsKs2d', 'Ad9s6s', 'KdTs5s', 'Qs7s3d', 'JsTd8s', '9s8s4d', '7s5d3s',
+      'AsJs6s', 'Ks8s4s', '8s6s4s',
+      'AsAd7c', 'KsKd4c', 'Qs3d3c', '7s7d2c', 'TsTd5s', 'As5d5s'],
+  },
+};
+const BATCH_ITERS = 60;          // 估時間用：低精度大約要算幾次
+function flopShape(cs) {
+  const r = cs.map((c) => c >> 2).sort((a, b) => b - a), ns = new Set(cs.map((c) => c & 3)).size;
+  const pair = r[0] === r[2] ? 2 : r[0] === r[1] || r[1] === r[2] ? 1 : 0;
+  return { r, suit: ns === 1 ? 'm' : ns === 2 ? 't' : 'r', pair };
+}
+function flopClassKey(sh) { return sh.pair === 2 ? 'pr' : (sh.pair ? 'p' : 'u') + sh.suit; }
+function flopDist(a, b) {
+  if (a.pair && b.pair) {
+    const pa = a.r[1], ka = a.r[0] === a.r[1] ? a.r[2] : a.r[0], pb = b.r[1], kb = b.r[0] === b.r[1] ? b.r[2] : b.r[0];
+    return 2 * Math.abs(pa - pb) + Math.abs(ka - kb);
+  }
+  return 1.5 * Math.abs(a.r[0] - b.r[0]) + Math.abs(a.r[1] - b.r[1]) + 0.75 * Math.abs(a.r[2] - b.r[2]);
+}
+/* 每個代表翻牌的權重（加起來是 1） */
+function flopWeights(list) { return flopAssign(list).w; }
+/* 全部翻牌分給代表翻牌：w[i]＝代表 i 的權重；grp[分類][名稱][i]＝屬於那個分類、又分給代表 i 的比例
+   （分類的平均要用這個：例如「K 高」的翻牌有些分給了 A 高或 Q 高的代表） */
+function flopAssign(list) {
+  const sh = list.map((b) => flopShape(parseCards(b))), key = sh.map(flopClassKey), w = new Array(list.length).fill(0);
+  const grp = { high: {}, suit: {}, pair: {} };
+  let tot = 0;
+  for (let a = 0; a < 52; a++) for (let b = a + 1; b < 52; b++) for (let c = b + 1; c < 52; c++) {
+    const s = flopShape([a, b, c]), k = flopClassKey(s);
+    let best = -1, bd = 1e9;
+    for (let pass = 0; pass < 2 && best < 0; pass++) {
+      for (let i = 0; i < sh.length; i++) {
+        if (pass === 0 ? key[i] !== k : !sh[i].pair !== !s.pair) continue;
+        const d = flopDist(s, sh[i]);
+        if (d < bd) { bd = d; best = i; }
+      }
+    }
+    if (best < 0) best = 0;
+    w[best]++; tot++;
+    const g = flopGroupsOf(s);
+    for (const d of ['high', 'suit', 'pair']) { const m = grp[d][g[d]] || (grp[d][g[d]] = new Array(list.length).fill(0)); m[best]++; }
+  }
+  for (const d of Object.keys(grp)) for (const k of Object.keys(grp[d])) grp[d][k] = grp[d][k].map((x) => x / tot);
+  return { w: w.map((x) => x / tot), grp };
+}
+/* 翻牌的分類（彙整用） */
+function flopGroups(b) { return flopGroupsOf(flopShape(parseCards(b))); }
+function flopGroupsOf(s) {
+  const h = s.r[0];
+  return {
+    high: h === 12 ? 'A 高' : h === 11 ? 'K 高' : h >= 9 ? 'Q、J 高' : '10 以下',
+    suit: { r: '彩虹（三種花色）', t: '兩張同花', m: '單色（三張同花）' }[s.suit],
+    pair: s.pair ? '有對子' : '沒有對子',
+  };
+}
+/* 一個節點：輪到的人整個範圍，每個動作的比例、平均勝率（對對手到這裡的範圍）、平均 EV */
+function aggNode(v) {
+  const p = v.p, n = v.n[p], k = v.acts.length, f = new Array(k).fill(0);
+  let W = 0, eq = 0, ev = 0;
+  for (let h = 0; h < n; h++) {
+    const w = v.reach[p][h] * v.comp[h];
+    if (!(w > 0)) continue;
+    W += w; eq += w * v.eq[h]; ev += w * v.ev[h];
+    for (let a = 0; a < k; a++) f[a] += w * v.strat[a * n + h];
+  }
+  return { acts: v.acts.map((a) => ({ t: a.t, label: a.label, add: a.add })), freq: f.map((x) => (W > 0 ? x / W : 0)), eq: W > 0 ? eq / W : 0, ev: W > 0 ? ev / W : 0 };
+}
+/* 解好的一個翻牌 → 報告的一列。s：Solver 或 ParSolver */
+async function batchRow(s) {
+  const v = await s.nodeView([]);
+  if (v.kind !== N_ACT) return null;
+  const oop = aggNode(v);
+  const ix = v.acts.findIndex((a) => a.t === 'x');
+  let ipx = null;
+  if (ix >= 0) { const v2 = await s.nodeView([{ a: ix }]); if (v2.kind === N_ACT) ipx = aggNode(v2); }
+  const ev = await s.evs();
+  return { pot: v.pot, oop, ipx, eq0: oop.eq, ev: [ev[0], ev[1]] };
+}
+/* 下注（含全下）的比例 */
+function betFreq(node) { if (!node) return 0; let s = 0; node.acts.forEach((a, i) => { if (a.t !== 'x' && a.t !== 'c' && a.t !== 'f') s += node.freq[i]; }); return s; }
+/* 很多列 → 加權平均（rows: [{w, row}]） */
+function batchAvg(items) {
+  let W = 0, b0 = 0, b1 = 0, eq = 0, e0 = 0, e1 = 0;
+  for (const { w, row } of items) {
+    if (!row) continue;
+    W += w; b0 += w * betFreq(row.oop); b1 += w * betFreq(row.ipx); eq += w * row.eq0; e0 += w * row.ev[0] / row.pot; e1 += w * row.ev[1] / row.pot;
+  }
+  return W > 0 ? { w: W, bet0: b0 / W, bet1: b1 / W, eq0: eq / W, ev0: e0 / W, ev1: e1 / W } : null;
+}

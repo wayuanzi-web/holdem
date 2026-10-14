@@ -25,11 +25,39 @@ function posClass(code) {
   return 'middle';
 }
 
+/* 錦標賽（坐滿就開）：每人 1500，盲注每 8 手升一級，輸光的人離桌；前幾名分獎金 */
+const TOURNEY_LEVELS = [[10, 20], [15, 30], [25, 50], [40, 80], [50, 100], [75, 150], [100, 200], [150, 300], [200, 400], [300, 600], [400, 800], [600, 1200], [800, 1600], [1000, 2000], [1500, 3000], [2000, 4000]];
+const TOURNEY_PAY = { 2: [100], 3: [65, 35], 4: [65, 35], 5: [65, 35], 6: [65, 35], 7: [50, 30, 20], 8: [50, 30, 20], 9: [50, 30, 20] };
 function newTable(opt) {
   const n = opt.n;
   const seats = [];
-  for (let i = 0; i < n; i++) seats.push({ name: opt.names[i], style: opt.styles[i], stack: GAME_STACK, hero: i === 0 });
-  return { n, seats, button: (opt.button === undefined ? n - 1 : opt.button), handNo: 0, level: opt.level || 1 };
+  const st = opt.tourney ? 1500 : GAME_STACK;
+  for (let i = 0; i < n; i++) seats.push({ name: opt.names[i], style: opt.styles[i], stack: st, hero: i === 0 });
+  const T = { n, seats, button: (opt.button === undefined ? n - 1 : opt.button), handNo: 0, level: opt.level || 1, sb: GAME_SB, bb: GAME_BB };
+  if (opt.tourney) T.tourney = { per: opt.per || 8, start: n, places: [], pay: TOURNEY_PAY[n] || [65, 35], lv: 0 };
+  return T;
+}
+/* 錦標賽：把輸光的人請下桌（記名次），照手數升盲注。回傳這一手被淘汰的人 */
+function tourneyPrep(T) {
+  const R = T.tourney;
+  if (!R) return [];
+  const out = [];
+  for (let i = T.seats.length - 1; i >= 1; i--) if (T.seats[i].stack <= 0) out.push(i);
+  if (out.length) {
+    const remaining = T.seats.length - out.length;
+    // 同一手出局：這手開始時籌碼多的名次比較前面
+    out.slice().sort((x, y) => (T.seats[y].handStart || 0) - (T.seats[x].handStart || 0)).forEach((i, q) => R.places.push({ name: T.seats[i].name, place: remaining + 1 + q }));
+    const b = T.button, before = out.filter((i) => i < b).length, gone = out.indexOf(b) >= 0;
+    const lb = T.lastBB, lbGone = out.indexOf(lb) >= 0, lbNew = lb - out.filter((i) => i < lb).length;
+    for (const i of out) T.seats.splice(i, 1);                 // out 是由大到小
+    T.n = T.seats.length;
+    T.button = ((b - before - (gone ? 1 : 0)) % T.n + T.n) % T.n;   // 按鈕那個人走了：算在他前一位，下一手往下移就對了
+    // 剩兩個人：上一手的大盲這手改當按鈕（小盲），不會連續下兩次大盲
+    if (T.n === 2 && lb >= 0 && !lbGone) T.button = (lbNew + 1) % 2;
+  }
+  R.lv = Math.min(TOURNEY_LEVELS.length - 1, Math.floor(T.handNo / R.per));
+  T.sb = TOURNEY_LEVELS[R.lv][0]; T.bb = TOURNEY_LEVELS[R.lv][1];
+  return out;
 }
 
 function shuffled(rng) {
@@ -41,23 +69,26 @@ function shuffled(rng) {
 
 /* 開一手新牌：按鈕往左移一位、補滿輸光的人 */
 function newHand(T, rng) {
+  const rebuy = [];
+  if (T.tourney) tourneyPrep(T);
   T.handNo++;
   const n = T.n;
-  const rebuy = [];
-  for (let i = 0; i < n; i++) if (T.seats[i].stack <= 0) { T.seats[i].stack = GAME_STACK; rebuy.push(i); }
+  if (!T.tourney) for (let i = 0; i < n; i++) if (T.seats[i].stack <= 0) { T.seats[i].stack = GAME_STACK; rebuy.push(i); }
   T.button = (T.button + 1) % n;
   const codes = posCodes(n);
+  for (const s of T.seats) s.handStart = s.stack;
   const players = T.seats.map((s, i) => ({
     seat: i, name: s.name, style: s.style, hero: s.hero, start: s.stack, stack: s.stack,
     bet: 0, total: 0, cards: [], folded: false, allin: false, acted: false, canRaise: true,
     pos: codes[(i - T.button + n) % n],
   }));
   const H = {
-    no: T.handNo, n, button: T.button, sb: GAME_SB, bb: GAME_BB, players, board: [], deck: shuffled(rng), dp: 0,
-    street: 0, curBet: 0, minRaise: GAME_BB, toAct: -1, phase: 'blinds', log: [], rebuy,
+    no: T.handNo, n, button: T.button, sb: T.sb || GAME_SB, bb: T.bb || GAME_BB, players, board: [], deck: shuffled(rng), dp: 0,
+    street: 0, curBet: 0, minRaise: T.bb || GAME_BB, toAct: -1, phase: 'blinds', log: [], rebuy, tourney: !!T.tourney,
     sbSeat: n === 2 ? T.button : (T.button + 1) % n, bbSeat: -1, runout: false, result: null, aggressor: -1,
   };
   H.bbSeat = (H.sbSeat + 1) % n;
+  T.lastBB = H.bbSeat;
   H.log.push({ k: 'start', button: H.button, sbSeat: H.sbSeat, bbSeat: H.bbSeat, rebuy });
   return H;
 }
@@ -115,7 +146,7 @@ function afterAction(H) {
 function applyAction(H, a) {
   const L = legalActions(H), p = H.players[H.toAct];
   const potBefore = potTotal(H);
-  const ev = { k: 'act', seat: p.seat, street: H.street, toCall: L.toCall, potBefore, curBefore: H.curBet };
+  const ev = { k: 'act', seat: p.seat, street: H.street, toCall: L.toCall, potBefore, curBefore: H.curBet, canRaiseBefore: L.canRaise };
   if (a.t === 'f' && L.toCall === 0) a = { t: 'x' };                       // 不用跟注時棄牌＝過牌
   if (a.t === 'x' && L.toCall > 0) a = { t: 'c' };
   if (a.t === 'r' && !L.canRaise) a = { t: L.toCall > 0 ? 'c' : 'x' };
@@ -155,7 +186,9 @@ function gameStep(H) {
   if (H.phase === 'blinds') {
     const s = H.players[H.sbSeat], b = H.players[H.bbSeat];
     const sa = putChips(H, s, H.sb), ba = putChips(H, b, H.bb);
-    H.curBet = Math.max(s.bet, b.bet); H.minRaise = H.bb;
+    // 大盲籌碼不夠下滿：還有兩個以上的人能說話時，要跟的仍然是一個大盲
+    const canAct = H.players.filter((q) => !q.folded && !q.allin).length;
+    H.curBet = Math.max(s.bet, b.bet, canAct >= 2 ? H.bb : 0); H.minRaise = H.bb;
     H.phase = 'deal';
     const ev = { k: 'blinds', sb: { seat: s.seat, amt: sa }, bb: { seat: b.seat, amt: ba } };
     H.log.push(ev); return ev;

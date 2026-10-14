@@ -8,7 +8,7 @@ function engineSource() {
 function load() {
   const src = engineSource();
   const names = new Set();
-  for (const m of src.matchAll(/^(?:function|class)\s+([A-Za-z_$][\w$]*)/gm)) names.add(m[1]);
+  for (const m of src.matchAll(/^(?:async\s+)?(?:function|class)\s+([A-Za-z_$][\w$]*)/gm)) names.add(m[1]);
   for (const m of src.matchAll(/^(?:const|let)\s+(.*)$/gm)) {                 // const A = …, B = …;
     for (const x of m[1].matchAll(/(?:^|,\s*)([A-Za-z_$][\w$]*)\s*=(?!=)/g)) names.add(x[1]);
   }

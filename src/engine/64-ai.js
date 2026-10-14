@@ -25,6 +25,21 @@ function aiDecide(H, rng, level) {
   const L = legalActions(H), p = H.players[L.seat];
   const st = STYLES[p.style] || STYLES.tag, lv = AI_LEVEL[level || 2];
   const g = classIndex(p.cards[0] >> 2, p.cards[1] >> 2, (p.cards[0] & 3) === (p.cards[1] & 3));
+  if (H.street === 0) {                                       // 短碼：推或棄（照風格鬆緊放寬或收緊）
+    const sh = shortSpot(H, L.seat);
+    if (sh) {
+      let go;
+      if (sh.kind === 'push') go = PRE_PCT[g] + gauss(rng) * lv.noise * 0.3 < Math.min(0.95, sh.pct * Math.sqrt(st.loose));
+      else if (sh.kind === 'reshove') go = sh.ev / Math.max(1, sh.pot) + gauss(rng) * lv.noise * 0.6 + (st.loose - 1) * 0.15 > 0;
+      else go = sh.eq + gauss(rng) * lv.noise * 0.06 + (st.loose - 1) * 0.04 + (st.sticky || 0) >= sh.need;
+      if (go) return sh.kind === 'push' || (L.canRaise && L.maxTo > H.curBet && p.stack + p.bet > H.curBet) ? { t: 'r', to: L.maxTo } : { t: 'c' };
+      return { t: L.canCheck ? 'x' : 'f' };
+    }
+  }
+  if (H.street === 0 && p.style === 'gto') {                // GTO 電腦：翻牌前照圖表的比例
+    const ch = chartSpot(H, L.seat);
+    if (ch) return chartAct(H, L, ch, rng);
+  }
   if (H.street === 0) {
     let pct = PRE_PCT[g] + gauss(rng) * lv.noise * 0.4;
     const raises = preflopRaises(H), limpers = preflopLimpers(H);

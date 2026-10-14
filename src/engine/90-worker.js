@@ -105,6 +105,38 @@ async function runSolve(s, m, resumed) {
   postMessage({ cmd: 'solve-done', id, tag: m.tag, t: s.t, t0, pct: ex.pct, ms: nowMs() - t1, ev: evs, stopped: stopFlag, threads: s.k || 1 });
 }
 
+/* ===== 多翻牌報告：一個翻牌一個翻牌算，每算好一個回報一列（會清掉工作室現在的解） ===== */
+async function doBatch(m) {
+  stopFlag = false;
+  SOL = null; const id = ++SOL_ID;
+  const k = Math.min(PORTS.length, m.threads || 0);
+  for (let i = m.from || 0; i < m.flops.length; i++) {
+    if (stopFlag || id !== SOL_ID) break;
+    const cfg = Object.assign({}, m.cfg, { board: parseCards(m.flops[i]) });
+    const t0 = nowMs();
+    let s;
+    try {
+      if (k >= 2) { s = new ParSolver(cfg, k, sendHelper); await s.init(); } else s = new Solver(cfg);
+    } catch (e) { postMessage({ cmd: 'batch-row', tag: m.tag, i, error: e.message }); continue; }
+    let ex = null, lastYield = nowMs();
+    while (s.t < cfg.maxIters) {
+      await s.iterate(1);
+      if (s.t % 10 === 0 || s.t === cfg.maxIters) {
+        ex = await s.exploit();
+        postMessage({ cmd: 'batch-prog', tag: m.tag, i, t: s.t, pct: ex.pct, ms: nowMs() - t0 });
+        if (ex.pct <= cfg.target) break;
+      }
+      if (s.k || nowMs() - lastYield > 150) { if (!s.k) await tick(); lastYield = nowMs(); if (stopFlag || id !== SOL_ID) break; }
+    }
+    if (stopFlag || id !== SOL_ID) break;                       // 算到一半停：這一個不算數
+    if (!ex) ex = await s.exploit();
+    const row = await batchRow(s);
+    postMessage({ cmd: 'batch-row', tag: m.tag, i, row, pct: ex.pct, t: s.t, ms: nowMs() - t0, threads: s.k || 1 });
+    s = null;
+  }
+  postMessage({ cmd: 'batch-done', tag: m.tag, stopped: stopFlag });
+}
+
 async function doRunouts(m) {
   if (!SOL) { postMessage({ cmd: 'runouts', req: m.req, none: true }); return; }
   const t0 = nowMs();
@@ -174,6 +206,13 @@ function gQuery(m) {
   postMessage(Object.assign(base, info, { p, acts, freq, ev, pot: s.P0 + nd.inv0 + nd.inv1 }));
 }
 
+/* 範圍對範圍 */
+function doRvr(m) {
+  const t0 = nowMs();
+  const r = rangeVsRange(m.board, Float32Array.from(m.a), Float32Array.from(m.b), { iters: m.iters || 3000 });
+  postMessage({ cmd: 'rvr', req: m.req, total: r.total, cls: r.cls, nA: r.nA, nB: r.nB, boards: r.boards, ms: nowMs() - t0 });
+}
+
 function doLock(m) {
   if (!SOL) return;
   const ok = SOL.setLock(m.id, m.strat ? Float32Array.from(m.strat) : null);
@@ -213,6 +252,8 @@ onmessage = (e) => {
     else if (m.cmd === 'view') doView(m).catch((err) => postMessage({ cmd: 'error', req: m.req, of: 'view', msg: String((err && err.message) || err) }));
     else if (m.cmd === 'runouts') doRunouts(m).catch((err) => postMessage({ cmd: 'error', req: m.req, of: 'runouts', msg: String((err && err.message) || err) }));
     else if (m.cmd === 'lock') doLock(m);
+    else if (m.cmd === 'rvr') doRvr(m);
+    else if (m.cmd === 'batch') doBatch(m).catch((err) => postMessage({ cmd: 'batch-done', tag: m.tag, error: String((err && err.message) || err) }));
     else if (m.cmd === 'g-start') gStart(m).catch((err) => postMessage({ cmd: 'g-progress', key: m.key, error: String((err && err.message) || err) }));
     else if (m.cmd === 'g-query') gQuery(m);
     else if (m.cmd === 'g-stop') GSOL = null;

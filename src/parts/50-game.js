@@ -23,7 +23,7 @@ function showView(v) {
   document.body.classList.toggle('intable', v === 'table');
   $('nHome').hidden = v === 'home';
   $('nGame').hidden = v === 'table' || !G.H;
-  $('subTitle').textContent = v === 'tools' ? '工具：勝率計算機、GTO 工作室、效能測試' : '德州撲克教練：一步一步帶你打';
+  $('subTitle').textContent = v === 'tools' ? '工具：勝率計算機、翻牌前圖表、GTO 工作室、效能測試' : '德州撲克教練：一步一步帶你打';
   if (v !== 'table') clearTimeout(G.timer);
   if (v === 'home') renderHome();
   window.scrollTo(0, 0);
@@ -40,7 +40,8 @@ function renderHome() {
   $('bResume').hidden = !G.H;
   $('hGto').checked = GS.gtoCoach; $('hAutoPre').checked = GS.autoPre;
   $('trainStats').textContent = trainStatsText();
-  $('homeStats').textContent = GS.hands ? '你總共打了 ' + GS.hands + ' 手，' + (GS.net >= 0 ? '贏了 ' : '輸了 ') + Math.abs(GS.net) + ' 籌碼（' + (GS.net / GAME_BB >= 0 ? '+' : '') + (GS.net / GAME_BB).toFixed(0) + ' 個大盲）。' : '';
+  $('hTn').innerHTML = [6, 9].map((k) => '<button type="button" data-tn="' + k + '" aria-pressed="' + (k === (GS.tn || 6)) + '">' + k + ' 人</button>').join('');
+  $('homeStats').textContent = GS.hands ? '一般桌你總共打了 ' + GS.hands + ' 手，' + (GS.net >= 0 ? '贏了 ' : '輸了 ') + Math.abs(GS.net) + ' 籌碼（' + (GS.net / GAME_BB >= 0 ? '+' : '') + (GS.net / GAME_BB).toFixed(0) + ' 個大盲）。詳細的數字在上面的「統計」。' : '';
 }
 function initHome() {
   $('hN').addEventListener('click', (e) => { const b = e.target.closest('button[data-n]'); if (!b) return; GS.n = +b.dataset.n; gsSave(); renderHome(); });
@@ -49,24 +50,30 @@ function initHome() {
   $('hS').addEventListener('click', (e) => { const b = e.target.closest('button[data-s]'); if (!b) return; GS.speed = +b.dataset.s; gsSave(); renderHome(); });
   $('bStart').addEventListener('click', () => newGame(false));
   $('bTrain').addEventListener('click', () => newGame(true));
+  $('bTour').addEventListener('click', () => newGame('tourney'));
+  $('hTn').addEventListener('click', (e) => { const b = e.target.closest('button[data-tn]'); if (!b) return; GS.tn = +b.dataset.tn; gsSave(); renderHome(); });
   $('hGto').addEventListener('change', (e) => { GS.gtoCoach = e.target.checked; gsSave(); });
   $('hAutoPre').addEventListener('change', (e) => { GS.autoPre = e.target.checked; gsSave(); });
   $('bResume').addEventListener('click', () => { showView('table'); renderCur(); scheduleAuto(); });
 }
 
 /* ===== 開新的一桌、新的一手 ===== */
-function newGame(train) {
+/* kind：false 一般、true GTO 訓練、'tourney' 錦標賽 */
+function newGame(kind) {
   G.rng = makeRng((Date.now() ^ (Math.random() * 1e9)) >>> 0);
-  GS.train = !!train; gsSave();
-  const n = train ? 2 : GS.n, level = train ? 4 : GS.level;
+  const train = kind === true, tour = kind === 'tourney';
+  GS.train = train; gsSave();
+  const n = train ? 2 : tour ? GS.tn || 6 : GS.n, level = train ? 4 : GS.level;
   const opp = makeOpponents(n, level, G.rng);
-  G.T = newTable({ n, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level, button: (G.rng() * n) | 0 });
+  G.T = newTable({ n, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level, button: (G.rng() * n) | 0, tourney: tour });
+  G.tEnd = null;
   G.ctx = { hero: 0, seen: new Set(GS.seen) };
   showView('table');
   nextHand();
 }
 function nextHand() {
   clearTimeout(G.timer);
+  if (G.tEnd) return;
   G.H = newHand(G.T, G.rng);
   G.steps = []; G.view = -1; G.review = []; G.over = false; G.replay = false; G.waitingHero = false; G.pendingAI = null; G.adv = null; G.lastRender = null; G.flash = null; G.paused = false;
   $('cOdds').open = false;
@@ -87,8 +94,20 @@ function produce() {
     gtoReset();
     endHand(G.T, H);
     const net = H.result.net[0];
-    GS.hands++; GS.net += net; if (net > 0) GS.won++;
+    if (!G.T.tourney && !GS.train) { GS.hands++; GS.net += net; if (net > 0) GS.won++; }   // 首頁的數字只算一般桌
     gsSave();
+    if (G.T.tourney) {
+      const alive = G.T.seats.filter((x) => x.stack > 0).length, R = G.T.tourney;
+      const prize = (pl) => (pl <= R.pay.length ? Math.round(R.start * 100 * R.pay[pl - 1] / 100) : 0);
+      if (G.T.seats[0].stack <= 0) {
+        // 同一手出局的人：這手開始時籌碼多的名次比較前面
+        const me = H.players[0].start, better = H.players.filter((q) => q.seat !== 0 && G.T.seats[q.seat].stack <= 0 && q.start > me).length;
+        const pl = alive + 1 + better;
+        G.tEnd = { place: pl, prize: prize(pl), n: R.start };
+      }
+      else if (alive === 1) G.tEnd = { place: 1, prize: prize(1), n: R.start };
+    }
+    try { statsHand(H, G.review); } catch (e) { console.error(e); }
     G.over = true;
     G.steps.push({ kind: 'summary', snap: snap(H) });
     return;
@@ -258,6 +277,16 @@ function renderTable(st) {
   if (S.result || showdown) si = 5;
   else if (!S.log.some((e) => e.k === 'deal') || (st.ev && st.ev.k === 'deal')) si = 0;
   else si = S.street + 1;
+  const tb = $('tInfo');
+  if (G.T && G.T.tourney) {
+    const R = G.T.tourney, lv = Math.min(TOURNEY_LEVELS.length - 1, Math.floor((S.no - 1) / R.per)), rem = R.per - ((S.no - 1) % R.per + 1);
+    const alive = S.players.length;
+    const order = 1 + S.players.filter((x) => x.start > S.players[0].start).length;
+    tb.hidden = false;
+    tb.innerHTML = ['盲注 ' + S.sb + '／' + S.bb, lv >= TOURNEY_LEVELS.length - 1 ? '最高級' : rem ? rem + ' 手後升級' : '下一手升級', '剩 ' + alive + ' 人', '你排第 ' + order + '（' + fmt(S.players[0].start / S.bb, 0) + ' 大盲）'].map((x) => '<span>' + x + '</span>').join('・');
+    tb.title = '錦標賽第 ' + (lv + 1) + ' 級；盲注每 ' + R.per + ' 手升一級';
+    if (G.tEnd && G.over && G.view === G.steps.length - 1) tb.textContent = G.tEnd.place === 1 ? '錦標賽結束：你拿到第 1 名' : '錦標賽結束：你第 ' + G.tEnd.place + ' 名出局';
+  } else tb.hidden = true;
   $('streetBar').innerHTML = STREETBAR.map((t, i) => '<li class="' + (i === si ? 'on' : i < si ? 'done' : '') + '">' + (i === 5 && S.result && S.result.uncontested ? '結束' : t) + '</li>').join('');
   G.lastRender = { view: G.view, board: S.board.length };
 }
@@ -265,7 +294,7 @@ function renderTable(st) {
 /* ===== 教練框 ===== */
 function renderCoach(st) {
   const S = st.snap;
-  $('handNo').textContent = (GS.train ? 'GTO 訓練・' : '') + '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
+  $('handNo').textContent = (GS.train ? 'GTO 訓練・' : G.T && G.T.tourney ? '錦標賽・' : '') + '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
   $('peekWrap').hidden = G.replay;
   $('peekChk').checked = GS.peek;
   let h = '';
@@ -376,6 +405,11 @@ function renderCtrl(st) {
     m = '<b>' + (net > 0 ? '你贏了 ' + net + '！' : net < 0 ? '你輸了 ' + (-net) : '沒輸沒贏') + '</b>' + (marks ? '　你的決定：' + marks : '') + '<button type="button" class="linkbtn" data-c="why">檢討</button>'
       + (GS.train ? '<div class="why">' + esc(trainStatsText()) + '</div>' : '');
     b = '<button class="btn main" data-c="nexthand" id="bNext">再來一手 ▶</button><button class="btn" data-c="replay">重看這一手</button>' + (studioBest() ? '<button class="btn" data-c="gto">GTO 分析</button>' : '');
+    if (G.tEnd) {
+      const E = G.tEnd;
+      m = '<b>' + (E.place === 1 ? '🏆 你拿到第 1 名！' : '你在第 ' + E.place + ' 名出局') + '</b>（' + E.n + ' 人）' + (E.prize ? '　獎金 ' + E.prize + ' 點（每人報名 100 點）' : '　沒有進獎金圈（前 ' + G.T.tourney.pay.length + ' 名）') + (marks ? '　這手：' + marks : '') + '<button type="button" class="linkbtn" data-c="why">檢討</button>';
+      b = '<button class="btn main" data-c="newtourney" id="bNext">再開一場 ▶</button><button class="btn" data-c="replay">重看這一手</button><button class="btn" data-c="home">回首頁</button>';
+    }
   } else if (!atHead()) {
     m = '你在看前面的步驟（第 ' + (G.view + 1) + ' 步）。';
     b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀</button><button class="btn main" data-c="next" id="bNext">下一步 ▶</button><button class="btn" data-c="now">回到現在</button>';
@@ -430,6 +464,8 @@ function ctrlCmd(c) {
   else if (c === 'play') { G.paused = false; if (GS.flow === 'step') { GS.flow = 'auto'; gsSave(); } G.view = G.steps.length - 1; renderCur(); forward(); }
   else if (c === 'skip') skipAhead();
   else if (c === 'nexthand') nextHand();
+  else if (c === 'newtourney') newGame('tourney');
+  else if (c === 'home') showView('home');
   else if (c === 'replay') { G.replay = true; G.view = 0; G.lastRender = null; clearTimeout(G.timer); renderCur(); }
   else if (c === 'endreplay') { G.replay = false; G.view = G.steps.length - 1; G.lastRender = null; renderCur(); }
   else if (c === 'gto') { const s = studioBest(); if (s) studioFromGame(s); }
@@ -558,7 +594,8 @@ function initGame() {
   $('ranksModal').addEventListener('click', (e) => { if (e.target === $('ranksModal')) $('ranksModal').hidden = true; });
   // 鍵盤：→／空白＝下一步或再來一手；←＝上一步；輪到你時 F 棄牌、C 過牌／跟注、B 下注／加注、A 全下
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { $('ranksModal').hidden = true; $('rangeModal').hidden = true; }
+    if (e.key === 'Escape') { $('ranksModal').hidden = true; $('rangeModal').hidden = true; closeStats(); }
+    if (document.querySelector('.modal:not([hidden])')) return;     // 有視窗開著：按鍵不動背後的牌局
     if ($('vTable').hidden || e.target.closest('input,textarea,select') || e.ctrlKey || e.metaKey || e.altKey) return;
     const k = e.key.toLowerCase();
     if (!$('actBtns').hidden) {

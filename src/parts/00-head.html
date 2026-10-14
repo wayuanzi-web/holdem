@@ -151,6 +151,24 @@ h3 { font-size: 14px; margin: 0 0 6px; color: var(--mute); font-weight: 500; }
 .combos th { text-align: left; color: var(--mute); font-weight: 500; padding: 4px 6px; border-bottom: 1px solid var(--line); }
 .combos td { padding: 4px 6px; border-bottom: 1px solid rgba(44,85,71,.5); }
 .combos td.r { text-align: right; }
+.bttab { width: 100%; border-collapse: collapse; font-size: 13px; }
+.bttab th, .bttab td { padding: 5px 6px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.bttab th { color: var(--mute); font-weight: 500; font-size: 12px; }
+.bttab th[data-sort] { cursor: pointer; text-decoration: underline dotted; }
+.bttab td:first-child, .bttab th:first-child { text-align: left; }
+.bttab td.bb { width: 34%; min-width: 96px; }
+.bttab .bbw { display: flex; align-items: center; gap: 6px; }
+.bttab .bbw .sbarh { flex: 1; min-width: 50px; height: 12px; }
+.bttab .bbw span { width: 3em; text-align: right; }
+.bttab tr.grp td { color: var(--mute); font-size: 12px; padding-top: 10px; border-bottom: 0; }
+.bttab tr.all td { font-weight: 700; }
+.bttab tbody tr[data-i] { cursor: pointer; }
+.bttab tbody tr[data-i]:hover td { background: rgba(255,255,255,.05); }
+.bttab tr.wait td { opacity: .45; }
+.bttab small { color: var(--mute); font-size: 11px; display: block; }
+.tscroll { overflow-x: auto; }
+.bttab td.btmsg { text-align: left; color: var(--mute); }
+@media (max-width: 560px) { .bttab .hw { display: none; } .bttab th, .bttab td { padding: 5px 3px; } .bttab td.bb { min-width: 74px; } .bttab .bbw .sbarh { min-width: 28px; } }
 .sbarh { display: flex; height: 10px; border-radius: 3px; overflow: hidden; min-width: 90px; background: rgba(255,255,255,.06); }
 .sbarh i { display: block; height: 100%; }
 /* ===== GTO 工作室 ===== */
@@ -223,6 +241,25 @@ input.badin { border-color: #d0533f; background: #3a1d17; }
 .lockb .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 .grid13.lockedit { touch-action: none; user-select: none; outline: 2px dashed rgba(208,168,78,.6); outline-offset: 3px; }
 .expo { margin-top: 10px; }
+.stt { width: 100%; border-collapse: collapse; font-size: 14px; }
+.stt td { padding: 5px 6px; border-bottom: 1px solid rgba(44,85,71,.6); vertical-align: top; }
+.stt td.r { text-align: right; white-space: nowrap; }
+.stchart { width: 100%; max-width: 560px; height: auto; display: block; }
+.stchart polyline { fill: none; stroke-width: 2; }
+.stchart polyline.up { stroke: #6fd08f; } .stchart polyline.down { stroke: #f08a7a; }
+.stchart line.zero { stroke: #4a6a5c; stroke-dasharray: 4 3; }
+.stchart text { fill: var(--mute); font-size: 17px; }
+#statsModal .rmbtns { position: sticky; bottom: -18px; background: #13281f; padding: 10px 0 4px; margin-bottom: 0; }
+#statsSeg { margin: 0 0 10px; }
+.chmain { display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 18px; margin-top: 10px; align-items: start; }
+.chgrid .cell .fill { top: 0; height: 100% !important; }
+.chgrid.edit { touch-action: none; user-select: none; outline: 2px dashed rgba(208,168,78,.6); outline-offset: 3px; }
+.chside .brushes { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.chside .brushes button { border: 1px solid var(--line); background: var(--felt2); border-radius: 8px; padding: 5px 10px; cursor: pointer; font-size: 13.5px; display: inline-flex; gap: 6px; align-items: center; }
+.chside .brushes button[aria-pressed="true"] { border-color: var(--brass); box-shadow: inset 0 0 0 1px var(--brass); }
+.chside .sw { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+#chPos .pills button { font-size: 14px; padding: 5px 12px; min-width: 0; }
+@media (max-width: 900px) { .chmain { grid-template-columns: 1fr; } .chside { order: -1; } .chside #chCell { min-height: 1.5em; } }
 .expo select { max-width: 100%; }
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #10241d; border: 1px solid var(--brass); color: var(--text); padding: 8px 16px; border-radius: 10px; z-index: 60; font-size: 14px; box-shadow: 0 8px 20px rgba(0,0,0,.5); }
 .stline .strow { margin: 2px 0 8px; }
@@ -299,6 +336,10 @@ body.intable .brand p { display: none; }
 .homego { display: flex; gap: 12px; margin: 28px 0 14px; flex-wrap: wrap; }
 .hchk { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: #c9d6cf; margin: 10px 0; cursor: pointer; }
 .hchk input { margin-top: 4px; }
+.tinfo span { white-space: nowrap; }
+.rvline { margin: 2px 0 8px; font-size: 15px; color: var(--mute); min-height: 1.4em; }
+.rvline b { color: var(--brass); font-size: 18px; }
+.tinfo { font-size: 12.5px; color: #f0dca6; background: rgba(208,168,78,.12); border: 1px solid rgba(208,168,78,.4); border-radius: 8px; padding: 3px 10px; margin: 0 0 8px; }
 .traincard { margin-top: 26px; border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; background: rgba(255,255,255,.03); }
 .gtob { border: 1px solid #6aa58a; background: #eef6f0; border-radius: 10px; padding: 8px 10px; margin: 4px 0 10px; font-size: 14px; }
 .gtob table { width: 100%; border-collapse: collapse; margin: 4px 0; }
@@ -544,7 +585,8 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   .brand { flex: 1 1 220px; min-width: 0; }
 .brand h1 { font-size: 21px; }
   .tabs { padding: 0 8px; }
-  .tabs button { padding: 9px 11px 10px; font-size: 15px; }
+  .tabs button { padding: 9px 8px 10px; font-size: 14.5px; }
+  .tabs { gap: 0; }
   main { padding: 14px 12px 50px; }
   .panel { padding: 12px; }
   .cd { --w: 38px; }
@@ -568,6 +610,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
     <button class="chip" id="nHome">首頁</button>
     <button class="chip" id="nGame" hidden>回到牌局</button>
     <button class="chip" id="nRanks">牌型大小</button>
+    <button class="chip" id="nStats">統計</button>
     <button class="chip" id="nTools">工具</button>
   </nav>
   <div class="webbar" id="webbar"></div>
@@ -593,6 +636,10 @@ body.noexplain .xp, body.noexplain .how { display: none; }
     </div>
     <p class="note" id="homeStats"></p>
     <div class="traincard">
+      <div><b>錦標賽（坐滿就開）</b><span class="note">　每人 1,500 籌碼，盲注每 8 手升一級，輸光就出局；前幾名分獎金。籌碼剩 12 個大盲以下時，教練會教你「推或棄」。</span></div>
+      <div class="strow"><div class="pills" id="hTn"></div><button class="btn" id="bTour">開始錦標賽</button></div>
+    </div>
+    <div class="traincard">
       <div><b>GTO 訓練（單挑）</b><span class="note">　跟 GTO 電腦一對一，轉牌、河牌每個決定都用求解器評分，累計少賺多少。</span></div>
       <label class="hchk"><input type="checkbox" id="hAutoPre"> 翻牌前、翻牌照教練的建議自動打（只練轉牌、河牌）</label>
       <div class="homego" style="margin:8px 0 4px"><button class="btn big" id="bTrain">開始 GTO 訓練</button></div>
@@ -605,6 +652,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 <section id="vTable" class="view" hidden>
   <div class="tv">
     <div class="tleft">
+      <div class="tinfo" id="tInfo" hidden></div>
       <ol class="streetbar" id="streetBar" aria-label="這一手進行到哪裡"></ol>
       <div class="felt" id="felt"><div class="rail"></div><div id="seats"></div>
         <div class="center"><div class="pot num" id="potTxt"></div><div class="board" id="board"></div><div class="live" id="liveTxt"></div></div>
@@ -634,6 +682,11 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 
 <div id="ranksModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="ranksTitle">
   <div class="mbox"><h2 id="ranksTitle">牌型大小（由大到小）</h2><div id="ranksList"></div><p class="note">用自己 2 張＋公牌 5 張裡最好的 5 張比。同牌型再比點數，A 最大（A2345 的順子 A 當 1）。花色不分大小。</p><button class="btn main" id="ranksClose">知道了</button></div>
+</div>
+
+<div id="statsModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+  <div class="mbox rbox"><h2 id="statsTitle">你的統計</h2><div id="statsBody"></div>
+    <div class="strow rmbtns"><button class="btn" id="statsReset">清除這一種的統計</button><button class="btn main" id="statsClose">關閉</button></div></div>
 </div>
 
 <div id="rangeModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="rmTitle">
@@ -667,11 +720,33 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 <section id="vTools" class="view" hidden>
 <nav class="tabs" role="tablist" aria-label="工具">
   <button role="tab" id="tCalc" aria-controls="pCalc" aria-selected="true">勝率計算機</button>
+  <button role="tab" id="tChart" aria-controls="pChart" aria-selected="false">翻牌前圖表</button>
   <button role="tab" id="tSolve" aria-controls="pSolve" aria-selected="false">GTO 工作室</button>
   <button role="tab" id="tBench" aria-controls="pBench" aria-selected="false">效能測試</button>
 </nav>
 <main>
   <section id="pCalc" role="tabpanel" aria-labelledby="tCalc">
+    <div class="strow" style="margin:0 0 12px"><div class="seg" id="calcMode"><button type="button" data-m="hand" aria-pressed="true">一手牌</button><button type="button" data-m="rvr" aria-pressed="false">範圍對範圍</button></div></div>
+    <div id="rvrBox" hidden>
+      <div class="stcols">
+        <div class="panel">
+          <h3 class="sth">兩個範圍</h3>
+          <div class="rcards" id="rvRanges"></div>
+          <h3 class="sth" style="margin-top:14px">公牌（可以不放）</h3>
+          <div class="stslots" id="rvSlots"></div>
+          <div class="rvline num" id="rvLine" aria-live="polite"></div>
+          <div class="deck stdeck" id="rvDeck" aria-label="選公牌"></div>
+          <div class="strow"><button class="btn sm" id="rvClear">清掉公牌</button><button class="btn sm" id="rvSwap">兩個範圍對調</button></div>
+        </div>
+        <div class="panel">
+          <div class="head"><div class="bignum num" id="rvBig">—</div><div class="headtxt"><div class="hand" id="rvTxt"></div><div class="sub" id="rvSub"></div></div></div>
+          <h3 class="sth" style="margin-top:12px" id="rvGridTitle">A 的每一格對 B 的勝率</h3>
+          <div class="grid13" id="rvGrid"></div>
+          <p class="note" id="rvNote"></p>
+          <div id="rvCats"></div>
+        </div>
+      </div>
+    </div>
     <div class="calc">
       <div class="lcol">
       <div class="panel">
@@ -707,11 +782,32 @@ body.noexplain .xp, body.noexplain .how { display: none; }
     </div>
   </section>
 
+  <section id="pChart" role="tabpanel" aria-labelledby="tChart" hidden>
+    <div class="panel">
+      <h2 style="margin-top:0">翻牌前圖表</h2>
+      <p class="note" style="margin:0 0 10px">100 大盲深籌碼，常見 GTO 圖表的簡化近似。牌局裡教練的翻牌前建議、GTO 電腦的翻牌前打法都照這裡（錦標賽籌碼剩 12 個大盲以下、或面對全下時，改用推或棄和底池賠率）；你可以自己改，存在這台裝置。</p>
+      <div class="strow"><div class="seg" id="chT"></div><div class="seg" id="chK"></div></div>
+      <div class="strow" id="chPos"></div>
+      <div class="chmain">
+        <div>
+          <div class="grid13 chgrid" id="chGrid"></div>
+          <div class="legend" id="chLegend"></div>
+        </div>
+        <div class="chside">
+          <h3 class="sth" id="chTitle"></h3>
+          <p id="chStat"></p>
+          <p class="note" id="chCell">點一格看那手牌怎麼打。</p>
+          <div id="chEdit"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="pSolve" role="tabpanel" aria-labelledby="tSolve" hidden>
     <div class="panel sthead">
       <div class="sttop">
         <div><h2 id="stTitle">GTO 工作室</h2><div class="note" id="stSub"></div></div>
-        <div class="seg" id="stTabs"><button type="button" data-v="setup" aria-pressed="true">① 設定局面</button><button type="button" data-v="result" aria-pressed="false">② 看結果</button></div>
+        <div class="seg" id="stTabs"><button type="button" data-v="setup" aria-pressed="true">① 設定局面</button><button type="button" data-v="result" aria-pressed="false">② 看結果</button><button type="button" data-v="batch" aria-pressed="false">③ 多翻牌報告</button></div>
       </div>
       <p class="stintro" id="stIntro">設定一個<b>兩個人</b>的翻牌後局面：公牌、底池、雙方可能拿的牌（<button type="button" class="term" data-term="範圍">範圍</button>）、可以怎麼下注。電腦會算出 <button type="button" class="term" data-term="GTO">GTO</button> 打法（雙方都沒辦法再占對方便宜的策略），之後點動作、點下一張牌，看每一手牌該怎麼打。範例已經設好，直接按「開始求解」就可以。</p>
       <div class="stbanner" id="stBanner" hidden></div>
@@ -802,6 +898,25 @@ body.noexplain .xp, body.noexplain .how { display: none; }
           <h2 style="margin-top:16px" id="cellTitle">點左邊的格子看每個組合</h2>
           <div id="cellBox"></div>
         </div>
+      </div>
+    </div>
+    <div id="stBatch" hidden>
+      <div class="panel">
+        <p class="note" style="margin:0 0 10px">同一組範圍和下注選項，套到一組有代表性的翻牌上一個一個算（精度比較低），看哪種翻牌誰下注多、誰占優勢。整體平均照每種翻牌<b>實際出現的機率</b>加權。點一列可以把那個翻牌帶到「① 設定局面」仔細算。</p>
+        <div class="strow"><span>範圍和下注</span><div class="seg" id="btSrc"></div></div>
+        <p class="note" id="btSrcNote" style="margin:4px 0 10px"></p>
+        <div class="strow"><span>翻牌</span><div class="seg" id="btSet"></div></div>
+        <div class="strow"><span>精度</span><div class="seg" id="btTarget"></div></div>
+        <div class="stest" id="btEst"></div>
+        <div class="strow"><button class="btn main" id="btGo">開始</button><button class="btn" id="btStop" hidden>停下來</button><button class="btn sm" id="btCsv" hidden>匯出 CSV</button></div>
+        <div class="prog" id="btProg" hidden><span class="num" id="btProgTxt"></span><div class="track" aria-hidden="true"><i id="btProgBar"></i></div><span class="num" id="btProgTime"></span></div>
+      </div>
+      <div class="panel" id="btOut" hidden style="margin-top:14px">
+        <h3 class="sth">整體和分類</h3>
+        <div class="tscroll"><table class="bttab num" id="btSum"></table></div>
+        <h3 class="sth" style="margin-top:16px">每個翻牌</h3>
+        <p class="note" style="margin:0 0 6px">下注的顏色：越深越大注。點表頭可以排序；點一列帶到「① 設定局面」。</p>
+        <div class="tscroll"><table class="bttab num" id="btTab"></table></div>
       </div>
     </div>
   </section>

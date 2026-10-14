@@ -190,6 +190,7 @@ function stEstimate() {
     + (est.iso ? '花色對稱：' + est.iso.split('/')[1] + ' 張' + (boardCards().length === 3 ? '轉牌' : '河牌') + '只要算 ' + est.iso.split('/')[0] + ' 張。' : '') + '</p>';
   if (tooBig) h += '<p class="bad">太大了：這台裝置最多用 ' + Math.round(maxMB) + ' MB。請減少下注尺寸、縮小範圍（範圍編輯器的「去掉權重低於 20% 的牌」），或多放一張公牌（從轉牌開始）。</p>';
   else h += '<p>用 ' + k + ' 個執行緒，這台裝置大約要 <b>' + tStr + '</b>' + (ST.ratio === 1 ? '（第一次是估的，跑過一次就會照這台裝置的速度算）' : '') + '。' + (sec > 900 ? '<span class="bad">很久：建議用「簡單」的下注選項、縮小範圍、或從轉牌開始。</span>' : '') + '</p>';
+  if (ST.running && typeof BT !== 'undefined' && BT.running) h += '<p class="bad">「③ 多翻牌報告」正在算：到 ③ 按「停下來」，或等它算完，才能在這裡求解。</p>';
   box.innerHTML = h;
   $('bSolve').disabled = tooBig || ST.running;
 }
@@ -197,6 +198,7 @@ function stEstimate() {
 /* ===== 求解 ===== */
 function solveStart() {
   if (ST.running || !ST.est) return;
+  if (BENCH.running) { toast('效能測試還在跑：等它跑完再求解。'); return; }
   const cfg = spotCfg(ST.spot, { maxMB: deviceMB(), target: ST.target, maxIters: 2000, compress: ST.compress });
   let k = threadsFor(ST.spot);
   if (k >= 2) k = W.helpers(k); else W.helpers(0);
@@ -253,19 +255,21 @@ W.on('solve-done', (m) => {
   ST.solved = P.spot; ST.solvedCfg = P.cfg; ST.solvedInfo = { t: m.t, pct: m.pct, ev: m.ev, stopped: m.stopped };
   ST.path = []; ST.labels = []; ST.sel = -1; ST.catSel = -1; ST.ro = null; ST.locks = new Map(); ST.lockEdit = null;
   buildLine();
-  stShow('result');
+  if (!$('stBatch').hidden) { $('stTabs').querySelector('[data-v="result"]').disabled = false; toast('「① 設定局面」算好了，到「② 看結果」看。'); }   // 正在看報告：不要跳走
+  else stShow('result');
   requestView();
 });
 
 /* ===== 結果 ===== */
 function stShow(v) {
-  $('stSetup').hidden = v !== 'setup'; $('stResult').hidden = v !== 'result';
+  $('stSetup').hidden = v !== 'setup'; $('stResult').hidden = v !== 'result'; $('stBatch').hidden = v !== 'batch';
   $('stTabs').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
   $('stTabs').querySelector('[data-v="result"]').disabled = !ST.solved;
-  $('stIntro').hidden = v === 'result';
+  $('stIntro').hidden = v !== 'setup';
   const sp = v === 'result' && ST.solved ? ST.solved : ST.spot;
-  $('stSub').innerHTML = esc(sp.title || '') + (v === 'result' && ST.solvedInfo ? '　精度：' + glossify('可剝削度') + ' ' + fmt(ST.solvedInfo.pct, 2) + '% 底池' : '');
+  $('stSub').innerHTML = v === 'batch' ? '多翻牌報告' : esc(sp.title || '') + (v === 'result' && ST.solvedInfo ? '　精度：' + glossify('可剝削度') + ' ' + fmt(ST.solvedInfo.pct, 2) + '% 底池' : '');
   if (v === 'setup') renderSetup();
+  if (v === 'batch') renderBatch();
 }
 function requestView() {
   ST.req++;
@@ -535,8 +539,12 @@ function renderRunouts() {
 const RM = { p: 0, w: null, brush: 1, painting: false, val: 1, last: -1 };
 function mineList() { try { return JSON.parse(localStorage.getItem(MINE_KEY) || '[]'); } catch (e) { return []; } }
 function openRange(p) {
-  RM.p = p; RM.w = parseRange(ST.spot.ranges[p]);
-  $('rmTitle').textContent = '編輯範圍：' + ST.spot.names[p] + '（' + (p ? '位置內' : '位置外') + '）';
+  openRangeEditor('編輯範圍：' + ST.spot.names[p] + '（' + (p ? '位置內' : '位置外') + '）', ST.spot.ranges[p], (txt) => { ST.spot.ranges[p] = txt; stChanged(true); });
+}
+/* 範圍編輯器（工作室、範圍對範圍共用）：onOk(文字) */
+function openRangeEditor(title, text, onOk) {
+  RM.onOk = onOk; RM.w = parseRange(text);
+  $('rmTitle').textContent = title;
   $('rmLib').innerHTML = '<option value="">選一個…</option>' + RANGE_LIB.map((r) => '<option value="' + r.key + '">' + esc(r.name) + '</option>').join('');
   $('rmBrush').innerHTML = [1, 0.75, 0.5, 0.25].map((x) => '<button type="button" data-b="' + x + '" aria-pressed="' + (x === RM.brush) + '">' + (x * 100) + '%</button>').join('');
   renderMine();
@@ -621,8 +629,8 @@ function initRangeModal() {
     renderMine();
   });
   $('rmOk').addEventListener('click', () => {
-    ST.spot.ranges[RM.p] = rangeText(RM.w);
-    $('rangeModal').hidden = true; stChanged(true);
+    $('rangeModal').hidden = true;
+    if (RM.onOk) RM.onOk(rangeText(RM.w));
   });
   $('rmCancel').addEventListener('click', () => { $('rangeModal').hidden = true; });
   $('rangeModal').addEventListener('click', (e) => { if (e.target === $('rangeModal')) $('rangeModal').hidden = true; });

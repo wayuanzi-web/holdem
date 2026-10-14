@@ -139,3 +139,77 @@ function preflopLookup(g) {
   for (let i = 0; i < 9; i++) cat.push(PREFLOP.cat[g * 9 + i] / 1e4);
   return { eq, win, tie, cat, rank: PREFLOP.rank ? PREFLOP.rank.slice(g * n, g * n + n) : null };
 }
+
+/* ===== 範圍對範圍（第六步）：A 的每一手牌對 B 整個範圍的勝率 =====
+   公牌 3–5 張：把剩下的公牌每一種發法都算（精確）；翻牌前：隨機抽 iters 組 5 張公牌（不偏：每一對手牌避開公牌的機率一樣）。
+   每一組公牌：雙方手牌照牌力排好，一次掃過（扣掉跟自己撞牌的對手手牌），跟求解器的攤牌一樣。 */
+function rangeVsRange(board, wA, wB, opt) {
+  opt = opt || {};
+  const dead = new Uint8Array(52);
+  for (const c of board) dead[c] = 1;
+  const mk = (w) => { const hs = [], ws = []; for (let k = 0; k < NCOMBO; k++) if (w[k] > 0 && !dead[COMBO_A[k]] && !dead[COMBO_B[k]]) { hs.push(k); ws.push(w[k]); } return { hs, ws }; };
+  const A = mk(wA), B = mk(wB), nA = A.hs.length, nB = B.hs.length;
+  const out = { nA, nB, eq: new Float64Array(nA), comp: new Float64Array(nA), boards: 0, total: -1, cls: new Array(169).fill(-1), hands: A.hs };
+  if (!nA || !nB) return out;
+  const aA = A.hs.map((k) => COMBO_A[k]), aB = A.hs.map((k) => COMBO_B[k]), bA = B.hs.map((k) => COMBO_A[k]), bB = B.hs.map((k) => COMBO_B[k]);
+  const vA = new Int32Array(nA), vB = new Int32Array(nB), oA = new Int32Array(nA), oB = new Int32Array(nB);
+  const cw = new Float64Array(52), lt = new Float64Array(nA), le = new Float64Array(nA);
+  const idxB = new Int32Array(NCOMBO).fill(-1);
+  B.hs.forEach((k, j) => { idxB[k] = j; });
+  const same = A.hs.map((k) => idxB[k]);
+  const one = (full) => {                                   // full：5 張公牌
+    const st = boardState(full), used = new Uint8Array(52);
+    for (const c of full) used[c] = 1;
+    let na = 0, nb = 0;
+    for (let i = 0; i < nA; i++) { if (used[aA[i]] || used[aB[i]]) continue; vA[i] = evalAdd2(st, aA[i], aB[i]); oA[na++] = i; }
+    for (let j = 0; j < nB; j++) { if (used[bA[j]] || used[bB[j]]) continue; vB[j] = evalAdd2(st, bA[j], bB[j]); oB[nb++] = j; }
+    const sa = oA.subarray(0, na).sort((x, y) => vA[x] - vA[y]), sb = oB.subarray(0, nb).sort((x, y) => vB[x] - vB[y]);
+    cw.fill(0);
+    let s = 0, i = 0, j = 0;
+    while (i < na) {
+      const v = vA[sa[i]];
+      while (j < nb && vB[sb[j]] < v) { const g = sb[j], x = B.ws[g]; s += x; cw[bA[g]] += x; cw[bB[g]] += x; j++; }
+      let i2 = i;
+      while (i2 < na && vA[sa[i2]] === v) { const h = sa[i2]; lt[h] = s - cw[aA[h]] - cw[aB[h]]; i2++; }
+      while (j < nb && vB[sb[j]] === v) { const g = sb[j], x = B.ws[g]; s += x; cw[bA[g]] += x; cw[bB[g]] += x; j++; }
+      for (let q = i; q < i2; q++) { const h = sa[q], m = same[h]; le[h] = s - cw[aA[h]] - cw[aB[h]] + (m >= 0 && !used[bA[m]] ? B.ws[m] : 0); }
+      i = i2;
+    }
+    while (j < nb) { const g = sb[j], x = B.ws[g]; s += x; cw[bA[g]] += x; cw[bB[g]] += x; j++; }
+    for (let q = 0; q < na; q++) {
+      const h = sa[q], m = same[h];
+      const comp = s - cw[aA[h]] - cw[aB[h]] + (m >= 0 ? B.ws[m] : 0);
+      out.eq[h] += (lt[h] + le[h]) / 2 * 1;                  // 贏的算 1、平手算一半：(lt + le)/2 ＝ lt + (le − lt)/2
+      out.comp[h] += comp;
+    }
+    out.boards++;
+  };
+  if (board.length >= 3) {
+    const rest = [];
+    for (let c = 0; c < 52; c++) if (!dead[c]) rest.push(c);
+    const need = 5 - board.length;
+    if (need === 0) one(board);
+    else if (need === 1) for (const c of rest) one(board.concat([c]));
+    else for (let x = 0; x < rest.length; x++) for (let y = x + 1; y < rest.length; y++) one(board.concat([rest[x], rest[y]]));
+  } else {
+    const rng = makeRng(opt.seed || 12345), iters = opt.iters || 3000, deck = [];
+    for (let c = 0; c < 52; c++) if (!dead[c]) deck.push(c);
+    for (let t = 0; t < iters; t++) {
+      for (let q = 0; q < 5 - board.length; q++) { const r = q + ((rng() * (deck.length - q)) | 0); const tmp = deck[q]; deck[q] = deck[r]; deck[r] = tmp; }
+      one(board.concat(deck.slice(0, 5 - board.length)));
+    }
+  }
+  // 每一手、每一格、整體
+  let tot = 0, totW = 0;
+  const cls = new Float64Array(169), clsW = new Float64Array(169);
+  for (let h = 0; h < nA; h++) {
+    const e = out.comp[h] > 0 ? out.eq[h] / out.comp[h] : 0, w = A.ws[h] * out.comp[h];
+    tot += e * w; totW += w;
+    cls[CLASS_OF[A.hs[h]]] += e * w; clsW[CLASS_OF[A.hs[h]]] += w;
+    out.eq[h] = e;
+  }
+  out.total = totW ? tot / totW : -1;                          // -1：A 的每一手都被 B 撞掉，沒有可以比的
+  out.cls = Array.from(cls, (x, g) => (clsW[g] ? x / clsW[g] : -1));
+  out.hands = A.hs;
+  return out;
+}

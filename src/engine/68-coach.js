@@ -3,6 +3,7 @@
 const CARD_TOK = (c) => '{c' + c + '}';
 const CARDS_TOK = (arr) => arr.map(CARD_TOK).join('');
 const PCT0 = (x) => Math.round(x * 100) + '%';
+const fmt1 = (x) => (Math.round(x * 10) / 10).toString();
 let COACH_STYLE_AWARE = false;
 let COACH_NO_DISCOUNT = false;   // 算勝率時把每個對手都當一般的緊凶玩家（實測比照風格估更穩）；風格只用在說明文字
 const STYLE_READ = {
@@ -89,7 +90,58 @@ function heroInfo(H, seat, rng, iters) {
 
 /* ===== 輪到你：建議和原因 =====
    回傳 { act: {t, to}, label, reasons: [...], more: [...], need, eq } */
+/* 教練的建議：翻牌前有圖表的情況照圖表（原本照勝率算的原因留在「更多說明」） */
 function coachAdvice(H, rng) {
+  const adv = coachAdviceRule(H, rng);
+  if (H.street !== 0) return adv;
+  const L = legalActions(H);
+  const sh = shortSpot(H, L.seat);
+  if (sh) {                                            // 短碼：推或棄
+    const pc = PRE_PCT[adv.info.g], go = sh.kind === 'push' ? pc < sh.pct : sh.kind === 'reshove' ? sh.ev > 0 : sh.eq >= sh.need, p = H.players[L.seat];
+    const head = adv.reasons[0];
+    adv.more.unshift('（照勝率估的看法：建議「' + adv.label + '」。' + (sh.kind === 'call' ? '面對全下以底池賠率為準。' : '短碼時以推或棄為準。') + '）');
+    adv.reasons.length = 0;
+    adv.reasons.push(head);
+    if (sh.kind === 'push') {
+      adv.reasons.push('你和對手的有效籌碼只有 ' + fmt1(sh.eff) + ' 個大盲：籌碼這麼短，翻牌後沒有空間慢慢打，標準打法是「推或棄」：要嘛全下，要嘛棄牌。');
+      adv.reasons.push('在這個位置、這個籌碼，大約前 ' + PCT0(sh.pct) + ' 的牌可以全下；你的牌是前 ' + PCT0(pc) + '，' + (go ? '在裡面，全下。對手棄牌你就贏下盲注。' : '不在裡面，棄牌等更好的機會。'));
+    } else if (sh.kind === 'reshove') {
+      adv.reasons.push('你只剩 ' + fmt1(sh.eff) + ' 個大盲，面對加注：標準打法是「推或棄」，跟注之後翻牌幾乎沒空間打。');
+      adv.reasons.push('他開牌大約是前 ' + PCT0(sh.v) + ' 的牌，你全下時他大概只用最好的前 ' + PCT0(sh.vc) + ' 跟（約 ' + PCT0(sh.c) + ' 的時候）。你的牌對那些牌勝率約 ' + PCT0(sh.eq) + '；連他棄牌的時候一起算，全下平均' + (sh.ev > 0 ? '多賺 ' + fmt1(sh.ev) + '，全下。' : '少 ' + fmt1(-sh.ev) + '，棄牌。') + '（這裡大約前 ' + PCT0(sh.pct) + ' 的牌可以推）');
+    } else {
+      adv.reasons.push('對手全下（或跟了就差不多全下）：照他的位置和籌碼，他大約拿前 ' + PCT0(sh.v) + ' 的牌' + (sh.opp >= 2 ? '，而且已經有 ' + sh.opp + ' 個人在底池裡' : '') + '。');
+      adv.reasons.push('你要再付 ' + sh.toCall + '，贏了可以拿 ' + (sh.pot + sh.toCall) + '：勝率要 ' + PCT0(sh.need) + ' 以上才划算。你的牌對他的範圍大約 ' + PCT0(sh.eq) + '，' + (go ? '夠了，跟。' : '不夠，棄牌。') + '（這個賠率大約前 ' + PCT0(sh.pct) + ' 的牌可以跟）');
+    }
+    if (go) adv.act = sh.kind === 'push' ? { t: 'r', to: L.maxTo } : (L.callAmt >= p.stack || !L.canRaise ? { t: 'c' } : { t: 'r', to: L.maxTo });
+    else adv.act = { t: L.canCheck ? 'x' : 'f' };
+    adv.label = adv.act.t === 'r' ? '全下 ' + L.maxTo : adv.act.t === 'c' ? '跟注 ' + L.callAmt : adv.act.t === 'x' ? '過牌' : '棄牌';
+    adv.short = sh;
+    return adv;
+  }
+  const ch = chartSpot(H, L.seat);
+  if (!ch) return adv;
+  adv.chart = ch; ch.canRaise = L.canRaise;
+  const best = ch.raise >= ch.call && ch.raise >= ch.fold && L.canRaise ? 'raise' : ch.call >= ch.fold ? 'call' : 'fold';
+  const line = '照「' + ch.name + '」的圖表，這手牌：' + chartMixText(ch) + '。' + (Math.max(ch.raise, ch.call, ch.fold) < 0.85 ? '比例混著用，選最常的那個就好。' : '');
+  let act, label;
+  if (best === 'raise') {
+    const to = adv.act.t === 'r' && Math.abs(adv.act.to - chartRaiseTo(H, L, ch)) <= H.bb ? adv.act.to : chartRaiseTo(H, L, ch);
+    act = { t: 'r', to }; label = to >= L.maxTo ? '全下 ' + to : (L.isBet ? '下注 ' : '加注到 ') + to;
+  } else if (best === 'call') { act = { t: L.canCheck ? 'x' : 'c' }; label = L.canCheck ? '過牌' : '跟注 ' + L.callAmt; }
+  else { act = { t: L.canCheck ? 'x' : 'f' }; label = L.canCheck ? '過牌' : '棄牌'; }
+  const same = actFamily(act.t) === actFamily(adv.act.t);
+  if (same) { adv.reasons.splice(1, 0, line); adv.act = act; adv.label = label; return adv; }
+  const head = adv.reasons[0];
+  adv.more.unshift('（另外照勝率估的看法：' + adv.reasons.slice(1).join(' ') + '建議是「' + adv.label + '」，跟圖表不一樣時以圖表為準。）');
+  adv.reasons.length = 0;
+  adv.reasons.push(head, line);
+  if (act.t === 'c') adv.reasons.push('要跟 ' + L.callAmt + '：勝率要 ' + PCT0(adv.need) + ' 以上；圖表已經把位置、之後還能贏多少算進去了。');
+  if (act.t === 'f') adv.reasons.push(H.players[L.seat].bet > 0 ? '已經放進去的盲注是沉沒成本，不要因為它勉強玩。' : '棄牌不用花錢，等下一手。');
+  if (act.t === 'r') adv.reasons.push(ch.kind === 'rfi' ? '主動加注開局：大家都棄牌你就贏下盲注，被跟也有主動權。' : '再加注讓比你差的牌付更多錢，也有一部分是當詐唬用（例如 A5 同花擋住對手的 A）。');
+  adv.act = act; adv.label = label;
+  return adv;
+}
+function coachAdviceRule(H, rng) {
   const L = legalActions(H), p = H.players[L.seat];
   const I = heroInfo(H, L.seat, rng, 3000);
   const pot = potTotal(H), need = L.callAmt > 0 ? L.callAmt / (pot + L.callAmt) : 0;
@@ -221,6 +273,14 @@ function lastAggressorSeat(H) {
 function actFamily(t) { return t === 'f' ? 'f' : (t === 'x' || t === 'c') ? 'p' : 'a'; }
 function gradeAction(adv, ev) {
   const rf = actFamily(adv.act.t), af = actFamily(ev.t === 'a' ? (ev.to !== undefined && !ev.callAll ? 'r' : 'c') : ev.t);
+  if (adv.chart) {                                     // 翻牌前照圖表評：這個動作在圖表裡的比例
+    const ch = adv.chart, rz = ch.canRaise === false ? ch.raise : 0;
+    const f = af === 'a' ? ch.raise : af === 'p' ? (ev.t === 'x' ? ch.call + ch.fold : ch.call + rz) : ch.fold;
+    const word = af === 'a' ? '加注' : af === 'p' ? (ev.t === 'x' ? '過牌' : '跟注') : '棄牌';
+    if (f >= 0.25) return { mark: 'good', text: '圖表裡這手牌有 ' + Math.round(f * 100) + '% 的時候' + word + '，打得對。', src: 'chart' };
+    if (f >= 0.05) return { mark: 'ok', text: '圖表裡這手牌很少' + word + '（' + Math.round(f * 100) + '%），偶爾可以。', src: 'chart' };
+    return { mark: af === 'f' ? 'ok' : 'bad', text: '圖表裡這手牌不會' + word + '（建議：' + adv.label + '）。' + (af === 'f' ? '保守了。' : ''), src: 'chart' };
+  }
   const eq = adv.eq || 0, need = adv.need || 0;
   if (rf === af) {
     if (af === 'a' && adv.act.to && ev.to && Math.abs(ev.to - adv.act.to) > Math.max(4, adv.act.to * 0.5)) return { mark: 'ok', text: '方向對，大小跟建議（' + adv.act.to + '）差比較多。' };
@@ -271,6 +331,7 @@ function narrate(ev, H, ctx) {
     L.push('按鈕（D）在' + name(H.button) + '。' + name(ev.sb.seat) + '下小盲 ' + ev.sb.amt + '、' + name(ev.bb.seat) + '下大盲 ' + ev.bb.amt + '。');
     L.push('你坐在' + POS_ZH[hero.pos] + '：' + posWhy(hero.pos) + '。');
     if (H.rebuy && H.rebuy.indexOf(ctx.hero) >= 0) L.push('你上一手籌碼輸光了，自動補回 ' + GAME_STACK + '。');
+    if (H.tourney) L.push('盲注 ' + H.sb + '／' + H.bb + '。');
     tip = tipOnce(ctx, 'blinds', '小盲、大盲是每手牌強制先下的錢，讓每一手都有東西可以搶。按鈕每手往左移一位，大家輪流當盲注。');
   } else if (ev.k === 'deal') {
     title = '發手牌';
