@@ -105,10 +105,12 @@ h3 { font-size: 14px; margin: 0 0 6px; color: var(--mute); font-weight: 500; }
 .bars td.xp b { color: var(--text); }
 .bars td.xp small { display: block; font-size: 11px; }
 .bars td.xp .mth { display: none; }
-.calc .how { background: rgba(255,255,255,.04); border-color: var(--line); color: var(--text); }
-.calc .how summary { color: var(--brass); }
-.calc .gdef { background: #2a3a33; border-color: #4a6a5c; color: var(--text); }
-.calc .gdef b { color: var(--brass); }
+.calc .how, #pSolve .how { background: rgba(255,255,255,.04); border-color: var(--line); color: var(--text); }
+.calc .how summary, #pSolve .how summary { color: var(--brass); }
+.calc .gdef, #pSolve .gdef { background: #2a3a33; border-color: #4a6a5c; color: var(--text); }
+.calc .gdef b, #pSolve .gdef b { color: var(--brass); }
+.sthow { margin: 0 0 10px; }
+.sthow li { margin: 3px 0; }
 .calc button.term:hover { background: rgba(208,168,78,.2); }
 .calc .tog2 { font-size: 13px; margin-left: auto; color: var(--mute); white-space: nowrap; }
 .outs .grp { margin: 6px 0; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: 14px; }
@@ -151,6 +153,105 @@ h3 { font-size: 14px; margin: 0 0 6px; color: var(--mute); font-weight: 500; }
 .combos td.r { text-align: right; }
 .sbarh { display: flex; height: 10px; border-radius: 3px; overflow: hidden; min-width: 90px; background: rgba(255,255,255,.06); }
 .sbarh i { display: block; height: 100%; }
+/* ===== GTO 工作室 ===== */
+.sttop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.sttop h2 { margin: 0; }
+.stintro { margin: 10px 0 0; font-size: 14.5px; color: #c9d6cf; max-width: 900px; }
+.stbanner { margin-top: 10px; background: rgba(208,168,78,.12); border: 1px solid rgba(208,168,78,.5); border-radius: 10px; padding: 10px 12px; font-size: 14.5px; }
+.stcols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; align-items: start; }
+.sth { font-size: 16px; color: var(--text); font-weight: 700; margin: 0 0 10px; }
+.strow { display: flex; gap: 8px 12px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+.strow label { display: inline-flex; gap: 6px; align-items: center; }
+select, input[type=number], input[type=text], textarea, .sharebox { background: #10241d; color: var(--text); border: 1px solid var(--line); border-radius: 7px; padding: 5px 8px; font: inherit; font-size: 14px; }
+input[type=number] { width: 5.5em; }
+.stslots { display: flex; gap: 6px; align-items: center; }
+.stslots [data-slot] { cursor: pointer; }
+.stslots .gap { width: 6px; }
+.stdeck { margin-top: 10px; }
+.rcards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.rcard { border: 1px solid var(--line); border-radius: 10px; padding: 10px; background: rgba(0,0,0,.12); min-width: 0; }
+.rchead { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
+.rchead b { font-size: 13px; color: var(--mute); font-weight: 600; }
+.rname { width: 100%; box-sizing: border-box; font-weight: 700; }
+.minibtn { display: block; width: 100%; border: 0; background: none; padding: 0; cursor: pointer; }
+.mini13 { display: grid; grid-template-columns: repeat(13, 1fr); gap: 1px; background: #0c1a15; border-radius: 4px; overflow: hidden; }
+.mini13 i { aspect-ratio: 1; background: var(--brass); }
+.rcard select { max-width: 100%; flex: 1 1 8em; }
+.treetab { width: 100%; border-collapse: collapse; font-size: 14px; }
+.treetab th { text-align: left; font-weight: 600; color: var(--mute); padding: 4px 6px 4px 0; white-space: nowrap; }
+.treetab thead th { color: var(--text); }
+.treetab th small { display: block; font-size: 11px; color: var(--mute); font-weight: 400; }
+.treetab td { padding: 3px 4px; }
+.treetab input { width: 100%; box-sizing: border-box; }
+input.badin { border-color: #d0533f; background: #3a1d17; }
+.stest p { margin: 6px 0; }
+.bad { color: #f0a08f; }
+.sharebox { width: 100%; box-sizing: border-box; margin-top: 6px; font-size: 12px; }
+.seg.sm button { padding: 5px 10px; font-size: 13px; }
+.seg button:disabled { opacity: .45; cursor: default; }
+.gridtop { margin: 4px 0 8px; }
+.grid13 .cell em { position: absolute; right: 2px; bottom: 1px; font-style: normal; font-size: 10px; font-weight: 700; line-height: 1; }
+.grid13 .cell.heat span { color: inherit; text-shadow: none; }
+.grid13 .cell.dim { opacity: .22; }
+.grid13 .cell.cf { box-shadow: inset 0 0 0 2px #fff; }
+.grid13 .cell.hero { box-shadow: inset 0 0 0 2px #fff, 0 0 0 2px var(--seal); z-index: 1; }
+.cats { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.cats th { text-align: left; color: var(--mute); font-weight: 500; padding: 3px 5px; border-bottom: 1px solid var(--line); }
+.cats td { padding: 4px 5px; border-bottom: 1px solid rgba(44,85,71,.5); }
+.cats .r { text-align: right; white-space: nowrap; }
+.cats td small { display: block; font-size: 11px; color: var(--mute); }
+.cats tr[data-c] { cursor: pointer; }
+.cats tr[data-c]:hover td { background: rgba(255,255,255,.04); }
+.cats tr.on td { background: rgba(208,168,78,.16); }
+.cats td:nth-child(4) { width: 34%; }
+.combos tr.gone { opacity: .4; }
+.combos tr.heror td { background: rgba(200,55,45,.18); }
+.herob { border: 1px solid rgba(208,168,78,.55); background: rgba(208,168,78,.08); border-radius: 10px; padding: 8px 10px; margin: 0 0 12px; font-size: 14.5px; }
+.herob .note { margin-top: 4px; }
+.hchip { display: inline-flex; gap: 5px; align-items: center; margin-right: 8px; white-space: nowrap; }
+.hchip .sw, .lg i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.lg { display: inline-flex; gap: 4px; align-items: center; margin-right: 6px; white-space: nowrap; }
+.herob .grade, .herob .grade.good, .herob .grade.ok, .herob .grade.bad { background: rgba(255,255,255,.06); margin: 8px 0 0; color: var(--text); }
+.herob .grade.good .mk { color: #6fd08f; } .herob .grade.ok .mk { color: #f0c05a; } .herob .grade.bad .mk { color: #f08a7a; }
+.stline { margin-top: 16px; }
+.stline .strow { margin: 2px 0 8px; }
+.lchips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.lchip { border: 1px solid var(--line); background: rgba(0,0,0,.15); border-radius: 999px; padding: 3px 11px; cursor: pointer; font-size: 13.5px; }
+.lchip.done { border-color: #4f9a7a; color: #bfe3d2; }
+.lchip.cur { border-color: var(--brass); background: rgba(208,168,78,.18); font-weight: 700; }
+.lchips .arrow { color: var(--mute); }
+.ro { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 3px; }
+.rot { border: 1px solid var(--line); background: rgba(0,0,0,.18); border-radius: 6px; padding: 3px 2px 2px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; min-width: 0; }
+.rot:hover { border-color: var(--brass); }
+.rot .ct { font-weight: 800; font-size: 13px; background: var(--face); border-radius: 3px; padding: 0 2px; }
+.rot .ct.c0 { color: #1c2333; } .rot .ct.c1 { color: #b62d24; } .rot .ct.c2 { color: #1f58b8; } .rot .ct.c3 { color: #23773f; }
+.sview.solo { grid-template-columns: minmax(0, 900px); }
+.rot .sbarh { width: 100%; min-width: 0; height: 6px; }
+.rot.used { border: 0; background: none; }
+.robest p { font-size: 14px; margin: 10px 0 0; }
+.mbox.rbox { background: #13281f; color: var(--text); max-width: 980px; border: 1px solid var(--line); }
+.mbox.rbox h2 { color: var(--text); margin-top: 0; }
+.mbox.rbox .note { color: var(--mute); }
+.rmtop { display: flex; gap: 10px 20px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; font-size: 14px; }
+.rmtop label { display: inline-flex; gap: 6px; align-items: center; }
+.rmmain { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.grid13.edit { touch-action: none; user-select: none; }
+.cell.rm .fill i { opacity: .85; }
+.rmside textarea { width: 100%; box-sizing: border-box; font-size: 12.5px; font-family: ui-monospace, Menlo, Consolas, monospace; }
+.rmstat { font-weight: 700; margin: 8px 0; }
+.rmside .seg { margin-top: 4px; }
+.rmbtns { justify-content: flex-end; margin-top: 12px; }
+body.noexplain button.term { border-bottom: 0; pointer-events: none; }
+@media (max-width: 900px) {
+  .stcols, .rmmain { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .rcards { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ro { grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 2px; }
+  .rot { font-size: 9px; padding: 2px 0; }
+  .rot .ct { font-size: 10px; padding: 0 1px; }
+  .treetab th { font-size: 12px; }
+}
 .cardpick { display: grid; grid-template-columns: repeat(13, 1fr); gap: 4px; max-width: 560px; }
 
 /* ===== 效能測試 ===== */
@@ -294,6 +395,8 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 .review .mk { font-weight: 900; width: 1.2em; flex: none; }
 .review .good .mk { color: #23773f; } .review .ok .mk { color: #a86b06; } .review .bad .mk { color: #b62d24; }
 .endbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.studiooffer { margin-top: 14px; border-top: 1px solid #e3d7b7; padding-top: 10px; }
+.studiooffer p { margin: 2px 0 0; }
 .coach .ct.c0 { color: #1c2333; } .coach .ct.c1 { color: #b62d24; } .coach .ct.c2 { color: #1f58b8; } .coach .ct.c3 { color: #23773f; }
 .coach .btn { background: #efe3bf; border-color: #d9c99c; color: #2b2410; }
 .coach .btn.main { background: var(--brass); border-color: var(--brass); color: #1b1608; }
@@ -441,7 +544,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
       <button class="btn big" id="bResume" hidden>回到牌局</button>
     </div>
     <p class="note" id="homeStats"></p>
-    <p class="note">想自己查勝率、看 GTO 求解器：右上角「工具」。<button type="button" class="linkbtn" id="bResetTips">重新顯示新手說明</button></p>
+    <p class="note">想自己查勝率、用 GTO 工作室分析一手牌：右上角「工具」。<button type="button" class="linkbtn" id="bResetTips">重新顯示新手說明</button></p>
   </div>
 </section>
 
@@ -482,10 +585,38 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   <div class="mbox"><h2 id="ranksTitle">牌型大小（由大到小）</h2><div id="ranksList"></div><p class="note">用自己 2 張＋公牌 5 張裡最好的 5 張比。同牌型再比點數，A 最大（A2345 的順子 A 當 1）。花色不分大小。</p><button class="btn main" id="ranksClose">知道了</button></div>
 </div>
 
+<div id="rangeModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="rmTitle">
+  <div class="mbox rbox">
+    <h2 id="rmTitle">編輯範圍</h2>
+    <div class="rmtop">
+      <label>範圍庫 <select id="rmLib"></select></label>
+      <label class="rmtopx">最好的前 <input type="range" id="rmTop" min="0" max="100" step="1"> <b class="num" id="rmTopTxt"></b></label>
+    </div>
+    <div class="rmmain">
+      <div class="grid13 edit" id="rmGrid"></div>
+      <div class="rmside">
+        <div class="note">畫筆：點或拖曳格子，塗上這個權重（同一格再點一次就清掉）</div>
+        <div class="seg sm" id="rmBrush"></div>
+        <p class="rmstat" id="rmStat"></p>
+        <label class="note" for="rmText">文字（可以直接貼上 PioSOLVER、GTO Wizard 的範圍）</label>
+        <textarea id="rmText" rows="5" spellcheck="false"></textarea>
+        <p class="note bad" id="rmBad"></p>
+        <div class="strow">
+          <button class="btn sm" id="rmClear">清空</button>
+          <button class="btn sm" id="rmTrim">去掉權重低於 20% 的牌</button>
+        </div>
+        <div class="strow"><label>我的範圍 <select id="rmMine"></select></label><button class="btn sm" id="rmDel">刪除</button></div>
+        <div class="strow"><input type="text" id="rmName" placeholder="名字（例如：我的按鈕開牌）" maxlength="20" style="flex:1 1 10em"><button class="btn sm" id="rmSave">存成我的範圍</button></div>
+      </div>
+    </div>
+    <div class="strow rmbtns"><button class="btn main" id="rmOk">套用</button><button class="btn" id="rmCancel">取消</button></div>
+  </div>
+</div>
+
 <section id="vTools" class="view" hidden>
 <nav class="tabs" role="tablist" aria-label="工具">
   <button role="tab" id="tCalc" aria-controls="pCalc" aria-selected="true">勝率計算機</button>
-  <button role="tab" id="tSolve" aria-controls="pSolve" aria-selected="false">求解器</button>
+  <button role="tab" id="tSolve" aria-controls="pSolve" aria-selected="false">GTO 工作室</button>
   <button role="tab" id="tBench" aria-controls="pBench" aria-selected="false">效能測試</button>
 </nav>
 <main>
@@ -526,34 +657,97 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   </section>
 
   <section id="pSolve" role="tabpanel" aria-labelledby="tSolve" hidden>
-    <div class="panel">
-      <div class="sbar">
-        <div class="seg" id="presetSeg"></div>
-        <button class="btn main" id="bSolve">開始求解</button>
-        <button class="btn" id="bStop" hidden>停止</button>
+    <div class="panel sthead">
+      <div class="sttop">
+        <div><h2 id="stTitle">GTO 工作室</h2><div class="note" id="stSub"></div></div>
+        <div class="seg" id="stTabs"><button type="button" data-v="setup" aria-pressed="true">① 設定局面</button><button type="button" data-v="result" aria-pressed="false">② 看結果</button></div>
       </div>
-      <div class="spec" id="spec"></div>
-      <div class="prog" id="prog" hidden>
-        <span class="num" id="progTxt"></span>
-        <div class="track" aria-hidden="true"><i id="progBar"></i></div>
-        <span class="num" id="progTime"></span>
+      <p class="stintro" id="stIntro">設定一個<b>兩個人</b>的翻牌後局面：公牌、底池、雙方可能拿的牌（<button type="button" class="term" data-term="範圍">範圍</button>）、可以怎麼下注。電腦會算出 <button type="button" class="term" data-term="GTO">GTO</button> 打法（雙方都沒辦法再占對方便宜的策略），之後點動作、點下一張牌，看每一手牌該怎麼打。範例已經設好，直接按「開始求解」就可以。</p>
+      <div class="stbanner" id="stBanner" hidden></div>
+    </div>
+    <div id="stSetup">
+      <div class="stcols">
+        <div class="panel">
+          <h3 class="sth">1. 公牌和籌碼</h3>
+          <div class="strow"><label for="stExample">範例</label><select id="stExample"></select></div>
+          <div class="stslots" id="stSlots"></div>
+          <div class="deck stdeck" id="stDeck" aria-label="選公牌"></div>
+          <p class="note" style="margin:6px 0 10px">點格子再點下面的牌；放 3 張從翻牌開始、4 張從轉牌、5 張從河牌。</p>
+          <div class="strow nums">
+            <label>底池 <input type="number" id="stPot" min="0.5" step="0.5" inputmode="decimal"></label>
+            <label>每人還剩 <input type="number" id="stStack" min="0.5" step="0.5" inputmode="decimal"></label>
+            <span class="note" id="stUnit">單位：大盲</span>
+          </div>
+          <p class="note" id="stSpr"></p>
+        </div>
+        <div class="panel">
+          <h3 class="sth">2. 雙方的範圍</h3>
+          <p class="note" style="margin:0 0 8px">每個人「可能拿著的牌」。格子越亮，那手牌越可能在範圍裡。點「編輯」可以自己畫、從範圍庫選、或貼上文字。</p>
+          <div class="rcards" id="stRanges"></div>
+        </div>
+        <div class="panel">
+          <h3 class="sth">3. 下注選項</h3>
+          <div class="strow"><div class="seg" id="stTreeSeg"></div></div>
+          <table class="treetab" id="stTree"></table>
+          <div class="strow"><label>每條街最多下注／加注幾次 <select id="stCap"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+            <label><input type="checkbox" id="stAddAllin"> 另外都加一個「全下」</label></div>
+          <p class="note" style="margin:6px 0 0">寫法：數字＝底池的 %（33 就是三分之一個底池）、2.5x＝對方下注的 2.5 倍、全下、幾何（每條街一樣的比例，河牌剛好全下）。用空白分開。尺寸越多，算得越慢。</p>
+        </div>
+        <div class="panel stgo">
+          <h3 class="sth">4. 開始求解</h3>
+          <div class="strow"><span>精度</span><div class="seg" id="stTarget"></div></div>
+          <div id="stEst" class="stest"></div>
+          <div class="strow">
+            <button class="btn main big" id="bSolve">開始求解</button>
+            <button class="btn" id="bStop" hidden>先停在這裡</button>
+            <button class="btn" id="stShare">複製分享連結</button>
+          </div>
+          <input class="sharebox" id="stShareBox" readonly hidden aria-label="分享連結">
+          <div class="prog" id="prog" hidden>
+            <span class="num" id="progTxt"></span>
+            <div class="track" aria-hidden="true"><i id="progBar"></i></div>
+            <span class="num" id="progTime"></span>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="sview" id="sview" hidden>
-      <div class="panel">
-        <div class="crumbs" id="crumbs"></div>
-        <div class="boardrow" id="sBoard"></div>
-        <div id="nodeHead"></div>
-        <div class="acts" id="acts"></div>
-        <div id="gridWrap"><div class="grid13" id="grid13"></div><div class="legend" id="legend"></div></div>
-        <div id="chancePick" hidden><p class="note">選下一張牌：</p><div class="cardpick deck" id="cardPick"></div></div>
-      </div>
-      <div class="panel" id="sideBox">
-        <h2>整體</h2>
-        <table class="bars num" id="freqTab"></table>
-        <p class="note" id="nodeNums"></p>
-        <h2 style="margin-top:16px" id="cellTitle">點左邊的格子看每個組合</h2>
-        <div id="cellBox"></div>
+    <div id="stResult" hidden>
+      <div class="panel stline" id="stLineBox" hidden></div>
+      <div class="sview" id="sview">
+        <div class="panel">
+          <details class="how sthow"><summary>怎麼看這一頁？</summary><ul>
+            <li>上面一排按鈕是輪到的人可以做的動作，% 是 GTO 整個範圍用這個動作的比例。點一個就走到下一步；上面的路徑可以點回去。</li>
+            <li>13×13 格子：每一格是一種起手牌（右上同花、左下不同花、對角線是對子）。顏色條是那一格的牌怎麼分配動作，高度是那一格還有多少組合打到這裡。</li>
+            <li>切到「EV」「勝率」看每一格的平均值；「範圍」只看還剩哪些牌。</li>
+            <li>「牌型分類」把範圍照中了什麼分組（頂對、聽牌…），看每一組怎麼打；點一列，格子只亮那一組。點一格，會列出那一格每個花色組合的策略。</li>
+            <li>走到發牌的地方，會列出每一張可能的下一張牌，點一張繼續走。</li>
+            <li>GTO 不是「一定要這樣打」：同一手牌常常混著用好幾個動作，比例是大概要多常這樣做。</li>
+          </ul></details>
+          <div class="crumbs" id="crumbs"></div>
+          <div class="boardrow" id="sBoard"></div>
+          <div id="nodeHead"></div>
+          <div class="acts" id="acts"></div>
+          <div id="heroBox"></div>
+          <div id="gridWrap">
+            <div class="strow gridtop"><div class="seg sm" id="gridMode"></div><span class="note" id="gridHint"></span></div>
+            <div class="grid13" id="grid13"></div><div class="legend" id="legend"></div>
+          </div>
+          <div id="chancePick" hidden>
+            <p class="note" id="roHead"></p>
+            <div class="ro" id="roGrid"></div>
+            <div class="robest" id="roBest"></div>
+          </div>
+        </div>
+        <div class="panel" id="sideBox">
+          <h2>整體</h2>
+          <table class="bars num" id="freqTab"></table>
+          <p class="note" id="nodeNums"></p>
+          <h2 style="margin-top:16px">牌型分類</h2>
+          <p class="note" style="margin:0 0 6px">這個人的範圍照牌型分組，每一組怎麼打。點一列，左邊的格子只亮那一組。</p>
+          <table class="cats" id="catTab2"></table>
+          <h2 style="margin-top:16px" id="cellTitle">點左邊的格子看每個組合</h2>
+          <div id="cellBox"></div>
+        </div>
       </div>
     </div>
   </section>

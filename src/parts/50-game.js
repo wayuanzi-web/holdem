@@ -18,7 +18,7 @@ function showView(v) {
   document.body.classList.toggle('intable', v === 'table');
   $('nHome').hidden = v === 'home';
   $('nGame').hidden = v === 'table' || !G.H;
-  $('subTitle').textContent = v === 'tools' ? '工具：勝率計算機、求解器、效能測試' : '德州撲克教練：一步一步帶你打';
+  $('subTitle').textContent = v === 'tools' ? '工具：勝率計算機、GTO 工作室、效能測試' : '德州撲克教練：一步一步帶你打';
   if (v !== 'table') clearTimeout(G.timer);
   if (v === 'home') renderHome();
   window.scrollTo(0, 0);
@@ -295,8 +295,28 @@ function summaryHTML(S) {
     }
     h += '</ul>';
   } else h += '<p class="note">這一手你不用做決定。</p>';
-  h += '<div class="endbtns"><button class="btn main" data-end="next">再來一手</button><button class="btn" data-end="replay">從頭一步一步重看</button><button class="btn" data-end="home">回首頁</button></div>';
+  h += '<div class="endbtns"><button class="btn main" data-end="next">再來一手</button><button class="btn" data-end="replay">從頭一步一步重看</button><button class="btn" data-end="home">回首頁</button>' + studioQuickBtn() + '</div>';
+  h += studioOfferHTML();
   return h;
+}
+
+/* 一手結束：可以送去 GTO 工作室的話，給按鈕（兩個人的轉牌、河牌最快；翻牌很慢） */
+function studioOfferHTML() {
+  if (!G.H || G.replay) return '';
+  const xs = importableStreets(G.H), ok = xs.filter((x) => x.ok);
+  if (!ok.length) {
+    const why = xs.find((x) => x.error && !/沒有到/.test(x.error));
+    return why ? '<p class="note" style="margin-top:12px">GTO 工作室：' + esc(why.error) + '</p>' : '';
+  }
+  const best = ok.find((x) => x.street >= 2) || ok[0];
+  let h = '<div class="studiooffer" id="studioOffer"><b>用 GTO 工作室分析這一手</b><p class="note">照每個人的動作估雙方的範圍，算出這個局面的 GTO 打法，再一步一步對照你實際怎麼打。</p><div class="endbtns">';
+  for (const x of ok) h += '<button class="btn' + (x === best ? ' main' : '') + '" data-studio="' + x.street + '">從' + STREET_NAME[x.street] + '開始' + (x.street === 1 ? '（很慢）' : '') + '</button>';
+  return h + '</div></div>';
+}
+/* 檢討畫面的按鈕列：可以分析的話多一顆，按了捲到下面的選項 */
+function studioQuickBtn() {
+  if (!G.H || G.replay) return '';
+  return importableStreets(G.H).some((x) => x.ok) ? '<button class="btn" data-end="gto">GTO 分析這一手 ▾</button>' : '';
 }
 
 /* ===== 動作列 ===== */
@@ -427,9 +447,12 @@ function initGame() {
   $('bBetGo').addEventListener('click', () => heroAct({ t: 'r', to: +$('sizeRange').value }));
   $('bBetCancel').addEventListener('click', () => { $('sizer').hidden = true; G.sizerStep = -1; });
   $('cBody').addEventListener('click', (e) => {
+    const sb = e.target.closest('button[data-studio]');
+    if (sb) { studioFromGame(+sb.dataset.studio); return; }
     const b = e.target.closest('button[data-end]'); if (!b) return;
     if (b.dataset.end === 'next') nextHand();
     else if (b.dataset.end === 'home') showView('home');
+    else if (b.dataset.end === 'gto') { const o = $('studioOffer'); if (o) o.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
     else if (b.dataset.end === 'replay') { G.replay = true; G.view = 0; G.lastRender = null; renderCur(); }
   });
   // 重看時按到最後一步：回到檢討畫面

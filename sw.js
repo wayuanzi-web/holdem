@@ -1,5 +1,5 @@
 /* 德州軍師的離線快取。每次建置會換 CACHE 名稱，舊快取在啟用時清掉。 */
-const CACHE = 'dezhou-20261014175557';
+const CACHE = 'dezhou-20261014182052';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => {

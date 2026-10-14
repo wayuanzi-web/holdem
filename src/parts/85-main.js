@@ -15,7 +15,8 @@ document.querySelector('.tabs').addEventListener('keydown', (e) => {
   showTab(ids[j]); $(ids[j]).focus();
 });
 initCalc();
-initSolver();
+initStudio();
 initBench();
 try { const t = localStorage.getItem('dz-tab'); if (t && $(t)) showTab(t); } catch (e) { /* 忽略 */ }
 initGame();
+studioFromHash();
