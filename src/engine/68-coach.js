@@ -67,10 +67,18 @@ function heroInfo(H, seat, rng, iters) {
   rng = stateRng(H); iters = 3000;
   const p = H.players[seat];
   const g = heroCls(p.cards);
-  const opps = H.players.filter((q) => q !== p && !q.folded);
-  const info = { g, rank: PRE_RANK[g], pct: PRE_PCT[g], nOpp: opps.length, opps: opps.map((q) => q.seat) };
+  let opps = H.players.filter((q) => q !== p && !q.folded);
+  // 翻牌前有人加注：只跟「已經把錢放進來」的人比（加注、跟注的人）；後面還沒說話的人多半會棄牌，另外算（behind）
+  let behind = [];
+  if (H.street === 0 && preflopRaises(H) > 0) {
+    const acted = new Set(H.log.filter((e) => e.k === 'act' && e.street === 0 && e.t !== 'f').map((e) => e.seat));
+    const inPot = opps.filter((q) => acted.has(q.seat));
+    if (inPot.length) { behind = opps.filter((q) => !acted.has(q.seat)); opps = inPot; }
+  }
+  const info = { g, rank: PRE_RANK[g], pct: PRE_PCT[g], nOpp: opps.length, opps: opps.map((q) => q.seat), behind: behind.map((q) => q.seat), iters: 3000 };
   if (!opps.length) return info;
   const ws = opps.map((q) => rangeWeights(H, q.seat, COACH_STYLE_AWARE ? q.style : 'tag'));
+  info.ws = ws;
   info.oppTop = ws.map(rangeTopPct);
   info.est = mcVsRanges(p.cards, H.board, ws, iters || 3000, rng).eq;
   info.rand = mcVsRandom(p.cards, H.board, opps.length, iters || 3000, rng).eq;
@@ -116,6 +124,12 @@ function coachAdvice(H, rng) {
     else adv.act = { t: L.canCheck ? 'x' : 'f' };
     adv.label = adv.act.t === 'r' ? '全下 ' + L.maxTo : adv.act.t === 'c' ? '跟注 ' + L.callAmt : adv.act.t === 'x' ? '過牌' : '棄牌';
     adv.short = sh;
+    if (sh.kind === 'call') {                                    // 面對全下：用查表的勝率講底池賠率
+      const last = H.players[lastAggressorSeat(H)], w = new Float32Array(NCOMBO);
+      for (let k = 0; k < NCOMBO; k++) w[k] = PRE_PCT[CLASS_OF[k]] < sh.v ? 1 : 0;
+      adv.detail = { street: 0, call: sh.toCall, pot: sh.pot, need: sh.need, est: sh.eq, rand: adv.rand, iters: 40000, eff: sh.eq, fac: [], allin: true, implied: 0, lookup: true,
+        opps: last ? [{ seat: last.seat, name: last.name, style: last.style, top: sh.v, act: 'shove', range: rangeText(w) }] : [], behind: [], cards: p.cards.slice(), board: [] };
+    } else delete adv.detail;                                    // 推、再推：照推牌表，不是底池賠率
     return adv;
   }
   const ch = chartSpot(H, L.seat);
@@ -131,6 +145,7 @@ function coachAdvice(H, rng) {
   else { act = { t: L.canCheck ? 'x' : 'f' }; label = L.canCheck ? '過牌' : '棄牌'; }
   const same = actFamily(act.t) === actFamily(adv.act.t);
   if (same) { adv.reasons.splice(1, 0, line); adv.act = act; adv.label = label; return adv; }
+  if (adv.detail) adv.detail.chartDiff = true;
   const head = adv.reasons[0];
   adv.more.unshift('（另外照勝率估的看法：' + adv.reasons.slice(1).join(' ') + '建議是「' + adv.label + '」，跟圖表不一樣時以圖表為準。）');
   adv.reasons.length = 0;
@@ -190,9 +205,21 @@ function coachAdviceRule(H, rng) {
     // 勝率打折：沒位置（翻牌後先說話）的牌很難把勝率「打出來」；不同花又不相連的牌更難
     const ip = ag && postflopOrder(H, p.seat) > postflopOrder(H, ag.seat);
     const play = isPair ? 0.95 : suited ? (pairOrSc ? 1 : 0.88) : (RANKS.indexOf(cn[1]) >= 8 ? 0.9 : 0.78);
-    const real = big || L.callAmt >= p.stack ? 1 : (ip ? 0.92 : 0.8) * play * (I.nOpp > 1 ? 0.95 : 1);   // 全下就沒有之後的街，不用打折
+    const allin = big || L.callAmt >= p.stack;              // 全下就沒有之後的街，不用打折
+    const nBehind = (I.behind || []).length;
+    const fac = [];
+    if (!allin) {
+      fac.push(ip ? { x: 0.92, s: '有位置只打 ×0.92（沒位置要 ×0.80）', t: '有位置（翻牌後你比他晚說話，能先看他怎麼做）：打的折比較少；沒位置要 ×0.80' } : { x: 0.8, s: '沒位置 ×0.80（有位置只要 ×0.92）', t: '沒位置（翻牌後你要先說話，看不到他怎麼做）：比較難把勝率打出來；有位置只要 ×0.92' });
+      if (play < 1) { const w = isPair ? '口袋對子' : suited ? '同花不相連' : '不同花' + (play < 0.85 ? '又不相連' : ''); fac.push({ x: play, s: w + ' ×' + play.toFixed(2), t: w + '：' + (isPair ? '沒中三條時翻牌後不好打' : '中牌的方式少，常常只中一對') }); }
+      if (I.nOpp > 1) fac.push({ x: 0.95, s: '多人底池 ×0.95', t: '已經有 ' + I.nOpp + ' 個人在底池裡：多人底池更難贏' });
+      if (nBehind) fac.push({ x: 0.95, s: '後面 ' + nBehind + ' 人沒說話 ×0.95', t: '後面還有 ' + nBehind + ' 個人沒說話：他們可能再加注，你就得棄牌' });
+    }
+    const real = fac.reduce((a, f) => a * f.x, 1);
     const eff = I.est * real;
     effNow = eff;
+    const mkDetail = () => ({ street: 0, call: L.callAmt, pot, need, est: I.est, rand: I.rand, iters: I.iters, eff, fac, allin, implied,
+      opps: I.opps.map((s, i) => ({ seat: s, name: H.players[s].name, style: H.players[s].style, top: rangeTopPct(I.ws[i]), act: preflopActKind(H.log.filter((e) => e.k === 'act' && e.street === 0 && e.seat === s).pop() || {}, H), range: rangeText(I.ws[i]) })),
+      behind: (I.behind || []).map((s) => H.players[s].name), cards: p.cards.slice(), board: H.board.slice() });
     R.push(head);
     if (raises >= 2 && I.pct < 0.032 && L.canRaise) {
       const to = big ? L.maxTo : Math.min(L.maxTo, Math.round(H.curBet * 2.4));
@@ -207,16 +234,19 @@ function coachAdviceRule(H, rng) {
       return mk({ t: 'r', to }, '加注到 ' + to);
     }
     R.push('要跟 ' + L.callAmt + '，跟完底池是 ' + (pot + L.callAmt) + '：勝率要 ' + L.callAmt + '÷' + (pot + L.callAmt) + '＝' + PCT0(need) + ' 以上才划算。');
-    R.push(who + '加注了（' + (ag ? (STYLE_READ[ag.style] || STYLE_READ.tag).open : '') + '），照他的動作估範圍大約是前 ' + PCT0(agTop) + '；你對這個範圍的勝率約 ' + PCT0(I.est) + '（對隨機手牌是 ' + PCT0(I.rand) + '）。');
-    R.push('但勝率要打折：' + (ip ? '翻牌後你比他晚說話（有位置）' : '翻牌後你要比他先說話（沒位置），很難把勝率打出來') + (play < 0.9 ? '，而且這手牌不同花、不相連，中牌的方式少' : '') + '。打折後大約 ' + PCT0(eff) + '。');
+    const others = I.nOpp > 1 ? '（另外 ' + (I.nOpp - 1) + ' 個跟注的人也照動作估）' : '';
+    R.push(who + '加注了（' + (ag ? (STYLE_READ[ag.style] || STYLE_READ.tag).open : '') + '），照他的動作估範圍大約是前 ' + PCT0(agTop) + others + '；把你的牌跟這些牌一路比到攤牌，勝率約 ' + PCT0(I.est) + '（如果他是隨便拿的牌是 ' + PCT0(I.rand) + '）。');
+    if (allin) R.push('跟了就全下，之後沒有下注，勝率不用打折。');
+    else R.push('但 ' + PCT0(I.est) + ' 是「一定看到攤牌」的勝率；翻牌後還會下注，沒中牌常常得棄牌，實際拿得到的比較少，要打折：' + fac.map((f) => f.s).join('、') + '。打折後大約 ' + PCT0(eff) + '。');
+    const out = (a, l) => { const r = mk(a, l); r.detail = mkDetail(); return r; };
     if (I.pct < 0.6 && (eff >= need + 0.02 || eff + implied >= need + 0.02)) {
       if (eff < need + 0.02) R.push('打折後差一點，但你的牌（對子、同花連張）中了大牌時常常能贏很多，這叫「隱含賠率」，可以跟。');
       else R.push(PCT0(eff) + ' ＞ ' + PCT0(need) + '，跟注划算。');
-      return mk({ t: 'c' }, '跟注 ' + L.callAmt);
+      return out({ t: 'c' }, '跟注 ' + L.callAmt);
     }
     R.push(PCT0(eff) + (eff < need + 0.02 ? ' 不夠 ' + PCT0(need) : ' 雖然接近，但這手牌太弱') + '，跟下去長期會虧，棄牌。');
     if (p.bet > 0) M.push('已經放進去的 ' + p.bet + ' 是沉沒成本，不影響這個判斷。');
-    return mk({ t: 'f' }, '棄牌');
+    return out({ t: 'f' }, '棄牌');
   }
   // ===== 翻牌後 =====
   const nO = I.nOpp;
@@ -226,22 +256,23 @@ function coachAdviceRule(H, rng) {
   const o = I.outs, outsN = o ? o.total : 0;
   R.push(status);
   if (L.toCall === 0) {
+    const mk0 = (a, l) => { const r = mk(a, l); r.detail = postDetail(H, I, L, pot, 0, I.est, [], 0, p); return r; };
     const valueThr = 0.56 + 0.05 * (nO - 1) + (H.street === 3 ? 0.04 : 0);
     R.push(eqLine);
     if (I.est >= valueThr && L.canRaise) {
       const to = sizeTo(H, L, I.est > 0.8 ? 0.75 : 0.6);
       R.push('你很可能領先：下注讓比你差的牌付錢給你（價值下注）。下注 ' + to + '，大約是底池的 ' + Math.round(to / pot * 100) + '%。');
-      return mk({ t: 'r', to }, sizeLbl(to));
+      return mk0({ t: 'r', to }, sizeLbl(to));
     }
     if (I.draws && outsN >= 8 && H.street < 3 && nO <= 2 && L.canRaise) {
       const to = sizeTo(H, L, 0.5);
       R.push('你有 ' + outsN + ' 張出牌。下注叫「半詐唬」：對手棄牌你直接贏；被跟的話還有 ' + PCT0(o.pRiver) + ' 的機會成牌。');
       M.push('過牌也可以：免費看下一張。');
-      return mk({ t: 'r', to }, sizeLbl(to));
+      return mk0({ t: 'r', to }, sizeLbl(to));
     }
     R.push(H.street === 3 ? '牌力不夠去下注：比你大的牌會跟，比你小的牌會棄。過牌，直接攤牌比大小。' : '勝率還不夠高去下注。過牌，免費看下一張牌。');
     if (outsN) M.push('下一張有 ' + outsN + ' 張牌讓你明顯變強（' + PCT0(o.pNext) + '）。');
-    return mk({ t: 'x' }, '過牌');
+    return mk0({ t: 'x' }, '過牌');
   }
   const implied = I.draws && H.street === 1 && p.stack > pot ? 0.05 : I.draws && H.street === 2 && p.stack > pot ? 0.03 : 0;
   R.push('要跟 ' + L.callAmt + '，跟完底池是 ' + (pot + L.callAmt) + '：勝率要 ' + L.callAmt + '÷' + (pot + L.callAmt) + '＝' + PCT0(need) + ' 以上才划算。');
@@ -252,15 +283,24 @@ function coachAdviceRule(H, rng) {
     return mk({ t: 'r', to }, '加注到 ' + to);
   }
   const ipNow = p.seat === lastToActSeat(H);
-  const eff = H.street === 3 || COACH_NO_DISCOUNT ? I.est : I.est * (ipNow ? 0.97 : 0.9);
+  const noDisc = H.street === 3 || COACH_NO_DISCOUNT || L.callAmt >= p.stack;
+  const fac = noDisc ? [] : [ipNow ? { x: 0.97, s: '你最後說話 ×0.97', t: '你最後說話：之後比較不會被加注，只打一點點折' } : { x: 0.9, s: '後面還有人說話 ×0.90', t: '你後面還有人說話：之後可能被加注、被逼棄牌' }];
+  const eff = fac.reduce((a, f) => a * f.x, I.est);
   effNow = eff;
-  if (eff >= need) { R.push(PCT0(I.est) + (eff < I.est - 0.005 ? '（沒位置打個折，約 ' + PCT0(eff) + '）' : '') + ' ≥ ' + PCT0(need) + '，跟注划算。'); return mk({ t: 'c' }, '跟注 ' + L.callAmt); }
+  const out = (a, l) => { const r = mk(a, l); r.detail = postDetail(H, I, L, pot, need, eff, fac, implied, p); return r; };
+  if (eff >= need) { R.push(PCT0(I.est) + (eff < I.est - 0.005 ? '（打個折，約 ' + PCT0(eff) + '）' : '') + ' ≥ ' + PCT0(need) + '，跟注划算。'); return out({ t: 'c' }, '跟注 ' + L.callAmt); }
   if (eff + implied >= need) {
     R.push('勝率差一點，但你在聽牌：中了的時候對手常常還會再付錢（隱含賠率），可以跟。');
-    return mk({ t: 'c' }, '跟注 ' + L.callAmt);
+    return out({ t: 'c' }, '跟注 ' + L.callAmt);
   }
-  R.push(PCT0(I.est) + ' < ' + PCT0(need) + '，跟下去長期會虧，棄牌。');
-  return mk({ t: 'f' }, '棄牌');
+  R.push(PCT0(eff) + (eff < I.est - 0.005 ? '（打折後）' : '') + ' < ' + PCT0(need) + '，跟下去長期會虧，棄牌。');
+  return out({ t: 'f' }, '棄牌');
+}
+/* 詳細解說用的資料（翻牌後） */
+function postDetail(H, I, L, pot, need, eff, fac, implied, p) {
+  return { street: H.street, call: L.callAmt, pot, need, est: I.est, rand: I.rand, iters: I.iters, eff, fac, allin: L.callAmt >= p.stack, implied,
+    opps: I.opps.map((s, i) => ({ seat: s, name: H.players[s].name, style: H.players[s].style, top: rangeTopPct(I.ws[i]), range: rangeText(I.ws[i]) })),
+    behind: [], cards: p.cards.slice(), board: H.board.slice(), outs: I.outs ? { total: I.outs.total, pNext: I.outs.pNext, pRiver: I.outs.pRiver } : null };
 }
 /* 翻牌後說話的順序（數字越大越晚說話） */
 function postflopOrder(H, seat) { return (seat - H.button - 1 + H.n) % H.n; }

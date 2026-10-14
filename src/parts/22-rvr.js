@@ -1,5 +1,6 @@
 /* ===== 22-rvr：範圍對範圍（勝率計算機的第二個模式） ===== */
 const RV = { a: RANGE_BTN_OPEN, b: RANGE_BB_CALL, names: ['範圍 A', '範圍 B'], board: [], req: 0, res: null };
+const RV_DEFNAMES = ['範圍 A', '範圍 B'];
 const RV_KEY = 'dezhou-rvr';
 function rvSave() { try { localStorage.setItem(RV_KEY, JSON.stringify({ a: RV.a, b: RV.b, board: RV.board, on: RV.on })); } catch (e) { /* 忽略 */ } }
 function rvLoad() { try { const o = JSON.parse(localStorage.getItem(RV_KEY) || 'null'); if (o) { RV.a = o.a || RV.a; RV.b = o.b || RV.b; RV.board = Array.isArray(o.board) ? o.board : []; RV.on = !!o.on; } } catch (e) { /* 忽略 */ } }
@@ -71,11 +72,11 @@ function initRvr() {
   $('rvRanges').addEventListener('click', (e) => {
     const b = e.target.closest('[data-rv]'); if (!b) return;
     const k = b.dataset.rv;
-    openRangeEditor('編輯' + RV.names[k === 'a' ? 0 : 1], RV[k], (txt) => { RV[k] = txt; renderRvr(); });
+    openRangeEditor('編輯' + RV.names[k === 'a' ? 0 : 1], RV[k], (txt) => { const i = k === 'a' ? 0 : 1; RV[k] = txt; RV.names[i] = RV_DEFNAMES[i]; renderRvr(); });
   });
-  $('rvRanges').addEventListener('change', (e) => { const s = e.target.closest('select[data-rvlib]'); if (!s) return; const r = RANGE_LIB.find((x) => x.key === s.value); if (r) { RV[s.dataset.rvlib] = r.text; renderRvr(); } });
+  $('rvRanges').addEventListener('change', (e) => { const s = e.target.closest('select[data-rvlib]'); if (!s) return; const r = RANGE_LIB.find((x) => x.key === s.value); if (r) { const i = s.dataset.rvlib === 'a' ? 0 : 1; RV[s.dataset.rvlib] = r.text; RV.names[i] = RV_DEFNAMES[i]; renderRvr(); } });
   $('rvSlots').addEventListener('click', (e) => { const t = e.target.closest('[data-rs]'); if (!t) return; const i = +t.dataset.rs; if (i < RV.board.length) { RV.board.splice(i); renderRvr(); } });
   $('rvDeck').addEventListener('click', (e) => { const b = e.target.closest('button[data-c]'); if (!b || b.classList.contains('used') || RV.board.length >= 5) return; RV.board.push(+b.dataset.c); renderRvr(); });
   $('rvClear').addEventListener('click', () => { RV.board = []; renderRvr(); });
-  $('rvSwap').addEventListener('click', () => { const t = RV.a; RV.a = RV.b; RV.b = t; renderRvr(); });
+  $('rvSwap').addEventListener('click', () => { const t = RV.a; RV.a = RV.b; RV.b = t; RV.names.reverse(); renderRvr(); });
 }

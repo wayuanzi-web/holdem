@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1d19"><meta name="description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="德州軍師"><meta property="og:type" content="website"><meta property="og:title" content="德州軍師"><meta property="og:description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><meta property="og:image" content="https://wayuanzi-web.github.io/holdem/og.png"><meta property="og:url" content="https://wayuanzi-web.github.io/holdem/"><meta name="twitter:card" content="summary_large_image"><title>德州軍師</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%9F%E4%B8%A6%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%9F%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%94%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A4%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BC%BC%E4%BD%86%E4%BD%88%E4%BD%8D%E4%BD%8E%E4%BD%8F%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%99%E5%82%B3%E5%83%8F%E5%83%B9%E5%84%AA%E5%84%B2%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AC%E5%85%B1%E5%85%B6%E5%85%B7%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%A2%E5%8B%BE%E5%8C%85%E5%8C%96%E5%8C%AF%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%AB%E5%91%8A%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%9F%E5%96%AE%E5%98%9B%E5%99%A8%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9C%88%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%8B%E5%9F%B7%E5%9F%BA%E5%A0%B1%E5%A0%B4%E5%A1%97%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%8D%E5%B0%8F%E5%B0%91%E5%B0%B1%E5%B0%BA%E5%B1%80%E5%B1%95%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%AB%E5%BB%BA%E5%BC%84%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%A9%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%97%E5%BF%A0%E5%BF%AB%E6%80%8E%E6%80%95%E6%80%9D%E6%80%A7%E6%83%85%E6%83%B3%E6%84%8F%E6%85%A2%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%88%90%E6%88%91%E6%88%96%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%BE%E6%8A%8A%E6%8A%95%E6%8A%98%E6%8B%96%E6%8B%BF%E6%8C%87%E6%8C%89%E6%8C%91%E6%8D%A8%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A8%E6%8F%9B%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%8B%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%B4%E6%95%B8%E6%96%87%E6%96%99%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%99%AF%E6%9A%97%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9C%80%E6%9C%83%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9F%90%E6%9F%A5%E6%A0%B8%E6%A0%BC%E6%A1%86%E6%A1%8C%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%B5%E6%A6%82%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A3%E6%AD%A5%E6%AE%B5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B0%A3%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E6%BB%BF%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%88%BE%E7%89%88%E7%89%8C%E7%8D%8E%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%90%86%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%99%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%AD%E7%9F%B3%E7%A2%BA%E7%A2%BC%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A8%B1%E7%A9%8D%E7%A9%BA%E7%AA%84%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%80%E7%B4%84%E7%B4%9A%E7%B4%AF%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B5%B1%E7%B6%93%E7%B6%B2%E7%B7%8A%E7%B7%92%E7%B7%9A%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%8C%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8E%8A%E8%90%AC%E8%91%97%E8%91%AB%E8%92%99%E8%98%86%E8%99%9B%E8%99%A7%E8%99%B9%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A1%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%8B%E8%A6%8F%E8%A6%BD%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%93%E8%A8%98%E8%A8%AD%E8%A8%B4%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%A9%B3%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AA%BF%E8%AB%8B%E8%AB%96%E8%AD%B0%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B7%91%E8%B7%9B%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8B%E9%81%8E%E9%81%93%E9%81%A9%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%91%E9%87%9D%E9%88%95%E9%8C%84%E9%8C%A2%E9%8C%A6%E9%8C%AF%E9%8E%96%E9%90%98%E9%95%B7%E9%96%89%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%BF%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%90%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8F%E9%A1%9E%E9%A1%AF%E9%A6%96%E9%A9%9F%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%9F%E4%B8%A6%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%9F%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%94%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A4%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BC%BC%E4%BD%86%E4%BD%88%E4%BD%8D%E4%BD%8E%E4%BD%8F%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%99%E5%82%B3%E5%83%8F%E5%83%B9%E5%84%AA%E5%84%B2%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AC%E5%85%B1%E5%85%B6%E5%85%B7%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%A2%E5%8B%BE%E5%8C%85%E5%8C%96%E5%8C%AF%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%83%E5%8F%88%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%AB%E5%91%8A%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%9F%E5%96%AE%E5%98%9B%E5%99%A8%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9C%88%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%8B%E5%9F%B7%E5%9F%BA%E5%A0%B1%E5%A0%B4%E5%A1%97%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%8D%E5%B0%8F%E5%B0%91%E5%B0%B1%E5%B0%BA%E5%B1%80%E5%B1%95%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%AB%E5%BB%BA%E5%BC%84%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%A9%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8B%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%97%E5%BF%A0%E5%BF%AB%E6%80%8E%E6%80%95%E6%80%9D%E6%80%A7%E6%83%85%E6%83%B3%E6%84%8F%E6%85%A2%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%88%90%E6%88%91%E6%88%96%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%BE%E6%8A%8A%E6%8A%95%E6%8A%98%E6%8A%BD%E6%8B%96%E6%8B%BF%E6%8C%87%E6%8C%89%E6%8C%91%E6%8D%A8%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A8%E6%8F%9B%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%8B%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%B4%E6%95%B8%E6%96%87%E6%96%99%E6%96%9C%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%99%AF%E6%9A%97%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9C%80%E6%9C%83%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9F%90%E6%9F%A5%E6%A0%B8%E6%A0%BC%E6%A1%86%E6%A1%8C%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%B5%E6%A6%82%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A3%E6%AD%A5%E6%AE%B5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B0%A3%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E6%BB%BF%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%88%BE%E7%89%88%E7%89%8C%E7%8C%9C%E7%8D%8E%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%90%86%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%99%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%AD%E7%9F%B3%E7%A2%BA%E7%A2%BC%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A8%B1%E7%A9%8D%E7%A9%A9%E7%A9%BA%E7%AA%84%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%80%E7%B4%84%E7%B4%9A%E7%B4%AF%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B5%B1%E7%B6%93%E7%B6%B2%E7%B7%8A%E7%B7%92%E7%B7%9A%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%8C%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8E%8A%E8%90%AC%E8%91%97%E8%91%AB%E8%92%99%E8%98%86%E8%99%9B%E8%99%A7%E8%99%B9%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A1%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%8B%E8%A6%8F%E8%A6%BD%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%93%E8%A8%98%E8%A8%AD%E8%A8%B4%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%A9%B3%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AA%BF%E8%AB%8B%E8%AB%96%E8%AD%B0%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B7%91%E8%B7%9B%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8B%E9%81%8E%E9%81%93%E9%81%A9%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%91%E9%87%9D%E9%88%95%E9%8C%84%E9%8C%A2%E9%8C%A6%E9%8C%AF%E9%8E%96%E9%90%98%E9%95%B7%E9%96%89%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%BF%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%90%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8F%E9%A1%9E%E9%A1%AF%E9%A2%A8%E9%A6%96%E9%A9%97%E9%A9%9F%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
 <style>
 :root {
   --ink: #0e1d19;        /* 牌桌陰影裡的深綠 */
@@ -466,6 +466,29 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 .adv ol { padding-left: 1.3em; margin: 6px 0 4px; }
 .adv li { margin: 5px 0; }
 .adv details summary { cursor: pointer; color: #7a5a14; font-size: 14px; }
+.adv details.deep { margin: 8px 0 6px; border-top: 1px dashed #d9c48f; padding-top: 6px; }
+.adv details.deep > summary { font-size: 15px; font-weight: 700; color: #6b4a06; padding: 4px 0; }
+.deepbody { font-size: 14.5px; line-height: 1.6; }
+.deepbody h4 { margin: 12px 0 4px; font-size: 15.5px; color: #4a3608; }
+.deepbody p { margin: 6px 0; }
+.deepbody ul { padding-left: 1.2em; margin: 4px 0; }
+.deepbody .note { color: #7a6a48; font-size: 13px; }
+.deepbody .neg { color: #b03a26; font-weight: 700; }
+.dtab { border-collapse: collapse; width: 100%; font-size: 14px; margin: 4px 0; }
+.dtab td { border-bottom: 1px solid #eadfc2; padding: 4px 4px; vertical-align: top; }
+.dtab td.r { text-align: right; }
+.dtab td:first-child { white-space: nowrap; width: 1%; color: #6b5a30; }
+.eqbar { position: relative; height: 16px; background: #eadfc2; border-radius: 8px; margin: 10px 0 4px; overflow: visible; }
+.eqbar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 8px; }
+.eqbar .fill.ok, .eqlegend .sw.ok { background: #3f9d6a; }
+.eqbar .fill.no, .eqlegend .sw.no { background: #c9462e; }
+.eqbar .mark { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1px; background: #2b2410; border-radius: 2px; }
+.eqlegend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: #4a3608; }
+.eqlegend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+.eqlegend .sw.mk { background: #2b2410; width: 3px; }
+.dopp { list-style: none; padding: 0 !important; }
+.dopp li { display: flex; gap: 10px; align-items: flex-start; margin: 6px 0; }
+.dmini { width: 92px; flex: none; }
 .grade { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border-radius: 8px; margin: 6px 0; }
 .grade.good { background: #def0e1; } .grade.ok { background: #f8ebc8; } .grade.bad { background: #f6d8d3; }
 .grade .mk { font-size: 20px; line-height: 1.1; font-weight: 900; }
@@ -3762,10 +3785,18 @@ function heroInfo(H, seat, rng, iters) {
   rng = stateRng(H); iters = 3000;
   const p = H.players[seat];
   const g = heroCls(p.cards);
-  const opps = H.players.filter((q) => q !== p && !q.folded);
-  const info = { g, rank: PRE_RANK[g], pct: PRE_PCT[g], nOpp: opps.length, opps: opps.map((q) => q.seat) };
+  let opps = H.players.filter((q) => q !== p && !q.folded);
+  // 翻牌前有人加注：只跟「已經把錢放進來」的人比（加注、跟注的人）；後面還沒說話的人多半會棄牌，另外算（behind）
+  let behind = [];
+  if (H.street === 0 && preflopRaises(H) > 0) {
+    const acted = new Set(H.log.filter((e) => e.k === 'act' && e.street === 0 && e.t !== 'f').map((e) => e.seat));
+    const inPot = opps.filter((q) => acted.has(q.seat));
+    if (inPot.length) { behind = opps.filter((q) => !acted.has(q.seat)); opps = inPot; }
+  }
+  const info = { g, rank: PRE_RANK[g], pct: PRE_PCT[g], nOpp: opps.length, opps: opps.map((q) => q.seat), behind: behind.map((q) => q.seat), iters: 3000 };
   if (!opps.length) return info;
   const ws = opps.map((q) => rangeWeights(H, q.seat, COACH_STYLE_AWARE ? q.style : 'tag'));
+  info.ws = ws;
   info.oppTop = ws.map(rangeTopPct);
   info.est = mcVsRanges(p.cards, H.board, ws, iters || 3000, rng).eq;
   info.rand = mcVsRandom(p.cards, H.board, opps.length, iters || 3000, rng).eq;
@@ -3811,6 +3842,12 @@ function coachAdvice(H, rng) {
     else adv.act = { t: L.canCheck ? 'x' : 'f' };
     adv.label = adv.act.t === 'r' ? '全下 ' + L.maxTo : adv.act.t === 'c' ? '跟注 ' + L.callAmt : adv.act.t === 'x' ? '過牌' : '棄牌';
     adv.short = sh;
+    if (sh.kind === 'call') {                                    // 面對全下：用查表的勝率講底池賠率
+      const last = H.players[lastAggressorSeat(H)], w = new Float32Array(NCOMBO);
+      for (let k = 0; k < NCOMBO; k++) w[k] = PRE_PCT[CLASS_OF[k]] < sh.v ? 1 : 0;
+      adv.detail = { street: 0, call: sh.toCall, pot: sh.pot, need: sh.need, est: sh.eq, rand: adv.rand, iters: 40000, eff: sh.eq, fac: [], allin: true, implied: 0, lookup: true,
+        opps: last ? [{ seat: last.seat, name: last.name, style: last.style, top: sh.v, act: 'shove', range: rangeText(w) }] : [], behind: [], cards: p.cards.slice(), board: [] };
+    } else delete adv.detail;                                    // 推、再推：照推牌表，不是底池賠率
     return adv;
   }
   const ch = chartSpot(H, L.seat);
@@ -3826,6 +3863,7 @@ function coachAdvice(H, rng) {
   else { act = { t: L.canCheck ? 'x' : 'f' }; label = L.canCheck ? '過牌' : '棄牌'; }
   const same = actFamily(act.t) === actFamily(adv.act.t);
   if (same) { adv.reasons.splice(1, 0, line); adv.act = act; adv.label = label; return adv; }
+  if (adv.detail) adv.detail.chartDiff = true;
   const head = adv.reasons[0];
   adv.more.unshift('（另外照勝率估的看法：' + adv.reasons.slice(1).join(' ') + '建議是「' + adv.label + '」，跟圖表不一樣時以圖表為準。）');
   adv.reasons.length = 0;
@@ -3885,9 +3923,21 @@ function coachAdviceRule(H, rng) {
     // 勝率打折：沒位置（翻牌後先說話）的牌很難把勝率「打出來」；不同花又不相連的牌更難
     const ip = ag && postflopOrder(H, p.seat) > postflopOrder(H, ag.seat);
     const play = isPair ? 0.95 : suited ? (pairOrSc ? 1 : 0.88) : (RANKS.indexOf(cn[1]) >= 8 ? 0.9 : 0.78);
-    const real = big || L.callAmt >= p.stack ? 1 : (ip ? 0.92 : 0.8) * play * (I.nOpp > 1 ? 0.95 : 1);   // 全下就沒有之後的街，不用打折
+    const allin = big || L.callAmt >= p.stack;              // 全下就沒有之後的街，不用打折
+    const nBehind = (I.behind || []).length;
+    const fac = [];
+    if (!allin) {
+      fac.push(ip ? { x: 0.92, s: '有位置只打 ×0.92（沒位置要 ×0.80）', t: '有位置（翻牌後你比他晚說話，能先看他怎麼做）：打的折比較少；沒位置要 ×0.80' } : { x: 0.8, s: '沒位置 ×0.80（有位置只要 ×0.92）', t: '沒位置（翻牌後你要先說話，看不到他怎麼做）：比較難把勝率打出來；有位置只要 ×0.92' });
+      if (play < 1) { const w = isPair ? '口袋對子' : suited ? '同花不相連' : '不同花' + (play < 0.85 ? '又不相連' : ''); fac.push({ x: play, s: w + ' ×' + play.toFixed(2), t: w + '：' + (isPair ? '沒中三條時翻牌後不好打' : '中牌的方式少，常常只中一對') }); }
+      if (I.nOpp > 1) fac.push({ x: 0.95, s: '多人底池 ×0.95', t: '已經有 ' + I.nOpp + ' 個人在底池裡：多人底池更難贏' });
+      if (nBehind) fac.push({ x: 0.95, s: '後面 ' + nBehind + ' 人沒說話 ×0.95', t: '後面還有 ' + nBehind + ' 個人沒說話：他們可能再加注，你就得棄牌' });
+    }
+    const real = fac.reduce((a, f) => a * f.x, 1);
     const eff = I.est * real;
     effNow = eff;
+    const mkDetail = () => ({ street: 0, call: L.callAmt, pot, need, est: I.est, rand: I.rand, iters: I.iters, eff, fac, allin, implied,
+      opps: I.opps.map((s, i) => ({ seat: s, name: H.players[s].name, style: H.players[s].style, top: rangeTopPct(I.ws[i]), act: preflopActKind(H.log.filter((e) => e.k === 'act' && e.street === 0 && e.seat === s).pop() || {}, H), range: rangeText(I.ws[i]) })),
+      behind: (I.behind || []).map((s) => H.players[s].name), cards: p.cards.slice(), board: H.board.slice() });
     R.push(head);
     if (raises >= 2 && I.pct < 0.032 && L.canRaise) {
       const to = big ? L.maxTo : Math.min(L.maxTo, Math.round(H.curBet * 2.4));
@@ -3902,16 +3952,19 @@ function coachAdviceRule(H, rng) {
       return mk({ t: 'r', to }, '加注到 ' + to);
     }
     R.push('要跟 ' + L.callAmt + '，跟完底池是 ' + (pot + L.callAmt) + '：勝率要 ' + L.callAmt + '÷' + (pot + L.callAmt) + '＝' + PCT0(need) + ' 以上才划算。');
-    R.push(who + '加注了（' + (ag ? (STYLE_READ[ag.style] || STYLE_READ.tag).open : '') + '），照他的動作估範圍大約是前 ' + PCT0(agTop) + '；你對這個範圍的勝率約 ' + PCT0(I.est) + '（對隨機手牌是 ' + PCT0(I.rand) + '）。');
-    R.push('但勝率要打折：' + (ip ? '翻牌後你比他晚說話（有位置）' : '翻牌後你要比他先說話（沒位置），很難把勝率打出來') + (play < 0.9 ? '，而且這手牌不同花、不相連，中牌的方式少' : '') + '。打折後大約 ' + PCT0(eff) + '。');
+    const others = I.nOpp > 1 ? '（另外 ' + (I.nOpp - 1) + ' 個跟注的人也照動作估）' : '';
+    R.push(who + '加注了（' + (ag ? (STYLE_READ[ag.style] || STYLE_READ.tag).open : '') + '），照他的動作估範圍大約是前 ' + PCT0(agTop) + others + '；把你的牌跟這些牌一路比到攤牌，勝率約 ' + PCT0(I.est) + '（如果他是隨便拿的牌是 ' + PCT0(I.rand) + '）。');
+    if (allin) R.push('跟了就全下，之後沒有下注，勝率不用打折。');
+    else R.push('但 ' + PCT0(I.est) + ' 是「一定看到攤牌」的勝率；翻牌後還會下注，沒中牌常常得棄牌，實際拿得到的比較少，要打折：' + fac.map((f) => f.s).join('、') + '。打折後大約 ' + PCT0(eff) + '。');
+    const out = (a, l) => { const r = mk(a, l); r.detail = mkDetail(); return r; };
     if (I.pct < 0.6 && (eff >= need + 0.02 || eff + implied >= need + 0.02)) {
       if (eff < need + 0.02) R.push('打折後差一點，但你的牌（對子、同花連張）中了大牌時常常能贏很多，這叫「隱含賠率」，可以跟。');
       else R.push(PCT0(eff) + ' ＞ ' + PCT0(need) + '，跟注划算。');
-      return mk({ t: 'c' }, '跟注 ' + L.callAmt);
+      return out({ t: 'c' }, '跟注 ' + L.callAmt);
     }
     R.push(PCT0(eff) + (eff < need + 0.02 ? ' 不夠 ' + PCT0(need) : ' 雖然接近，但這手牌太弱') + '，跟下去長期會虧，棄牌。');
     if (p.bet > 0) M.push('已經放進去的 ' + p.bet + ' 是沉沒成本，不影響這個判斷。');
-    return mk({ t: 'f' }, '棄牌');
+    return out({ t: 'f' }, '棄牌');
   }
   // ===== 翻牌後 =====
   const nO = I.nOpp;
@@ -3921,22 +3974,23 @@ function coachAdviceRule(H, rng) {
   const o = I.outs, outsN = o ? o.total : 0;
   R.push(status);
   if (L.toCall === 0) {
+    const mk0 = (a, l) => { const r = mk(a, l); r.detail = postDetail(H, I, L, pot, 0, I.est, [], 0, p); return r; };
     const valueThr = 0.56 + 0.05 * (nO - 1) + (H.street === 3 ? 0.04 : 0);
     R.push(eqLine);
     if (I.est >= valueThr && L.canRaise) {
       const to = sizeTo(H, L, I.est > 0.8 ? 0.75 : 0.6);
       R.push('你很可能領先：下注讓比你差的牌付錢給你（價值下注）。下注 ' + to + '，大約是底池的 ' + Math.round(to / pot * 100) + '%。');
-      return mk({ t: 'r', to }, sizeLbl(to));
+      return mk0({ t: 'r', to }, sizeLbl(to));
     }
     if (I.draws && outsN >= 8 && H.street < 3 && nO <= 2 && L.canRaise) {
       const to = sizeTo(H, L, 0.5);
       R.push('你有 ' + outsN + ' 張出牌。下注叫「半詐唬」：對手棄牌你直接贏；被跟的話還有 ' + PCT0(o.pRiver) + ' 的機會成牌。');
       M.push('過牌也可以：免費看下一張。');
-      return mk({ t: 'r', to }, sizeLbl(to));
+      return mk0({ t: 'r', to }, sizeLbl(to));
     }
     R.push(H.street === 3 ? '牌力不夠去下注：比你大的牌會跟，比你小的牌會棄。過牌，直接攤牌比大小。' : '勝率還不夠高去下注。過牌，免費看下一張牌。');
     if (outsN) M.push('下一張有 ' + outsN + ' 張牌讓你明顯變強（' + PCT0(o.pNext) + '）。');
-    return mk({ t: 'x' }, '過牌');
+    return mk0({ t: 'x' }, '過牌');
   }
   const implied = I.draws && H.street === 1 && p.stack > pot ? 0.05 : I.draws && H.street === 2 && p.stack > pot ? 0.03 : 0;
   R.push('要跟 ' + L.callAmt + '，跟完底池是 ' + (pot + L.callAmt) + '：勝率要 ' + L.callAmt + '÷' + (pot + L.callAmt) + '＝' + PCT0(need) + ' 以上才划算。');
@@ -3947,15 +4001,24 @@ function coachAdviceRule(H, rng) {
     return mk({ t: 'r', to }, '加注到 ' + to);
   }
   const ipNow = p.seat === lastToActSeat(H);
-  const eff = H.street === 3 || COACH_NO_DISCOUNT ? I.est : I.est * (ipNow ? 0.97 : 0.9);
+  const noDisc = H.street === 3 || COACH_NO_DISCOUNT || L.callAmt >= p.stack;
+  const fac = noDisc ? [] : [ipNow ? { x: 0.97, s: '你最後說話 ×0.97', t: '你最後說話：之後比較不會被加注，只打一點點折' } : { x: 0.9, s: '後面還有人說話 ×0.90', t: '你後面還有人說話：之後可能被加注、被逼棄牌' }];
+  const eff = fac.reduce((a, f) => a * f.x, I.est);
   effNow = eff;
-  if (eff >= need) { R.push(PCT0(I.est) + (eff < I.est - 0.005 ? '（沒位置打個折，約 ' + PCT0(eff) + '）' : '') + ' ≥ ' + PCT0(need) + '，跟注划算。'); return mk({ t: 'c' }, '跟注 ' + L.callAmt); }
+  const out = (a, l) => { const r = mk(a, l); r.detail = postDetail(H, I, L, pot, need, eff, fac, implied, p); return r; };
+  if (eff >= need) { R.push(PCT0(I.est) + (eff < I.est - 0.005 ? '（打個折，約 ' + PCT0(eff) + '）' : '') + ' ≥ ' + PCT0(need) + '，跟注划算。'); return out({ t: 'c' }, '跟注 ' + L.callAmt); }
   if (eff + implied >= need) {
     R.push('勝率差一點，但你在聽牌：中了的時候對手常常還會再付錢（隱含賠率），可以跟。');
-    return mk({ t: 'c' }, '跟注 ' + L.callAmt);
+    return out({ t: 'c' }, '跟注 ' + L.callAmt);
   }
-  R.push(PCT0(I.est) + ' < ' + PCT0(need) + '，跟下去長期會虧，棄牌。');
-  return mk({ t: 'f' }, '棄牌');
+  R.push(PCT0(eff) + (eff < I.est - 0.005 ? '（打折後）' : '') + ' < ' + PCT0(need) + '，跟下去長期會虧，棄牌。');
+  return out({ t: 'f' }, '棄牌');
+}
+/* 詳細解說用的資料（翻牌後） */
+function postDetail(H, I, L, pot, need, eff, fac, implied, p) {
+  return { street: H.street, call: L.callAmt, pot, need, est: I.est, rand: I.rand, iters: I.iters, eff, fac, allin: L.callAmt >= p.stack, implied,
+    opps: I.opps.map((s, i) => ({ seat: s, name: H.players[s].name, style: H.players[s].style, top: rangeTopPct(I.ws[i]), range: rangeText(I.ws[i]) })),
+    behind: [], cards: p.cards.slice(), board: H.board.slice(), outs: I.outs ? { total: I.outs.total, pNext: I.outs.pNext, pRiver: I.outs.pRiver } : null };
 }
 /* 翻牌後說話的順序（數字越大越晚說話） */
 function postflopOrder(H, seat) { return (seat - H.button - 1 + H.n) % H.n; }
@@ -4645,6 +4708,7 @@ function initCalc() {
 
 /* ===== 22-rvr：範圍對範圍（勝率計算機的第二個模式） ===== */
 const RV = { a: RANGE_BTN_OPEN, b: RANGE_BB_CALL, names: ['範圍 A', '範圍 B'], board: [], req: 0, res: null };
+const RV_DEFNAMES = ['範圍 A', '範圍 B'];
 const RV_KEY = 'dezhou-rvr';
 function rvSave() { try { localStorage.setItem(RV_KEY, JSON.stringify({ a: RV.a, b: RV.b, board: RV.board, on: RV.on })); } catch (e) { /* 忽略 */ } }
 function rvLoad() { try { const o = JSON.parse(localStorage.getItem(RV_KEY) || 'null'); if (o) { RV.a = o.a || RV.a; RV.b = o.b || RV.b; RV.board = Array.isArray(o.board) ? o.board : []; RV.on = !!o.on; } } catch (e) { /* 忽略 */ } }
@@ -4716,13 +4780,13 @@ function initRvr() {
   $('rvRanges').addEventListener('click', (e) => {
     const b = e.target.closest('[data-rv]'); if (!b) return;
     const k = b.dataset.rv;
-    openRangeEditor('編輯' + RV.names[k === 'a' ? 0 : 1], RV[k], (txt) => { RV[k] = txt; renderRvr(); });
+    openRangeEditor('編輯' + RV.names[k === 'a' ? 0 : 1], RV[k], (txt) => { const i = k === 'a' ? 0 : 1; RV[k] = txt; RV.names[i] = RV_DEFNAMES[i]; renderRvr(); });
   });
-  $('rvRanges').addEventListener('change', (e) => { const s = e.target.closest('select[data-rvlib]'); if (!s) return; const r = RANGE_LIB.find((x) => x.key === s.value); if (r) { RV[s.dataset.rvlib] = r.text; renderRvr(); } });
+  $('rvRanges').addEventListener('change', (e) => { const s = e.target.closest('select[data-rvlib]'); if (!s) return; const r = RANGE_LIB.find((x) => x.key === s.value); if (r) { const i = s.dataset.rvlib === 'a' ? 0 : 1; RV[s.dataset.rvlib] = r.text; RV.names[i] = RV_DEFNAMES[i]; renderRvr(); } });
   $('rvSlots').addEventListener('click', (e) => { const t = e.target.closest('[data-rs]'); if (!t) return; const i = +t.dataset.rs; if (i < RV.board.length) { RV.board.splice(i); renderRvr(); } });
   $('rvDeck').addEventListener('click', (e) => { const b = e.target.closest('button[data-c]'); if (!b || b.classList.contains('used') || RV.board.length >= 5) return; RV.board.push(+b.dataset.c); renderRvr(); });
   $('rvClear').addEventListener('click', () => { RV.board = []; renderRvr(); });
-  $('rvSwap').addEventListener('click', () => { const t = RV.a; RV.a = RV.b; RV.b = t; renderRvr(); });
+  $('rvSwap').addEventListener('click', () => { const t = RV.a; RV.a = RV.b; RV.b = t; RV.names.reverse(); renderRvr(); });
 }
 
 /* ===== 30-studio：GTO 工作室（設定局面 → 求解 → 看結果；範圍編輯器；分享連結；從牌局帶入） ===== */
@@ -6065,14 +6129,16 @@ function setExplain(on) {
 /* 名詞解釋：教練的文字裡出現這些詞，就可以點開看 */
 const GLOSS = {
   '底池賠率': '要跟的錢 ÷ 跟完之後的底池。例如跟 4、跟完底池是 15：4÷15＝27%。你的勝率高過 27%，長期跟注會賺；低於就會虧。',
-  '勝率要': '這就是「底池賠率」：要跟的錢 ÷ 跟完之後的底池。你的勝率比它高，長期跟注會賺；比它低，長期會虧。',
+  '勝率要': '這就是「底池賠率」：要跟的錢 ÷ 跟完之後的底池。想像同樣情況打 100 次、每次跟 5 搶 13 的底池：一共付 500；勝率 38% 就贏 38 次 × 13 ≈ 500，剛好打平。勝率比它高，長期跟注會賺；比它低，長期會虧。下面「詳細解說」有這一手的實際算法。',
   '對隨機手牌': '假設對手拿的是任意兩張牌，不管他之前怎麼打。這是最基本的算法，但通常會高估你的勝率：還留在牌局裡的人，牌一般比隨機的好。',
   '照他們的動作估': '對手加注、跟注、下注，都會透露他的牌大概在哪裡。教練把他比較可能拿的牌加重、不太可能的減輕，再算你的勝率，通常比「對隨機手牌」準。',
   '照他的動作估': '對手加注、跟注、下注，都會透露他的牌大概在哪裡。教練把他比較可能拿的牌加重、不太可能的減輕，再算你的勝率，通常比「對隨機手牌」準。',
+  '一路比到攤牌': '電腦模擬幾千次：每次照範圍幫對手抽一手牌、把公牌發完、比大小，算你贏的比例（平手算一半）。這是假設之後沒有人再下注、一定看到最後的勝率。',
+  '勝率實現': '「一定看到攤牌」的勝率，實際上拿不到那麼多：之後還會下注，沒中牌常常得棄牌。實際拿得到的比例叫勝率實現，所以教練會把勝率打個折。',
   '範圍': '一個人在這個情況下「可能拿著的所有手牌」。例如「前 20%」就是 169 種起手牌裡最好的那 20%。',
   '有位置': '翻牌後比對手晚說話。你看得到他怎麼做再決定，資訊比較多，所以比較有利。',
   '沒位置': '翻牌後比對手先說話。你得先做決定，對手看了再反應，所以比較吃虧。',
-  '打折': '勝率是「一路打到攤牌」的數字。沒位置、或牌不好打（不同花、不相連）的時候，常常還沒攤牌就被逼著棄牌，實際拿得到的會比較少，所以要打個折。',
+  '打折': '勝率是「一路打到攤牌」的數字。之後還會下注，沒中牌常常還沒攤牌就被逼著棄牌，實際拿得到的會比較少，所以要打個折。有位置打的折少（×0.92），沒位置打得多（×0.80）；牌不好打（不同花、不相連）再多打一點。',
   '隱含賠率': '現在跟注的價錢有點貴，但如果中了大牌，對手之後還會再付錢給你。把這些之後會贏的錢算進去，跟注可能就划算。',
   '半詐唬': '還沒成牌、但有聽牌時下注：對手棄牌你直接贏；對手跟了，你還有機會補到牌。',
   '價值下注': '你的牌很可能比對手好的時候下注，讓比你差的牌付錢跟你。',
@@ -6508,6 +6574,11 @@ function heroHTML(st, S) {
   const used = new Set();
   h += gtoBoxHTML();
   h += '<div class="adv"><div class="rec">' + (gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  if (adv.detail) {
+    const d = adv.detail;
+    const q = d.call > 0 ? '為什麼要 ' + Math.round(d.need * 100) + '%？你的勝率怎麼算的？' : '你的勝率 ' + Math.round(d.est * 100) + '% 怎麼算的？';
+    h += '<details class="deep"' + (GS.deepOpen ? ' open' : '') + '><summary>📖 詳細解說：' + q + '</summary><div class="deepbody">' + deepHTML(d) + '</div></details>';
+  }
   if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
   if (EXPLAIN.on && atHead() && !G.replay && !GS.seenTermHint) h += '<p class="note">底下有虛線的詞可以點，會跳出解釋；不需要的話，右上角「深入說明」可以關掉。</p>';
   h += '</div>';
@@ -6757,7 +6828,10 @@ function initGame() {
   $('cBody').addEventListener('click', (e) => {
     const sb = e.target.closest('button[data-studio]');
     if (sb) studioFromGame(+sb.dataset.studio);
+    if (e.target.closest('button[data-deep="rvr"]')) { const st = G.steps[G.view]; if (st && st.adv) { clearTimeout(G.timer); deepToRvr(st.adv.detail); } }
   });
+  // 詳細解說打開或收起：記住，下一次照你上次的習慣
+  $('cBody').addEventListener('toggle', (e) => { if (e.target.classList && e.target.classList.contains('deep')) { GS.deepOpen = e.target.open; gsSave(); } }, true);
   $('nHome').addEventListener('click', () => showView('home'));
   $('bHomeSeal').addEventListener('click', () => showView('home'));
   $('nTools').addEventListener('click', () => showView('tools'));
@@ -6785,6 +6859,87 @@ function initGame() {
   let rt = 0;
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (!$('vTable').hidden && G.H && G.steps[G.view]) { G.lastRender = { view: G.view, board: G.steps[G.view].snap.board.length }; renderTable(G.steps[G.view]); } /* 只重畫桌面：教練框裡打開的解釋、下注框都保留 */ }, 150); });
   showView('home');
+}
+
+/* ===== 52-deep：教練的「詳細解說」——底池賠率、勝率怎麼算、為什麼打折，用這一手的實際數字一步一步講 ===== */
+const ACT_KIND_ZH = { shove: '全下', open: '加注開局', reraise: '再加注', callRaise: '跟注別人的加注', limp: '跛入（只跟大盲）', check: '過牌' };
+const P1 = (x) => Math.round(x * 100);
+
+/* 勝率條：打折後的勝率（填色）和打平線（直線） */
+function deepBar(eff, need) {
+  const ok = eff >= need;
+  return '<div class="eqbar" role="img" aria-label="你的勝率 ' + P1(eff) + '%，打平要 ' + P1(need) + '%">'
+    + '<i class="fill ' + (ok ? 'ok' : 'no') + '" style="width:' + Math.min(100, eff * 100).toFixed(1) + '%"></i>'
+    + '<b class="mark" style="left:' + Math.min(100, need * 100).toFixed(1) + '%"></b></div>'
+    + '<div class="eqlegend"><span><i class="sw ' + (ok ? 'ok' : 'no') + '"></i>你的勝率（打折後）' + P1(eff) + '%</span><span><i class="sw mk"></i>打平線 ' + P1(need) + '%</span></div>';
+}
+
+function deepHTML(d) {
+  if (!d) return '';
+  let h = '';
+  if (d.chartDiff) h += '<p class="note">這手的建議照翻牌前圖表（圖表把之後每一條街能贏多少都算進去了）。下面是用勝率和底池賠率算的另一個角度，兩個不一樣時以圖表為準。</p>';
+  if (d.lookup) h += '<p class="note">這是短碼面對全下的情況：勝率用事先模擬好的表查（每種起手牌對「前 v% 的牌」各模擬 4 萬次）。</p>';
+  const after = d.pot + d.call;
+  // 1. 底池賠率
+  if (d.call > 0) {
+    const n = 100, win = Math.round(d.eff * 100), back = win * after, pay = d.call * n, diff = back - pay;
+    const evOne = d.eff * after - d.call;
+    h += '<h4>① 為什麼勝率要 ' + P1(d.need) + '% 以上才划算？</h4>'
+      + '<p>現在底池有 <b>' + d.pot + '</b>。你跟 <b>' + d.call + '</b> 之後，底池變成 <b>' + after + '</b>（你放進去的 ' + d.call + ' 也在裡面）。贏了就把這 ' + after + ' 全部拿走；輸了，你的 ' + d.call + ' 就沒了。</p>'
+      + '<p>想像<b>一模一樣的情況打 100 次</b>，每次都跟：</p>'
+      + '<table class="dtab"><tr><td>一共付出</td><td class="r">' + d.call + ' × 100 ＝ <b>' + pay + '</b></td></tr>'
+      + '<tr><td>勝率剛好 ' + P1(d.need) + '% 時</td><td class="r">贏 ' + P1(d.need) + ' 次 × ' + after + ' ＝ ' + Math.round(d.need * 100) * after + '（≈ 付出的，打平）</td></tr>'
+      + '<tr><td>你的勝率 ' + win + '% 時</td><td class="r">贏 ' + win + ' 次 × ' + after + ' ＝ <b>' + back + '</b>，' + (diff >= 0 ? '多賺 ' + diff : '<span class="neg">少了 ' + (-diff) + '</span>') + '</td></tr></table>'
+      + '<p>所以「打平要的勝率」＝ 要跟的 ÷ 跟完的底池 ＝ ' + d.call + ' ÷ ' + after + ' ＝ <b>' + P1(d.need) + '%</b>。這叫<b>底池賠率</b>。勝率比它高，長期跟注會賺；比它低，長期會虧（照你的勝率，平均每跟一次' + (evOne >= 0 ? '賺' : '虧') + '約 ' + fmt(Math.abs(evOne), 1) + '）。</p>'
+      + deepBar(d.eff, d.need)
+      + '<p class="note">底池越大、要跟的越少，打平線就越低：例如跟 5 搶 100 的底池，只要 5 ÷ 105 ≈ 5% 就划算。</p>';
+  }
+  // 2. 勝率怎麼算
+  h += '<h4>' + (d.call > 0 ? '②' : '①') + ' 你的勝率 ' + P1(d.est) + '% 是怎麼算的？</h4>';
+  h += '<p><b>第 1 步：猜對手可能拿什麼牌（範圍）。</b>看不到他的牌，只能照他的位置和動作猜：</p><ul class="dopp">';
+  for (const o of d.opps) {
+    const w = parseRange(o.range);
+    h += '<li><div class="dmini">' + miniGridHTML(w) + '</div><div><b>' + esc(o.name) + '</b>（' + esc(styleZh(o.style)) + '）'
+      + (d.street === 0 ? (o.act && ACT_KIND_ZH[o.act] ? ACT_KIND_ZH[o.act] : '有動作') + '：' : '照他到現在每一條街的動作：')
+      + '估計他手上是最好的<b>前 ' + P1(o.top) + '%</b> 的牌（左邊的格子，越亮越可能；右上同花、左下不同花、斜線是對子）。</div></li>';
+  }
+  h += '</ul>';
+  if (d.behind && d.behind.length) h += '<p>後面還沒說話的 ' + d.behind.map(esc).join('、') + '：大多會棄牌，所以先不算進去（他們可能再加注，第 ' + (d.call > 0 ? '③' : '②') + ' 段會打一點折）。</p>';
+  h += '<p class="note">教練一律先當對手是一般的緊凶玩家來估範圍（實測比照風格估還穩），風格只用在說明。</p>';
+  const left = 5 - d.board.length;
+  h += '<p><b>第 2 步：電腦模擬 ' + (d.iters || 3000).toLocaleString() + ' 次。</b>每一次：照範圍幫對手抽一手牌（越可能的牌越常被抽到，跟你的牌或公牌撞到的不會抽）'
+    + (left > 0 ? '，再把剩下的 ' + left + ' 張公牌隨機發完' : '') + '，比大小；你贏算 1 次、平手算半次。全部平均起來，你贏的比例約 <b>' + P1(d.est) + '%</b>。</p>';
+  h += '<p><b>對照：</b>如果他是隨便拿的牌，你的勝率是 ' + P1(d.rand) + '%。' + (d.rand - d.est > 0.05 ? '他只用好牌' + (d.street === 0 ? '加注' : '這樣打') + '，所以你的勝率低很多——這就是「看動作猜範圍」的意思。' : d.est - d.rand > 0.05 ? '他的動作看起來牌不強，所以你的勝率比對隨便的牌還高。' : '') + '</p>';
+  if (d.outs && d.outs.total) h += '<p>你還有 ' + d.outs.total + ' 張「出牌」（下一張出來就明顯變強）：下一張中的機率約 ' + P1(d.outs.pNext) + '%' + (d.outs.pRiver !== undefined && d.board.length === 3 ? '，到河牌約 ' + P1(d.outs.pRiver) + '%' : '') + '。模擬已經把這些算進去了。</p>';
+  // 3. 打折
+  if (d.call > 0) {
+    const sec = '③';
+    if (d.allin) h += '<h4>' + sec + ' 不用打折</h4><p>你跟了就全下，之後沒有人能再下注，一定看到攤牌：勝率就是 ' + P1(d.est) + '%。</p>';
+    else if (!d.fac.length) h += '<h4>' + sec + ' 不用打折</h4><p>' + (d.street === 3 ? '河牌之後沒有牌、也沒有下一條街，跟了就直接攤牌：' : '') + '勝率就是 ' + P1(d.est) + '%。</p>';
+    else {
+      h += '<h4>' + sec + ' 為什麼還要打折？</h4><p>' + P1(d.est) + '% 是「<b>一定看到最後、攤牌比大小</b>」的勝率。但之後大家還會下注：你沒中牌時常常只能棄牌，那一部分勝率就拿不到。實際拿得到的比較少，這叫<b>勝率實現</b>。這手打的折：</p><ul>';
+      for (const f of d.fac) h += '<li>× ' + f.x.toFixed(2) + '　' + esc(f.t) + '</li>';
+      h += '</ul><p>' + P1(d.est) + '% ' + d.fac.map((f) => '× ' + f.x.toFixed(2)).join(' ') + ' ≈ <b>' + P1(d.eff) + '%</b>。</p>'
+        + '<p class="note">這些折數是教練的經驗值（參考 GTO 解的平均），不是精確計算。要把之後每一條街都真的算進去，要用「工具 → GTO 工作室」求解。</p>';
+      if (d.implied > 0) h += '<p>另外，對子、同花連張這種牌中了大牌時常常能多贏很多（隱含賠率），教練會再寬鬆約 ' + P1(d.implied) + '%。</p>';
+    }
+    h += '<h4>結論</h4><p><b>' + P1(d.eff) + '% ' + (d.eff >= d.need ? '≥' : '＜') + ' ' + P1(d.need) + '%</b>：' + (d.eff >= d.need ? '跟注長期會賺。' : d.eff + (d.implied || 0) >= d.need ? '差一點，但有隱含賠率，可以跟。' : '跟下去長期會虧，棄牌。') + '</p>';
+  }
+  h += '<div class="strow"><button type="button" class="btn sm" data-deep="rvr">用「範圍對範圍」自己算一次</button></div>'
+    + '<p class="note">會打開「工具 → 勝率計算機」，A 是你這手牌、B 是' + esc(d.opps[0] ? d.opps[0].name : '對手') + '的估計範圍' + (d.board.length ? '、公牌照現在' : '') + '。看完按上面的「回到牌局」接著打。</p>';
+  return h;
+}
+
+/* 帶到範圍對範圍 */
+function deepToRvr(d) {
+  if (!d || !d.opps.length) return;
+  RV.a = d.cards.map(cardStr).join('');
+  RV.b = d.opps[0].range;
+  RV.names = ['你的牌', d.opps[0].name + '的估計範圍'];
+  RV.board = d.board.slice();
+  showView('tools'); showTab('tCalc');
+  rvMode(true);
+  window.scrollTo(0, 0);
 }
 
 /* ===== 55-gamegto：牌局裡的 GTO（第五步） =====

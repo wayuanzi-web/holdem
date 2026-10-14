@@ -465,6 +465,29 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 .adv ol { padding-left: 1.3em; margin: 6px 0 4px; }
 .adv li { margin: 5px 0; }
 .adv details summary { cursor: pointer; color: #7a5a14; font-size: 14px; }
+.adv details.deep { margin: 8px 0 6px; border-top: 1px dashed #d9c48f; padding-top: 6px; }
+.adv details.deep > summary { font-size: 15px; font-weight: 700; color: #6b4a06; padding: 4px 0; }
+.deepbody { font-size: 14.5px; line-height: 1.6; }
+.deepbody h4 { margin: 12px 0 4px; font-size: 15.5px; color: #4a3608; }
+.deepbody p { margin: 6px 0; }
+.deepbody ul { padding-left: 1.2em; margin: 4px 0; }
+.deepbody .note { color: #7a6a48; font-size: 13px; }
+.deepbody .neg { color: #b03a26; font-weight: 700; }
+.dtab { border-collapse: collapse; width: 100%; font-size: 14px; margin: 4px 0; }
+.dtab td { border-bottom: 1px solid #eadfc2; padding: 4px 4px; vertical-align: top; }
+.dtab td.r { text-align: right; }
+.dtab td:first-child { white-space: nowrap; width: 1%; color: #6b5a30; }
+.eqbar { position: relative; height: 16px; background: #eadfc2; border-radius: 8px; margin: 10px 0 4px; overflow: visible; }
+.eqbar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 8px; }
+.eqbar .fill.ok, .eqlegend .sw.ok { background: #3f9d6a; }
+.eqbar .fill.no, .eqlegend .sw.no { background: #c9462e; }
+.eqbar .mark { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1px; background: #2b2410; border-radius: 2px; }
+.eqlegend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: #4a3608; }
+.eqlegend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+.eqlegend .sw.mk { background: #2b2410; width: 3px; }
+.dopp { list-style: none; padding: 0 !important; }
+.dopp li { display: flex; gap: 10px; align-items: flex-start; margin: 6px 0; }
+.dmini { width: 92px; flex: none; }
 .grade { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border-radius: 8px; margin: 6px 0; }
 .grade.good { background: #def0e1; } .grade.ok { background: #f8ebc8; } .grade.bad { background: #f6d8d3; }
 .grade .mk { font-size: 20px; line-height: 1.1; font-weight: 900; }

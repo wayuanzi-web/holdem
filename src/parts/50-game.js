@@ -334,6 +334,11 @@ function heroHTML(st, S) {
   const used = new Set();
   h += gtoBoxHTML();
   h += '<div class="adv"><div class="rec">' + (gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  if (adv.detail) {
+    const d = adv.detail;
+    const q = d.call > 0 ? '為什麼要 ' + Math.round(d.need * 100) + '%？你的勝率怎麼算的？' : '你的勝率 ' + Math.round(d.est * 100) + '% 怎麼算的？';
+    h += '<details class="deep"' + (GS.deepOpen ? ' open' : '') + '><summary>📖 詳細解說：' + q + '</summary><div class="deepbody">' + deepHTML(d) + '</div></details>';
+  }
   if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
   if (EXPLAIN.on && atHead() && !G.replay && !GS.seenTermHint) h += '<p class="note">底下有虛線的詞可以點，會跳出解釋；不需要的話，右上角「深入說明」可以關掉。</p>';
   h += '</div>';
@@ -583,7 +588,10 @@ function initGame() {
   $('cBody').addEventListener('click', (e) => {
     const sb = e.target.closest('button[data-studio]');
     if (sb) studioFromGame(+sb.dataset.studio);
+    if (e.target.closest('button[data-deep="rvr"]')) { const st = G.steps[G.view]; if (st && st.adv) { clearTimeout(G.timer); deepToRvr(st.adv.detail); } }
   });
+  // 詳細解說打開或收起：記住，下一次照你上次的習慣
+  $('cBody').addEventListener('toggle', (e) => { if (e.target.classList && e.target.classList.contains('deep')) { GS.deepOpen = e.target.open; gsSave(); } }, true);
   $('nHome').addEventListener('click', () => showView('home'));
   $('bHomeSeal').addEventListener('click', () => showView('home'));
   $('nTools').addEventListener('click', () => showView('tools'));
