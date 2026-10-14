@@ -76,48 +76,6 @@ function handCategory(a, b, board) {
   return 13;
 }
 
-/* ===== 下一張牌報告（Pio 的 runouts）：在發牌點，每一張可能的下一張牌各算一次 =====
-   回傳每張牌：下一個說話的人的整體策略、雙方平均 EV、位置外（OOP）的平均勝率 */
-Solver.prototype.runouts = function (path) {
-  const L = this.locate(path), nd = L.nd;
-  if (nd.kind !== N_CHANCE) return null;
-  const child = nd.kids[0], D = this.D;
-  const res = { p: child.kind === N_ACT ? child.p : -1, acts: child.kind === N_ACT ? child.acts.map((a) => ({ t: a.t, add: a.add, to: a.to, label: actLabel(a) })) : [], cards: [] };
-  const n0 = this.n[0], n1 = this.n[1];
-  const r = [new Float32Array(n0), new Float32Array(n1)], out = [new Float32Array(n0), new Float32Array(n1)];
-  const buf = new Float32Array(16 * Math.max(n0, n1));
-  for (let i = 0; i < D; i++) {
-    const c = this.deck[i];
-    if (c === L.ca || c === L.cb) continue;
-    for (let p = 0; p < 2; p++) { r[p].set(L.reach[p]); const l = this.withCard[p][c]; for (let q = 0; q < l.length; q++) r[p][l[q]] = 0; }
-    const inst = L.inst * D + i, ca = L.ca < 0 ? c : L.ca, cb = L.ca < 0 ? -1 : c;
-    const row = { c, freq: null, ev: [0, 0], eq0: 0, w: [0, 0] };
-    if (child.kind === N_ACT) {
-      const p = child.p, n = child.nh, k = child.k;
-      this.avgStrat(child, inst, buf);
-      const f = new Float64Array(k);
-      let tot = 0;
-      for (let h = 0; h < n; h++) { const x = r[p][h]; if (!x) continue; tot += x; for (let a = 0; a < k; a++) f[a] += x * buf[a * n + h]; }
-      row.freq = Array.from(f, (x) => (tot ? x / tot : 0));
-    }
-    for (let t = 0; t < 2; t++) {
-      this.sp = 0;
-      this.walk(M_EV, child, inst, ca, cb, t, r[t], r[1 - t], out[t]);
-      const comp = this.compat(t, r[1 - t], new Float32Array(this.n[t]));
-      let s = 0, z = 0;
-      for (let h = 0; h < this.n[t]; h++) { s += r[t][h] * out[t][h]; z += r[t][h] * comp[h]; }
-      row.ev[t] = z ? s / z : 0; row.w[t] = z;
-    }
-    const eq = this.equityAt(0, ca, cb, nd.level + 1, r[1]);
-    const comp0 = this.compat(0, r[1], new Float32Array(n0));
-    let s = 0, z = 0;
-    for (let h = 0; h < n0; h++) { const w = r[0][h] * comp0[h]; s += w * eq[h]; z += w; }
-    row.eq0 = z ? s / z : 0;
-    res.cards.push(row);
-  }
-  return res;
-};
-
 /* ===== 下注樹的預設 =====
    簡單：每條街一種尺寸＋全下（轉牌大約半分鐘）；標準：兩種尺寸；細：三種尺寸（只建議河牌） */
 const TREE_PRESETS = {
@@ -166,14 +124,16 @@ function presetSpot(key) {
   const p = PRESETS[key];
   const tree = { bet: {}, raise: {}, cap: p.cap, allin: 0.67, addAllin: true };
   for (const k of Object.keys(p.bet)) { tree.bet[k] = p.bet[k].map((x) => x.slice()); tree.raise[k] = p.raise[k].map((x) => x.slice()); }
-  return { board: p.board, pot: p.pot, stack: p.stack, names: ['BB', 'BTN'], ranges: [RANGE_BB_CALL, RANGE_BTN_OPEN], tree, target: p.target, title: p.name };
+  return { board: p.board, pot: p.pot, stack: p.stack, names: p.names || ['BB', 'BTN'], ranges: [p.oop || RANGE_BB_CALL, p.ip || RANGE_BTN_OPEN], tree, target: p.target, title: p.name };
 }
 
 /* 估計一次迭代要多久（毫秒）：用這台機器實測的「運算量 → 時間」比例；之後用效能測試或實際跑的速度修正 */
 const SPEED = { k: 1.9e-5, c: 1 };          // 一次迭代 ≈ work × k ＋ c 毫秒（雲端測試機）；工作室跑過一次就換成這台裝置實際的速度
-function estimateTime(est, target) {
+/* threads：幾個背景執行緒一起算（翻牌、轉牌才分得開）；compress：16 位元儲存大約慢 40% */
+function estimateTime(est, target, threads, compress) {
   const iters = target <= 0.3 ? 330 : target <= 0.5 ? 220 : 140;
-  return { iters, ms: iters * (est.work * SPEED.k + SPEED.c) * 1.1 };
+  const sp = threads >= 2 ? threads * 0.8 : 1;
+  return { iters, ms: iters * (est.work * SPEED.k + SPEED.c) * 1.1 * (compress ? 1.4 : 1) / sp };
 }
 
 /* ===== 從牌局帶入：一手牌的某一條街開始（只能兩個人） =====

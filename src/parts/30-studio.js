@@ -5,7 +5,11 @@ const ST = {
   running: false, curId: 0, tag: 0, solved: null, solvedCfg: null, est: null,
   path: [], labels: [], view: null, sel: -1, req: 0, mode: 'strat', catSel: -1, catCache: new Map(),
   ro: null, roReq: 0, linePath: null, lineLabels: null, ratio: 1, firstPct: 0, autoGo: false,
+  threads: 0, compress: false, locks: new Map(), lockEdit: null, round: false, resuming: false,
 };
+const autoThreads = () => Math.max(1, Math.min(8, (navigator.hardwareConcurrency || 2) - 1));
+/* 這個局面用幾個執行緒：河牌沒有發牌點，分不開 */
+function threadsFor(sp) { const n = parseCards(sp.board || '').length; const k = ST.threads || autoThreads(); return n <= 4 ? k : 1; }
 const TARGETS = [[1, '快（1%）'], [0.5, '標準（0.5%）'], [0.3, '精細（0.3%）']];
 const GRID_MODES = [['strat', '策略'], ['ev', 'EV'], ['eq', '勝率'], ['range', '範圍']];
 const STREET3 = ['翻牌', '轉牌', '河牌'];
@@ -17,11 +21,12 @@ const deviceMB = () => {
 };
 
 /* ===== 存讀 ===== */
-function stSave() { try { localStorage.setItem(ST_KEY, JSON.stringify({ spot: ST.spot, treeKey: ST.treeKey, target: ST.target })); } catch (e) { /* 忽略 */ } }
+function stSave() { try { localStorage.setItem(ST_KEY, JSON.stringify({ spot: ST.spot, treeKey: ST.treeKey, target: ST.target, threads: ST.threads })); } catch (e) { /* 忽略 */ } }
 function stLoad() {
   try {
     const o = JSON.parse(localStorage.getItem(ST_KEY) || 'null');
     if (o && o.spot && o.spot.board) { ST.spot = o.spot; ST.treeKey = o.treeKey || 'custom'; ST.target = o.target || 0.5; }
+    if (o && o.threads >= 0) ST.threads = o.threads;
     const r = +localStorage.getItem(SPEED_KEY);
     if (r > 0.05 && r < 50) ST.ratio = r;
   } catch (e) { /* 忽略 */ }
@@ -65,13 +70,17 @@ function stProblems() {
 function renderSetup() {
   const sp = ST.spot;
   // 範例
-  const ex = [['', '換一個範例…'], ['river', PRESETS.river.name], ['turn', PRESETS.turn.name]];
+  const ex = [['', '換一個範例…'], ['river', PRESETS.river.name], ['turn', PRESETS.turn.name], ['flop3bet', PRESETS.flop3bet.name + '（要幾分鐘）']];
   $('stExample').innerHTML = ex.map(([k, t]) => '<option value="' + k + '">' + esc(t) + '</option>').join('');
   renderStBoard();
   $('stPot').value = sp.pot; $('stStack').value = sp.stack; $('stUnit').textContent = '單位：' + unitOf(sp);
   renderRangeCards();
   renderTreeSetup();
   $('stTarget').innerHTML = TARGETS.map(([x, t]) => '<button type="button" data-t="' + x + '" aria-pressed="' + (x === ST.target) + '">' + t + '</button>').join('');
+  const au = autoThreads();
+  $('stThreads').innerHTML = '<option value="0">自動（' + au + ' 個）</option>' + [1, 2, 3, 4, 6, 8].filter((x) => x <= Math.max(au, 2) * 2).map((x) => '<option value="' + x + '">' + x + ' 個</option>').join('');
+  $('stThreads').value = String(ST.threads || 0);
+  $('stThreadNote').textContent = '這台裝置有 ' + (navigator.hardwareConcurrency || '?') + ' 個核心；翻牌、轉牌才分得開。';
   stEstimate();
 }
 function renderStBoard() {
@@ -170,13 +179,17 @@ function stEstimate() {
   let est;
   try { est = estimateSolve(spotCfg(ST.spot)); } catch (e) { box.innerHTML = '<p class="bad">' + esc(e.message) + '</p>'; $('bSolve').disabled = true; return; }
   ST.est = est;
-  const tm = estimateTime(est, ST.target), sec = tm.ms * ST.ratio / 1000, maxMB = deviceMB();
+  const maxMB = deviceMB();
+  ST.compress = est.mb > maxMB * 0.6;                       // 記憶體吃緊才壓縮（壓縮大約慢 40%）
+  const mb = ST.compress ? est.mb / 2 : est.mb, k = threadsFor(ST.spot);
+  const tm = estimateTime(est, ST.target, k, ST.compress), sec = tm.ms * ST.ratio / 1000;
   const nAct = est.stats.act[0] + est.stats.act[1] + est.stats.act[2];
-  const tooBig = est.mb > maxMB;
+  const tooBig = mb > maxMB;
   const tStr = sec < 60 ? Math.max(1, Math.round(sec)) + ' 秒' : sec < 3600 ? Math.round(sec / 60) + ' 分鐘' : (sec / 3600).toFixed(1) + ' 小時';
-  let h = '<p>' + glossify('下注樹') + '：' + nAct + ' 個決策點；手牌 ' + est.n[0] + '／' + est.n[1] + ' 個組合；記憶體約 ' + Math.max(1, Math.round(est.mb)) + ' MB。</p>';
-  if (tooBig) h += '<p class="bad">太大了：這台裝置最多用 ' + Math.round(maxMB) + ' MB。請減少下注尺寸、縮小範圍，或多放一張公牌（從轉牌開始）。翻牌的完整求解要等第四步。</p>';
-  else h += '<p>這台裝置大約要 <b>' + tStr + '</b>' + (ST.ratio === 1 ? '（第一次是估的，跑過一次就會照這台裝置的速度算）' : '') + '。' + (sec > 600 ? '<span class="bad">很久：建議用「簡單」的下注選項、或從轉牌開始。</span>' : '') + '</p>';
+  let h = '<p>' + glossify('下注樹') + '：' + nAct + ' 個決策點；手牌 ' + est.n[0] + '／' + est.n[1] + ' 個組合；記憶體約 ' + Math.max(1, Math.round(mb)) + ' MB' + (ST.compress ? '（壓縮儲存）' : '') + '。'
+    + (est.iso ? '花色對稱：' + est.iso.split('/')[1] + ' 張' + (boardCards().length === 3 ? '轉牌' : '河牌') + '只要算 ' + est.iso.split('/')[0] + ' 張。' : '') + '</p>';
+  if (tooBig) h += '<p class="bad">太大了：這台裝置最多用 ' + Math.round(maxMB) + ' MB。請減少下注尺寸、縮小範圍（範圍編輯器的「去掉權重低於 20% 的牌」），或多放一張公牌（從轉牌開始）。</p>';
+  else h += '<p>用 ' + k + ' 個執行緒，這台裝置大約要 <b>' + tStr + '</b>' + (ST.ratio === 1 ? '（第一次是估的，跑過一次就會照這台裝置的速度算）' : '') + '。' + (sec > 900 ? '<span class="bad">很久：建議用「簡單」的下注選項、縮小範圍、或從轉牌開始。</span>' : '') + '</p>';
   box.innerHTML = h;
   $('bSolve').disabled = tooBig || ST.running;
 }
@@ -184,19 +197,29 @@ function stEstimate() {
 /* ===== 求解 ===== */
 function solveStart() {
   if (ST.running || !ST.est) return;
-  const cfg = spotCfg(ST.spot, { maxMB: deviceMB(), target: ST.target, maxIters: 2000 });
-  ST.running = true; ST.firstPct = 0; ST.tag++;
-  ST.pending = { spot: JSON.parse(JSON.stringify(ST.spot)), cfg, est: ST.est };
+  const cfg = spotCfg(ST.spot, { maxMB: deviceMB(), target: ST.target, maxIters: 2000, compress: ST.compress });
+  let k = threadsFor(ST.spot);
+  if (k >= 2) k = W.helpers(k); else W.helpers(0);
+  ST.running = true; ST.firstPct = 0; ST.tag++; ST.resuming = false;
+  ST.pending = { spot: JSON.parse(JSON.stringify(ST.spot)), cfg, est: ST.est, k, compress: ST.compress };
   $('bSolve').hidden = true; $('bStop').hidden = false; $('bSolve').disabled = true;
   $('prog').hidden = false; $('progTxt').textContent = '建樹中…'; $('progBar').style.width = '0'; $('progTime').textContent = '';
-  W.send({ cmd: 'solve', cfg, tag: ST.tag });
+  W.send({ cmd: 'solve', cfg, tag: ST.tag, threads: k });
 }
-function solveEnded() { ST.running = false; $('bSolve').hidden = false; $('bStop').hidden = true; stEstimate(); }
+/* 鎖定之後接著算（從現在的結果繼續） */
+function solveResume() {
+  if (ST.running || !ST.solved) return;
+  ST.running = true; ST.firstPct = 0; ST.tag++; ST.resuming = true;
+  $('bSolve').disabled = true; $('bStop').hidden = false;
+  $('prog').hidden = false; $('progTxt').textContent = '照鎖定的策略重新算…'; $('progBar').style.width = '0'; $('progTime').textContent = '';
+  W.send({ cmd: 'solve', resume: true, target: ST.target, maxIters: 1500, tag: ST.tag });
+}
+function solveEnded() { ST.running = false; $('bSolve').hidden = false; $('bStop').hidden = true; if (!$('stSetup').hidden) stEstimate(); else $('bSolve').disabled = false; }
 W.on('solve-error', (m) => { if (m.tag !== ST.tag) return; solveEnded(); $('progTxt').textContent = m.msg; });
 W.on('solve-start', (m) => {
   if (m.tag !== ST.tag) return;
   ST.curId = m.id;
-  $('progTxt').textContent = '樹：' + (m.stats.act[0] + m.stats.act[1] + m.stats.act[2]) + ' 個決策點，記憶體 ' + Math.max(1, Math.round(m.mem)) + ' MB；開始算…';
+  if (!m.resumed) $('progTxt').textContent = '樹：' + (m.stats.act[0] + m.stats.act[1] + m.stats.act[2]) + ' 個決策點，記憶體 ' + Math.max(1, Math.round(m.mem)) + ' MB，' + m.threads + ' 個執行緒；開始算…';
 });
 W.on('solve-progress', (m) => {
   if (m.tag !== ST.tag) return;
@@ -204,7 +227,7 @@ W.on('solve-progress', (m) => {
   const f = Math.max(0, Math.min(1, Math.log(ST.firstPct / m.pct) / Math.log(ST.firstPct / ST.target)));
   $('progBar').style.width = (f * 100).toFixed(1) + '%';
   $('progTxt').innerHTML = '第 ' + m.t + ' 次，' + glossify('可剝削度') + ' ' + fmt(m.pct, 2) + '%（目標 ' + ST.target + '%）';
-  const per = m.ms / m.t, left = f > 0.05 ? (m.ms / f - m.ms) : null;
+  const per = m.ms / Math.max(1, m.t - (m.t0 || 0)), left = f > 0.05 ? (m.ms / f - m.ms) : null;
   $('progTime').textContent = fmt(m.ms / 1000, 0) + ' 秒' + (left !== null && f < 0.98 ? '，大約還要 ' + Math.max(1, Math.round(left / 1000)) + ' 秒' : '');
   ST.lastPer = per;
 });
@@ -212,17 +235,23 @@ W.on('solve-done', (m) => {
   if (m.tag !== ST.tag) return;
   solveEnded();
   $('progBar').style.width = '100%';
-  $('progTxt').innerHTML = (m.stopped ? '停在' : '算好了：') + '算了 ' + m.t + ' 次，' + glossify('可剝削度') + ' ' + fmt(m.pct, 2) + '% 底池';
+  $('progTxt').innerHTML = (m.stopped ? '停在' : '算好了：') + '算了 ' + m.t + ' 次，' + glossify('可剝削度') + ' ' + fmt(m.pct, 2) + '% 底池' + (m.threads > 1 ? '（' + m.threads + ' 個執行緒）' : '');
   $('progTime').textContent = fmt(m.ms / 1000, 1) + ' 秒';
+  if (ST.resuming) {                                          // 鎖定後重新算：留在原來的節點
+    ST.resuming = false;
+    ST.solvedInfo = { t: m.t, pct: m.pct, ev: m.ev, stopped: m.stopped };
+    stShow('result'); requestView();
+    return;
+  }
   // 照這次的速度修正之後的估計
   const P = ST.pending;
   if (P && m.t >= 10 && P.est && P.est.work > 1e6) {         // 小的樹時間都花在固定開銷上，拿來推估大樹不準
-    const pred = P.est.work * SPEED.k + SPEED.c, act = m.ms / m.t / 1.1;
+    const pred = (P.est.work * SPEED.k + SPEED.c) * (P.compress ? 1.4 : 1) / (P.k >= 2 ? P.k * 0.8 : 1), act = m.ms / m.t / 1.1;
     const r = act / pred;
     if (r > 0.05 && r < 50) { ST.ratio = ST.ratio === 1 ? r : ST.ratio * 0.5 + r * 0.5; try { localStorage.setItem(SPEED_KEY, String(ST.ratio)); } catch (e) { /* 忽略 */ } }
   }
   ST.solved = P.spot; ST.solvedCfg = P.cfg; ST.solvedInfo = { t: m.t, pct: m.pct, ev: m.ev, stopped: m.stopped };
-  ST.path = []; ST.labels = []; ST.sel = -1; ST.catSel = -1; ST.ro = null;
+  ST.path = []; ST.labels = []; ST.sel = -1; ST.catSel = -1; ST.ro = null; ST.locks = new Map(); ST.lockEdit = null;
   buildLine();
   stShow('result');
   requestView();
@@ -265,6 +294,19 @@ function heroCombo() {
   const c = parseCards(sp.hero.cards);
   return c.length === 2 ? comboOf(c[0], c[1]) : -1;
 }
+/* 顯示用的策略（每手牌 k 個比例） */
+function dispStrat(v) {
+  if (ST.lockEdit && ST.lockEdit.id === v.id) return ST.lockEdit.strat;
+  if (!ST.round) return v.strat;
+  const k = v.acts.length, n = v.n[v.p], out = new Float32Array(k * n);
+  for (let h = 0; h < n; h++) {
+    let sum = 0, best = 0;
+    for (let a = 0; a < k; a++) { const x = Math.round(v.strat[a * n + h] * 4) / 4; out[a * n + h] = x; sum += x; if (v.strat[a * n + h] > v.strat[best * n + h]) best = a; }
+    if (sum <= 0) { out[best * n + h] = 1; sum = 1; }
+    for (let a = 0; a < k; a++) out[a * n + h] /= sum;
+  }
+  return out;
+}
 function renderView() {
   const v = ST.view, N = ST.solved.names;
   let cr = '<button type="button" data-step="0">開始</button>';
@@ -290,13 +332,13 @@ function renderView() {
     return;
   }
   const p = v.p, n = v.n[p], k = v.acts.length, hands = v.hands[p], reach = v.reach[p];
-  const cols = actColors(v.acts);
+  const cols = actColors(v.acts), ds = v.ds = dispStrat(v);
   let tot = 0, totC = 0, evS = 0, eqS = 0;
   const fr = new Float64Array(k);
   for (let h = 0; h < n; h++) {
     const r = reach[h]; if (!r) continue;
     tot += r;
-    for (let a = 0; a < k; a++) fr[a] += r * v.strat[a * n + h];
+    for (let a = 0; a < k; a++) fr[a] += r * ds[a * n + h];
     const w = r * v.comp[h]; totC += w; evS += w * (v.ev[h] + v.inv[p]); eqS += w * v.eq[h];
   }
   $('nodeHead').innerHTML = '<p style="margin:0">輪到 <b>' + esc(N[p]) + '</b>（' + glossify(p ? '位置內' : '位置外') + '）' + (v.facing > 0 ? '，要跟 ' + fmt(v.facing, 1) : '') + '。下面的按鈕是 GTO 用各動作的頻率；點一個往下走。</p>';
@@ -305,9 +347,11 @@ function renderView() {
   $('nodeNums').innerHTML = esc(N[p]) + ' 的範圍到這裡還有 ' + fmt(tot, 1) + ' 個組合；平均勝率 ' + (totC ? pct(eqS / totC) : '—') + '%，平均 ' + glossify('EV') + ' ' + (totC ? fmt(evS / totC, 2) : '—') + '（底池 ' + fmt(v.pot, 1) + '）。';
   $('gridMode').innerHTML = GRID_MODES.map(([m, t]) => '<button type="button" data-m="' + m + '" aria-pressed="' + (m === ST.mode) + '">' + t + '</button>').join('');
   renderHero();
+  renderLock();
   renderGrid();
   renderCats();
   renderCell();
+  renderRangeOut();
 }
 /* 13×13 格：策略（顏色條）、EV、勝率、範圍 */
 function renderGrid() {
@@ -318,7 +362,7 @@ function renderGrid() {
     const r = reach[h]; if (!r) continue;
     const g = CLASS_OF[hands[h]];
     sumR[g] += r;
-    for (let a = 0; a < k; a++) sumA[g * k + a] += r * v.strat[a * n + h];
+    for (let a = 0; a < k; a++) sumA[g * k + a] += r * v.ds[a * n + h];
     const w = r * v.comp[h]; sumW[g] += w; sumEv[g] += w * (v.ev[h] + v.inv[p]); sumEq[g] += w * v.eq[h];
     if (ST.catSel >= 0 && cats[hands[h]] === ST.catSel) inCat[g] = 1;
   }
@@ -347,6 +391,7 @@ function renderGrid() {
     gh += '<button type="button" class="' + cls + '" data-g="' + g + '" style="' + style + '" aria-label="' + classTxt(g) + '">' + inner + '<span>' + className(g) + '</span>' + val + '</button>';
   }
   $('grid13').innerHTML = gh;
+  $('grid13').classList.toggle('lockedit', !!(ST.lockEdit && ST.lockEdit.id === v.id));
   const hint = { strat: '顏色＝各動作的比例；格子的高度＝這一格還在範圍裡的比例', ev: '越亮 EV 越高（數字是平均 EV，單位' + unitOf(ST.solved) + '）', eq: '越亮勝率越高（數字是對對手現在範圍的勝率 %）', range: '高度＝這一格還有多少組合打到這裡' }[ST.mode];
   $('gridHint').innerHTML = hint + (hcCell >= 0 ? '；外框是你的牌' : '');
   $('legend').innerHTML = ST.mode === 'strat' ? v.acts.map((a, i) => '<span><i style="background:' + cols[i] + '"></i>' + esc(a.label) + '</span>').join('') : '';
@@ -361,7 +406,7 @@ function renderCats() {
     const r = reach[h]; if (!r) continue;
     const c = cats[hands[h]]; if (c < 0) continue;
     tot += r; R[c] += r;
-    for (let a = 0; a < k; a++) A[c * k + a] += r * v.strat[a * n + h];
+    for (let a = 0; a < k; a++) A[c * k + a] += r * v.ds[a * n + h];
     const w = r * v.comp[h]; Wt[c] += w; EV[c] += w * (v.ev[h] + v.inv[p]); EQ[c] += w * v.eq[h];
   }
   let h = '<thead><tr><th>牌型</th><th class="r">組合</th><th class="r">勝率</th><th>怎麼打</th><th class="r">EV</th></tr></thead><tbody>';
@@ -383,10 +428,10 @@ function renderCell() {
     if (CLASS_OF[hands[h]] !== g) continue;
     const r = reach[h];
     let bar = '';
-    for (let a = 0; a < k; a++) { const f = v.strat[a * n + h]; if (f > 0.001) bar += '<i style="width:' + (f * 100).toFixed(1) + '%;background:' + cols[a] + '" title="' + esc(v.acts[a].label) + ' ' + pct(f, 0) + '%"></i>'; }
+    for (let a = 0; a < k; a++) { const f = v.ds[a * n + h]; if (f > 0.001) bar += '<i style="width:' + (f * 100).toFixed(1) + '%;background:' + cols[a] + '" title="' + esc(v.acts[a].label) + ' ' + pct(f, 0) + '%"></i>'; }
     let best = 0;
-    for (let a = 1; a < k; a++) if (v.strat[a * n + h] > v.strat[best * n + h]) best = a;
-    rows += '<tr class="' + (r < 1e-6 ? 'gone' : '') + (hands[h] === hc && ST.solved.hero.p === p ? ' heror' : '') + '"><td>' + comboSpan(hands[h]) + '<div class="note">' + (cats[hands[h]] >= 0 ? CATG[cats[hands[h]]] : '') + '</div></td><td><div class="sbarh">' + bar + '</div><div class="note">' + esc(v.acts[best].label) + ' ' + pct(v.strat[best * n + h], 0) + '%</div></td><td class="r num">' + fmt(v.ev[h] + v.inv[p], 2) + '</td><td class="r num">' + pct(v.eq[h]) + '%</td><td class="r num">' + fmt(r, 2) + '</td></tr>';
+    for (let a = 1; a < k; a++) if (v.ds[a * n + h] > v.ds[best * n + h]) best = a;
+    rows += '<tr class="' + (r < 1e-6 ? 'gone' : '') + (hands[h] === hc && ST.solved.hero.p === p ? ' heror' : '') + '"><td>' + comboSpan(hands[h]) + '<div class="note">' + (cats[hands[h]] >= 0 ? CATG[cats[hands[h]]] : '') + '</div></td><td><div class="sbarh">' + bar + '</div><div class="note">' + esc(v.acts[best].label) + ' ' + pct(v.ds[best * n + h], 0) + '%</div></td><td class="r num">' + fmt(v.ev[h] + v.inv[p], 2) + '</td><td class="r num">' + pct(v.eq[h]) + '%</td><td class="r num">' + fmt(r, 2) + '</td></tr>';
   }
   $('cellBox').innerHTML = rows ? '<table class="combos"><thead><tr><th>組合</th><th>策略</th><th class="r">EV</th><th class="r">勝率</th><th class="r">權重</th></tr></thead><tbody>' + rows + '</tbody></table><p class="note">' + glossify('權重') + '：這個組合打到這裡的機率（1＝一定在）。勝率是對對手現在的範圍；EV 是從現在算、平均拿回多少（單位' + unitOf(ST.solved) + '，底池裡已經有的錢也算）。</p>'
     : '<p class="note">這一格不在 ' + esc(ST.solved.names[p]) + ' 的範圍裡（或跟公牌撞牌）。</p>';
@@ -644,7 +689,7 @@ function studioLoad(sp, banner, autoGo) {
 function studioFromGame(street) {
   const sp = spotFromHand(G.H, street);
   if (sp.error) return;
-  studioLoad(sp, '從牌局帶入：' + esc(sp.title) + '。你坐' + esc(sp.hero.pos || sp.names[sp.hero.p]) + '，拿 ' + parseCards(sp.hero.cards).map(cardSpan).join('') + '。雙方的範圍是照每個人在這一手的動作估的（可以再改）；下注選項包含你們實際用的大小。' + (street === 1 ? '<br><b>翻牌開始的樹很大</b>，手機可能算不動；可以先多放一張轉牌。' : ''), true);
+  studioLoad(sp, '從牌局帶入：' + esc(sp.title) + '。你坐' + esc(sp.hero.pos || sp.names[sp.hero.p]) + '，拿 ' + parseCards(sp.hero.cards).map(cardSpan).join('') + '。雙方的範圍是照每個人在這一手的動作估的（可以再改）；下注選項包含你們實際用的大小。' + (street === 1 ? '<br><b>從翻牌開始要算幾分鐘</b>（電腦會用好幾個執行緒一起算）；手機記憶體不夠的話，可以多放一張轉牌改從轉牌開始。' : ''), true);
 }
 
 function initStudio() {
@@ -710,6 +755,7 @@ function initStudio() {
   });
   $('gridMode').addEventListener('click', (e) => { const b = e.target.closest('button[data-m]'); if (!b) return; ST.mode = b.dataset.m; $('gridMode').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); renderGrid(); });
   $('grid13').addEventListener('click', (e) => {
+    if (ST.lockEdit && ST.view && ST.lockEdit.id === ST.view.id) return;
     const b = e.target.closest('button[data-g]'); if (!b) return;
     ST.sel = +b.dataset.g;
     $('grid13').querySelectorAll('.cell').forEach((x) => x.classList.toggle('sel', x === b));
@@ -722,5 +768,99 @@ function initStudio() {
     ST.catSel = ST.catSel === c ? -1 : c;
     renderGrid(); renderCats();
   });
+  initStudio2();
   stShow('setup');
+}
+
+/* ===== 節點鎖定（只能鎖第一條街的節點）：自己決定這裡怎麼打，再讓對手重新針對 ===== */
+function renderLock() {
+  const v = ST.view, box = $('lockBox');
+  if (!v || v.kind !== 0 || v.level !== 0) { box.innerHTML = ''; return; }
+  const N = ST.solved.names, cols = actColors(v.acts), E = ST.lockEdit && ST.lockEdit.id === v.id ? ST.lockEdit : null;
+  if (E) {
+    box.innerHTML = '<div class="lockb on"><b>鎖定 ' + esc(N[v.p]) + ' 在這裡的打法</b><div class="note">選一個動作，再點或拖曳格子：那一格的牌都改成 100% 這個動作。</div>'
+      + '<div class="brushes">' + v.acts.map((a, i) => '<button type="button" data-lb="' + i + '" aria-pressed="' + (i === E.brush) + '"><i class="sw" style="background:' + cols[i] + '"></i>' + esc(a.label) + '</button>').join('') + '</div>'
+      + '<div class="strow"><button class="btn sm" data-lk="all">整個範圍都改成這個動作</button><button class="btn sm" data-lk="reset">回到 GTO 的打法</button></div>'
+      + '<div class="strow"><button class="btn sm main" data-lk="apply">鎖定並重新算</button><button class="btn sm" data-lk="cancel">取消</button></div></div>';
+  } else if (v.locked) {
+    box.innerHTML = '<div class="lockb on">🔒 這個節點已經鎖定（' + esc(N[v.p]) + ' 照你設定的打）。其他地方是對手針對這個打法的最佳解。<div class="strow"><button class="btn sm" data-lk="edit">改鎖定</button><button class="btn sm" data-lk="unlock">解除鎖定並重新算</button></div></div>';
+  } else {
+    box.innerHTML = '<div class="lockb"><button type="button" class="linkbtn" data-lk="edit" style="padding:0">🔒 鎖定這個節點</button><span class="note">：如果 ' + esc(N[v.p]) + ' 在這裡不照 GTO 打（例如每次都下注），對手該怎麼應對？</span></div>';
+  }
+}
+function lockPaint(g) {
+  const v = ST.view, E = ST.lockEdit, n = v.n[v.p], k = v.acts.length, hands = v.hands[v.p];
+  for (let h = 0; h < n; h++) {
+    if (CLASS_OF[hands[h]] !== g) continue;
+    for (let a = 0; a < k; a++) E.strat[a * n + h] = a === E.brush ? 1 : 0;
+  }
+}
+function lockCmd(c) {
+  const v = ST.view;
+  if (c === 'edit') { ST.lockEdit = { id: v.id, brush: 0, strat: Float32Array.from(v.strat) }; renderView(); return; }
+  if (c === 'cancel') { ST.lockEdit = null; renderView(); return; }
+  if (c === 'reset') { ST.lockEdit.strat = Float32Array.from(v.strat); renderView(); return; }
+  if (c === 'all') { const E = ST.lockEdit, n = v.n[v.p], k = v.acts.length; for (let h = 0; h < n; h++) for (let a = 0; a < k; a++) E.strat[a * n + h] = a === E.brush ? 1 : 0; renderView(); return; }
+  if (c === 'apply') { const E = ST.lockEdit; ST.lockEdit = null; ST.locks.set(E.id, E.strat); W.send({ cmd: 'lock', id: E.id, strat: Array.from(E.strat) }); solveResume(); return; }
+  if (c === 'unlock') { ST.locks.delete(v.id); W.send({ cmd: 'lock', id: v.id, strat: null }); solveResume(); }
+}
+/* ===== 匯出：這個節點每個組合（CSV）、某個動作的範圍（文字，可以貼回範圍編輯器或 PioSOLVER） ===== */
+function exportCsv() {
+  const v = ST.view;
+  if (!v || v.kind !== 0) return;
+  const p = v.p, n = v.n[p], k = v.acts.length, hands = v.hands[p], cats = catsFor(v.board);
+  const rows = [['組合', '牌型', '權重'].concat(v.acts.map((a) => a.label + ' %'), ['EV', '勝率 %'])];
+  for (let h = 0; h < n; h++) {
+    const r = v.reach[p][h]; if (!(r > 1e-6)) continue;
+    rows.push([comboTxt(hands[h]), cats[hands[h]] >= 0 ? CATG[cats[hands[h]]] : '', r.toFixed(4)].concat(v.acts.map((a, i) => (v.strat[i * n + h] * 100).toFixed(1)), [(v.ev[h] + v.inv[p]).toFixed(3), (v.eq[h] * 100).toFixed(1)]));
+  }
+  const csv = '﻿' + rows.map((r) => r.map((x) => (/[",\n]/.test(x) ? '"' + String(x).replace(/"/g, '""') + '"' : x)).join(',')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = 'gto-' + v.board.map(cardStr).join('') + '-' + (ST.labels.length ? 'n' + ST.path.length : 'root') + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+function renderRangeOut() {
+  const v = ST.view, el = $('rangeOut');
+  if (!v || v.kind !== 0) { el.innerHTML = ''; return; }
+  el.innerHTML = '<option value="">複製某個動作的範圍…</option><option value="all">' + esc(ST.solved.names[v.p]) + ' 現在的整個範圍</option>' + v.acts.map((a, i) => '<option value="' + i + '">' + esc(ST.solved.names[v.p]) + ' ' + esc(a.label) + ' 的範圍</option>').join('');
+}
+function copyRange(sel) {
+  const v = ST.view, p = v.p, n = v.n[p], hands = v.hands[p], w = new Float32Array(NCOMBO);
+  for (let h = 0; h < n; h++) { const x = v.reach[p][h] * (sel === 'all' ? 1 : v.strat[+sel * n + h]); if (x > 0.005) w[hands[h]] = Math.min(1, Math.round(x * 1000) / 1000); }
+  const txt = rangeText(w);
+  const done = () => toast('已複製（' + fmt(rangeCombos(w), 1) + ' 個組合）。可以貼到範圍編輯器的文字框。');
+  try { navigator.clipboard.writeText(txt).then(done, () => { prompt('複製這段文字', txt); }); } catch (e) { done(); }
+}
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+function initStudio2() {
+  $('lockBox').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-lb]');
+    if (b) { ST.lockEdit.brush = +b.dataset.lb; renderLock(); return; }
+    const c = e.target.closest('[data-lk]'); if (c) lockCmd(c.dataset.lk);
+  });
+  // 鎖定編輯：點或拖曳格子
+  let painting = false, last = -1;
+  const grid = $('grid13');
+  grid.addEventListener('pointerdown', (e) => {
+    if (!(ST.lockEdit && ST.view && ST.lockEdit.id === ST.view.id)) return;
+    const b = e.target.closest('[data-g]'); if (!b) return;
+    e.preventDefault(); painting = true; last = +b.dataset.g; lockPaint(last); renderGrid(); renderCats();
+  });
+  grid.addEventListener('pointermove', (e) => {
+    if (!painting) return;
+    const el = document.elementFromPoint(e.clientX, e.clientY), b = el && el.closest('#grid13 [data-g]');
+    if (b && +b.dataset.g !== last) { last = +b.dataset.g; lockPaint(last); renderGrid(); }
+  });
+  window.addEventListener('pointerup', () => { if (painting) { painting = false; renderView(); } });
+  $('roundChk').addEventListener('change', (e) => { ST.round = e.target.checked; if (ST.view) renderView(); });
+  $('bCsv').addEventListener('click', exportCsv);
+  $('rangeOut').addEventListener('change', (e) => { if (e.target.value !== '') copyRange(e.target.value); e.target.value = ''; });
+  $('stThreads').addEventListener('change', (e) => { ST.threads = +e.target.value; stSave(); stEstimate(); });
 }

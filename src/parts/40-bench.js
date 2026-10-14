@@ -17,17 +17,21 @@ function benchRow(r) {
   } else if (r.key === 'flop') {
     sub = '沒有真的跑：用轉牌的實測速度推估。需要記憶體 ' + Math.round(r.mem) + ' MB；每次迭代約 ' + fmt(r.perIter / 1000, 1) + ' 秒，到 0.5% 約 ' + (r.value > 120 ? fmt(r.value / 60, 0) + ' 分鐘' : fmt(r.value, 0) + ' 秒') + '<br>' + esc(r.tree || '');
     v = r.value > 120 ? fmt(r.value / 60, 0) + ' 分鐘（估）' : fmt(r.value, 0) + ' 秒（估）';
+  } else if (r.key === 'par' && r.value !== null) {
+    v = fmt(r.value, 0) + ' 秒（估）';
+    sub = '每次迭代：1 個執行緒 ' + fmt(r.per1 / 1000, 2) + ' 秒' + (r.perK ? '，' + r.k + ' 個執行緒 ' + fmt(r.perK / 1000, 2) + ' 秒（快 ' + fmt(r.per1 / r.perK, 1) + ' 倍）' : '（這台裝置只用 1 個執行緒）') + '；到 1% 大約 100 次；記憶體 ' + Math.round(r.mem) + ' MB<br>' + esc(r.tree || '');
   } else sub = esc(r.note || '');
   return '<tr><td>' + esc(r.name) + '</td><td class="v num">' + v + '</td><td class="sub">' + sub + '</td></tr>';
 }
 function renderBench() { $('benchTab').tBodies[0].innerHTML = BENCH.res.map(benchRow).join(''); }
 function benchText() {
-  const L = ['德州軍師 效能測試（第一步）', devText()];
+  const L = ['德州軍師 效能測試（第四版）', devText()];
   for (const r of BENCH.res) {
     if (r.key === 'eval') L.push('評牌器 ' + fmt(r.value, 2) + ' 百萬手/秒');
     else if (r.key === 'mc') L.push('蒙地卡羅 9 人 ' + fmt(r.value, 0) + ' 千次/秒');
     else if (r.key === 'exact') L.push('精確勝率翻牌 ' + fmt(r.value, 0) + ' ms');
     else if (r.key === 'flop') L.push('翻牌（估）每次 ' + fmt(r.perIter / 1000, 2) + ' 秒，記憶體 ' + Math.round(r.mem) + ' MB');
+    else if (r.key === 'par' && r.value !== null) L.push('翻牌3bet 每次 1執行緒 ' + fmt(r.per1 / 1000, 2) + ' 秒' + (r.perK ? '、' + r.k + '執行緒 ' + fmt(r.perK / 1000, 2) + ' 秒' : ''));
     else if (r.value !== null) L.push(r.name + ' ' + fmt(r.value, 2) + ' 秒，' + r.iters + ' 次，每次 ' + fmt(r.perIter, 1) + ' ms，' + fmt(r.pct, 2) + '%，' + Math.round(r.mem) + ' MB');
     else L.push(r.name + '：' + (r.note || '失敗'));
   }
@@ -35,7 +39,7 @@ function benchText() {
   return L.join('\n');
 }
 W.on('bench-item', (m) => { BENCH.res.push(m.r); renderBench(); });
-W.on('bench-step', (m) => { $('benchMsg').textContent = '正在解' + (PRESETS[m.key] ? PRESETS[m.key].name : '') + '：第 ' + m.t + ' 次，可剝削度 ' + fmt(m.pct, 2) + '%'; });
+W.on('bench-step', (m) => { $('benchMsg').textContent = m.key === 'flop3bet' ? '正在測翻牌（好幾個執行緒一起算）…' : '正在解' + (PRESETS[m.key] ? PRESETS[m.key].name : '') + '：第 ' + m.t + ' 次，可剝削度 ' + fmt(m.pct, 2) + '%'; });
 W.on('bench-done', () => {
   BENCH.running = false;
   $('bBench').disabled = false; $('bCopy').disabled = false;
@@ -50,6 +54,7 @@ function initBench() {
     renderBench();
     $('bBench').disabled = true; $('bCopy').disabled = true;
     $('benchMsg').textContent = '測試中…';
+    const k = autoThreads(); W.helpers(k >= 2 ? k : 0);
     W.send({ cmd: 'bench', big: $('bigChk').checked });
   });
   $('bCopy').addEventListener('click', async () => {

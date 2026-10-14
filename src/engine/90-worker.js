@@ -45,44 +45,77 @@ async function doCalc(m) {
   }
 }
 
+/* ===== 幫手（別的背景執行緒）：畫面建好後把 MessagePort 交給這裡 ===== */
+let PORTS = [], REQ = 0;
+const PENDING = new Map();
+function setPorts(ports) {
+  PORTS = ports;
+  for (const pt of ports) pt.onmessage = (e) => { const f = PENDING.get(e.data.req); if (f) { PENDING.delete(e.data.req); f(e.data.r); } };
+}
+function sendHelper(i, msg) {
+  return new Promise((res) => { const req = ++REQ; PENDING.set(req, res); PORTS[i].postMessage({ req, msg }); });
+}
+/* 這個背景執行緒當幫手 */
+function beHelper(port) {
+  port.onmessage = (e) => {
+    let r;
+    try { r = helperHandle(e.data.msg); } catch (err) { r = { error: String((err && err.message) || err) }; }
+    port.postMessage({ req: e.data.req, r });
+  };
+}
+
 async function doSolve(m) {
   stopFlag = false;
+  if (m.resume && SOL) return runSolve(SOL, m, true);
   const cfg = m.preset ? presetCfg(m.preset, { maxMB: m.maxMB || 1200 }) : m.cfg;
   let s;
   const t0 = nowMs();
-  SOL = null;                                                  // 先放掉舊的，記憶體才夠
-  try { s = new Solver(cfg); } catch (e) { postMessage({ cmd: 'solve-error', tag: m.tag, msg: e.message, mem: e.mem }); return; }
-  SOL = s; SOL_ID++;
-  const id = SOL_ID;
-  postMessage({ cmd: 'solve-start', id, tag: m.tag, mem: s.memMB, stats: treeStats(s.tree), hands: s.n, build: nowMs() - t0, target: cfg.target, maxIters: cfg.maxIters });
-  const target = m.target || cfg.target || 0.5, maxIters = m.maxIters || cfg.maxIters || 1000;
-  const t1 = nowMs();
+  SOL = null; SOL_ID++;                                        // 先放掉舊的，記憶體才夠
+  const k = Math.min(PORTS.length, m.threads || PORTS.length);
+  try {
+    if (k >= 2 && cfg.board.length <= 4) {
+      const total = estimateSolve(cfg).mb;
+      if (cfg.maxMB && total > cfg.maxMB) { const e = new Error('記憶體不夠：這棵樹要 ' + Math.round(total) + ' MB'); e.mem = total; throw e; }
+      s = new ParSolver(cfg, k, sendHelper);
+      await s.init();
+    } else s = new Solver(cfg);
+  } catch (e) { postMessage({ cmd: 'solve-error', tag: m.tag, msg: e.message, mem: e.mem }); return; }
+  SOL = s;
+  postMessage({ cmd: 'solve-start', id: SOL_ID, tag: m.tag, mem: s.memMB, stats: treeStats(s.tree), hands: s.n, build: nowMs() - t0, threads: s.k || 1, target: cfg.target, maxIters: cfg.maxIters });
+  return runSolve(s, m, false);
+}
+async function runSolve(s, m, resumed) {
+  const id = resumed ? SOL_ID : SOL_ID;
+  const cfg = s.cfg;
+  const target = m.target || cfg.target || 0.5, maxIters = s.t + (m.maxIters || cfg.maxIters || 1000);
+  const t1 = nowMs(), t0 = s.t;
   let ex = null, lastYield = nowMs();
+  if (resumed) postMessage({ cmd: 'solve-start', id, tag: m.tag, mem: s.memMB, stats: treeStats(s.tree), hands: s.n, build: 0, threads: s.k || 1, resumed: true });
   while (s.t < maxIters) {
-    s.iterate(1);
-    if (s.t % 10 === 0 || s.t === maxIters) {
-      ex = s.exploit();
-      postMessage({ cmd: 'solve-progress', id, tag: m.tag, t: s.t, pct: ex.pct, ms: nowMs() - t1 });
+    await s.iterate(1);
+    if ((s.t - t0) % 10 === 0 || s.t === maxIters) {
+      ex = await s.exploit();
+      postMessage({ cmd: 'solve-progress', id, tag: m.tag, t: s.t, t0, pct: ex.pct, ms: nowMs() - t1 });
       if (ex.pct <= target) break;
     }
-    if (nowMs() - lastYield > 150) { await tick(); lastYield = nowMs(); if (stopFlag || id !== SOL_ID) break; }
+    if (s.k || nowMs() - lastYield > 150) { if (!s.k) await tick(); lastYield = nowMs(); if (stopFlag || id !== SOL_ID) break; }
   }
-  if (!ex) ex = s.exploit();
-  const evs = s.evs();
-  postMessage({ cmd: 'solve-done', id, tag: m.tag, t: s.t, pct: ex.pct, ms: nowMs() - t1, ev: evs, stopped: stopFlag });
+  if (!ex) ex = await s.exploit();
+  const evs = await s.evs();
+  postMessage({ cmd: 'solve-done', id, tag: m.tag, t: s.t, t0, pct: ex.pct, ms: nowMs() - t1, ev: evs, stopped: stopFlag, threads: s.k || 1 });
 }
 
-function doRunouts(m) {
+async function doRunouts(m) {
   if (!SOL) { postMessage({ cmd: 'runouts', req: m.req, none: true }); return; }
   const t0 = nowMs();
-  const r = SOL.runouts(m.path || []);
+  const r = await SOL.runouts(m.path || []);
   postMessage({ cmd: 'runouts', req: m.req, ms: nowMs() - t0, data: r });
 }
 
-function doView(m) {
+async function doView(m) {
   if (!SOL) { postMessage({ cmd: 'view', req: m.req, none: true }); return; }
   const t0 = nowMs();
-  const v = SOL.nodeView(m.path || []);
+  const v = await SOL.nodeView(m.path || []);
   v.cmd = 'view'; v.req = m.req; v.ms = nowMs() - t0;
   v.hands = [Array.from(SOL.H[0]), Array.from(SOL.H[1])];
   v.reach = [Array.from(v.reach[0]), Array.from(v.reach[1])];
@@ -90,12 +123,33 @@ function doView(m) {
   v.P0 = SOL.P0; v.stack = SOL.cfg.stack;
   postMessage(v);
 }
+function doLock(m) {
+  if (!SOL) return;
+  const ok = SOL.setLock(m.id, m.strat ? Float32Array.from(m.strat) : null);
+  postMessage({ cmd: 'locked', id: m.id, ok, on: !!m.strat });
+}
 
 async function doBench(m) {
   postMessage({ cmd: 'bench-start' });
   await tick();
   const res = runBench({ big: !!m.big, maxMB: m.maxMB || 1200, onStep: (key, t, e) => postMessage({ cmd: 'bench-step', key, t, pct: e.pct }) },
     (r) => postMessage({ cmd: 'bench-item', r }));
+  // 翻牌 3-bet 底池：一個執行緒 vs 好幾個一起算（各跑 3 次迭代）
+  try {
+    const cfg = presetCfg('flop3bet', { maxMB: 0 }), IT = 3;
+    postMessage({ cmd: 'bench-step', key: 'flop3bet', t: 0, pct: 0 });
+    const one = new Solver(cfg);
+    let t0 = nowMs(); one.iterate(IT); const per1 = (nowMs() - t0) / IT;
+    const r = { key: 'par', name: PRESETS.flop3bet.name, tree: PRESETS.flop3bet.tree, per1, k: PORTS.length, mem: one.memMB, hands: one.n };
+    SOL = null;
+    if (PORTS.length >= 2) {
+      const par = new ParSolver(cfg, PORTS.length, sendHelper);
+      await par.init();
+      t0 = nowMs(); await par.iterate(IT); r.perK = (nowMs() - t0) / IT;
+    }
+    r.value = (r.perK || r.per1) * 100 / 1000;                  // 到 1% 大約 100 次
+    res.push(r); postMessage({ cmd: 'bench-item', r });
+  } catch (e) { postMessage({ cmd: 'bench-item', r: { key: 'par', name: '翻牌分工', value: null, note: e.message } }); }
   postMessage({ cmd: 'bench-done', res });
 }
 
@@ -103,10 +157,13 @@ onmessage = (e) => {
   const m = e.data;
   try {
     if (m.cmd === 'calc') doCalc(m);
-    else if (m.cmd === 'solve') doSolve(m);
+    else if (m.cmd === 'solve') doSolve(m).catch((err) => postMessage({ cmd: 'solve-error', tag: m.tag, msg: String((err && err.message) || err) }));
     else if (m.cmd === 'stop') stopFlag = true;
-    else if (m.cmd === 'view') doView(m);
-    else if (m.cmd === 'runouts') doRunouts(m);
+    else if (m.cmd === 'view') doView(m).catch((err) => postMessage({ cmd: 'error', req: m.req, of: 'view', msg: String((err && err.message) || err) }));
+    else if (m.cmd === 'runouts') doRunouts(m).catch((err) => postMessage({ cmd: 'error', req: m.req, of: 'runouts', msg: String((err && err.message) || err) }));
+    else if (m.cmd === 'lock') doLock(m);
+    else if (m.cmd === 'ports') setPorts(m.ports);
+    else if (m.cmd === 'helper') beHelper(m.port);
     else if (m.cmd === 'bench') doBench(m);
   } catch (err) { postMessage({ cmd: 'error', req: m.req, of: m.cmd, msg: String((err && err.message) || err) }); }
 };

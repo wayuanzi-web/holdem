@@ -13,4 +13,7 @@ node test/game-random.js 20000
 node test/ai-sim.js 600 6 2 | head -1
 node test/coach-sim.js 150 0 | tail -1
 node test/studio.js 300 2 5 | tail -1
+node test/solver-iso.js | tail -1
+node test/solver-par.js | tail -1
+node test/par-threads.js 2 3 flop3bet
 echo 全部通過

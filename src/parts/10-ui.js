@@ -29,7 +29,9 @@ for (let s = 0; s < 4; s++) for (let r = 12; r >= 0; r--) DECK_ORDER.push(cardOf
    引擎的程式碼就在頁面的 <script id="engine"> 裡，拿它加上 worker 的主程式做成一個 Blob */
 const W = (function makeWorker() {
   const src = $('engine').textContent + '\n' + $('workersrc').textContent;
-  const w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  const url = URL.createObjectURL(new Blob([src], { type: 'text/javascript' }));
+  const w = new Worker(url);
+  let helpers = [];
   const subs = {};
   let calcSeq = 0;
   w.onmessage = (e) => { const m = e.data; (subs[m.cmd] || []).forEach((f) => f(m)); };
@@ -38,6 +40,22 @@ const W = (function makeWorker() {
     on(cmd, f) { (subs[cmd] = subs[cmd] || []).push(f); },
     send(m) { w.postMessage(m); },
     nextCalc() { return ++calcSeq; },     // 勝率計算機和牌局的勝率表共用同一個背景執行緒：各自記住自己的編號
+    /* 求解用的幫手：k 個背景執行緒，各自跟主要的背景執行緒直接連線（MessageChannel），不經過畫面 */
+    helpers(k) {
+      if (helpers.length === k) return k;
+      for (const h of helpers) h.terminate();
+      helpers = [];
+      const ports = [];
+      for (let i = 0; i < k; i++) {
+        let h;
+        try { h = new Worker(url); } catch (e) { break; }
+        const ch = new MessageChannel();
+        h.postMessage({ cmd: 'helper', port: ch.port2 }, [ch.port2]);
+        helpers.push(h); ports.push(ch.port1);
+      }
+      w.postMessage({ cmd: 'ports', ports }, ports);
+      return helpers.length;
+    },
   };
 })();
 

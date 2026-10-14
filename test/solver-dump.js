@@ -22,7 +22,11 @@ const strat = {};
 for (const nd of s.nodes) {
   if (nd.kind !== E.N_ACT) continue;
   const arr = [], buf = new Float32Array(nd.k * nd.nh);
-  for (let i = 0; i < nd.inst; i++) { s.avgStrat(nd, i, buf); arr.push(Array.from(buf, (x) => +x.toFixed(7))); }
+  const cnt = Math.pow(s.D, nd.level);
+  for (let i = 0; i < cnt; i++) {
+    if (s.lslot(nd.level, i) < 0) { arr.push(new Array(nd.k * nd.nh).fill(+(1 / nd.k).toFixed(7))); continue; }   // 不可能的發牌（同一張牌兩次）
+    s.avgStrat(nd, i, buf); arr.push(Array.from(buf, (x) => +x.toFixed(7)));
+  }
   strat[nd.id] = arr;
 }
 const dump = {

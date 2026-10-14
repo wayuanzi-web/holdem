@@ -17,6 +17,12 @@ const PRESETS = {
     name: '轉牌 K♦5♣6♥9♥（大樹）', board: 'Kd5c6h9h', pot: 5.5, stack: 97.5, tree: '每街兩種尺寸（轉牌 50%、100%；河牌 33%、75%）＋全下；加注 2.5 倍',
     bet: { turn: [[50, 100], [50, 100]], river: [[33, 75], [33, 75]] }, raise: { turn: [['2.5x'], ['2.5x']], river: [['2.5x'], ['2.5x']] }, cap: 3, target: 0.5, maxIters: 1000,
   },
+  flop3bet: {
+    name: '翻牌 A♠7♦2♦（3-bet 底池）', board: 'As7d2d', pot: 20.5, stack: 90, tree: '每街一種尺寸（翻牌 33%、轉牌 66%、河牌 75%）＋全下',
+    oop: 'TT+,AQs+,AKo,A5s-A4s,K9s,Q9s,J9s,T8s,76s,65s,54s', ip: '77-JJ,ATs-AQs,A5s-A4s,KTs-KQs,QTs+,JTs,T9s,98s,87s,AQo,KQo',
+    names: ['BB（3-bet）', 'BTN（跟注）'],
+    bet: { flop: [[33], [33]], turn: [[66], [66]], river: [[75], [75]] }, raise: { flop: [['a'], ['a']], turn: [['a'], ['a']], river: [['a'], ['a']] }, cap: 2, target: 1, maxIters: 400,
+  },
   flop: {
     name: '翻牌 K♦5♣6♥', board: 'Kd5c6h', pot: 5.5, stack: 97.5, tree: '每街一種尺寸（翻牌 50%、轉牌 75%、河牌 75%）＋全下',
     bet: { flop: [[50], [50]], turn: [[75], [75]], river: [[75], [75]] }, raise: { flop: [['a'], ['a']], turn: [['a'], ['a']], river: [['a'], ['a']] }, cap: 2, target: 0.5, maxIters: 400,

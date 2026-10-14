@@ -322,7 +322,7 @@ function studioOfferHTML() {
   }
   const best = ok.find((x) => x.street >= 2) || ok[0];
   let h = '<div class="studiooffer" id="studioOffer"><b>用 GTO 工作室分析這一手</b><p class="note">照每個人的動作估雙方的範圍，算出這個局面的 GTO 打法，再一步一步對照你實際怎麼打。</p><div class="endbtns">';
-  for (const x of ok) h += '<button class="btn' + (x === best ? ' main' : '') + '" data-studio="' + x.street + '">從' + STREET_NAME[x.street] + '開始' + (x.street === 1 ? '（很慢）' : '') + '</button>';
+  for (const x of ok) h += '<button class="btn' + (x === best ? ' main' : '') + '" data-studio="' + x.street + '">從' + STREET_NAME[x.street] + '開始' + (x.street === 1 ? '（要幾分鐘）' : '') + '</button>';
   return h + '</div></div>';
 }
 /* 這一手可以送去工作室的話，回傳最好的那條街 */

@@ -214,6 +214,17 @@ input.badin { border-color: #d0533f; background: #3a1d17; }
 .herob .grade, .herob .grade.good, .herob .grade.ok, .herob .grade.bad { background: rgba(255,255,255,.06); margin: 8px 0 0; color: var(--text); }
 .herob .grade.good .mk { color: #6fd08f; } .herob .grade.ok .mk { color: #f0c05a; } .herob .grade.bad .mk { color: #f08a7a; }
 .stline { margin-top: 16px; }
+.sthead .prog { margin-top: 10px; }
+.lockb { border: 1px dashed rgba(208,168,78,.6); border-radius: 10px; padding: 8px 10px; margin: 0 0 12px; font-size: 14px; }
+.lockb.on { border-style: solid; background: rgba(208,168,78,.08); }
+.lockb .brushes { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+.lockb .brushes button { border: 1px solid var(--line); background: var(--felt2); border-radius: 8px; padding: 4px 10px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; font-size: 13.5px; }
+.lockb .brushes button[aria-pressed="true"] { border-color: var(--brass); box-shadow: inset 0 0 0 1px var(--brass); }
+.lockb .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.grid13.lockedit { touch-action: none; user-select: none; outline: 2px dashed rgba(208,168,78,.6); outline-offset: 3px; }
+.expo { margin-top: 10px; }
+.expo select { max-width: 100%; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #10241d; border: 1px solid var(--brass); color: var(--text); padding: 8px 16px; border-radius: 10px; z-index: 60; font-size: 14px; box-shadow: 0 8px 20px rgba(0,0,0,.5); }
 .stline .strow { margin: 2px 0 8px; }
 .lchips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .lchip { border: 1px solid var(--line); background: rgba(0,0,0,.15); border-radius: 999px; padding: 3px 11px; cursor: pointer; font-size: 13.5px; }
@@ -687,6 +698,12 @@ body.noexplain .xp, body.noexplain .how { display: none; }
       </div>
       <p class="stintro" id="stIntro">設定一個<b>兩個人</b>的翻牌後局面：公牌、底池、雙方可能拿的牌（<button type="button" class="term" data-term="範圍">範圍</button>）、可以怎麼下注。電腦會算出 <button type="button" class="term" data-term="GTO">GTO</button> 打法（雙方都沒辦法再占對方便宜的策略），之後點動作、點下一張牌，看每一手牌該怎麼打。範例已經設好，直接按「開始求解」就可以。</p>
       <div class="stbanner" id="stBanner" hidden></div>
+      <div class="prog" id="prog" hidden>
+        <span class="num" id="progTxt"></span>
+        <div class="track" aria-hidden="true"><i id="progBar"></i></div>
+        <span class="num" id="progTime"></span>
+        <button class="btn sm" id="bStop" hidden>先停在這裡</button>
+      </div>
     </div>
     <div id="stSetup">
       <div class="stcols">
@@ -720,17 +737,12 @@ body.noexplain .xp, body.noexplain .how { display: none; }
           <h3 class="sth">4. 開始求解</h3>
           <div class="strow"><span>精度</span><div class="seg" id="stTarget"></div></div>
           <div id="stEst" class="stest"></div>
+          <div class="strow"><label>一起算的執行緒 <select id="stThreads"></select></label><span class="note" id="stThreadNote"></span></div>
           <div class="strow">
             <button class="btn main big" id="bSolve">開始求解</button>
-            <button class="btn" id="bStop" hidden>先停在這裡</button>
             <button class="btn" id="stShare">複製分享連結</button>
           </div>
           <input class="sharebox" id="stShareBox" readonly hidden aria-label="分享連結">
-          <div class="prog" id="prog" hidden>
-            <span class="num" id="progTxt"></span>
-            <div class="track" aria-hidden="true"><i id="progBar"></i></div>
-            <span class="num" id="progTime"></span>
-          </div>
         </div>
       </div>
     </div>
@@ -751,8 +763,9 @@ body.noexplain .xp, body.noexplain .how { display: none; }
           <div id="nodeHead"></div>
           <div class="acts" id="acts"></div>
           <div id="heroBox"></div>
+          <div id="lockBox"></div>
           <div id="gridWrap">
-            <div class="strow gridtop"><div class="seg sm" id="gridMode"></div><span class="note" id="gridHint"></span></div>
+            <div class="strow gridtop"><div class="seg sm" id="gridMode"></div><label class="note"><input type="checkbox" id="roundChk"> 四捨五入到 25%</label><span class="note" id="gridHint"></span></div>
             <div class="grid13" id="grid13"></div><div class="legend" id="legend"></div>
           </div>
           <div id="chancePick" hidden>
@@ -768,6 +781,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
           <h2 style="margin-top:16px">牌型分類</h2>
           <p class="note" style="margin:0 0 6px">這個人的範圍照牌型分組，每一組怎麼打。點一列，左邊的格子只亮那一組。</p>
           <table class="cats" id="catTab2"></table>
+          <div class="strow expo"><button class="btn sm" id="bCsv">匯出這個節點（CSV）</button><select id="rangeOut" aria-label="複製某個動作的範圍"></select></div>
           <h2 style="margin-top:16px" id="cellTitle">點左邊的格子看每個組合</h2>
           <div id="cellBox"></div>
         </div>
