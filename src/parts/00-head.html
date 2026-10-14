@@ -336,6 +336,130 @@ body.intable .brand p { display: none; }
 .homego { display: flex; gap: 12px; margin: 28px 0 14px; flex-wrap: wrap; }
 .hchk { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: #c9d6cf; margin: 10px 0; cursor: pointer; }
 .hchk input { margin-top: 4px; }
+
+/* ===== 大師之路 ===== */
+.learncard { display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid var(--brass); background: rgba(208,168,78,.10); border-radius: 12px; padding: 10px 14px; margin: 4px 0 18px; }
+.learncard .note { display: block; margin-top: 2px; }
+.learn { max-width: 900px; margin: 0 auto; padding: 18px 16px 70px; }
+@media (max-width: 600px) { .learn { padding: 12px 12px 60px; } }
+.lnhead h2 { margin: 0 0 4px; }
+.lnprog { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+.lnprog .track { flex: 1; height: 10px; background: rgba(255,255,255,.08); border-radius: 6px; overflow: hidden; }
+.lnprog .track i { display: block; height: 100%; background: var(--brass); }
+.lngo { width: 100%; margin: 6px 0 10px; text-align: left; }
+.lndone { font-size: 20px; }
+.lnstage { border: 1px solid var(--line); border-radius: 12px; margin: 10px 0; padding: 8px 12px; background: rgba(23,57,47,.55); }
+.lnstage summary { cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 16px; padding: 4px 0; }
+.lnstage summary b { flex: 1; }
+.lnstage.done summary b::after { content: ' ✓'; color: #6fd08f; }
+.lnsn { color: var(--mute); font-size: 13px; white-space: nowrap; }
+.lnsc { color: var(--mute); font-size: 13px; }
+.lnlist { list-style: none; padding: 0; margin: 6px 0; }
+.lnlist li button, .lnlist li .nr { display: flex; width: 100%; align-items: center; gap: 10px; background: none; border: 0; color: var(--text); text-align: left; padding: 9px 6px; border-radius: 8px; font-size: 15px; cursor: pointer; }
+.lnlist li .nr { color: var(--mute); cursor: default; }
+.lnlist li button:hover { background: rgba(255,255,255,.05); }
+.lnlist li.cur button { background: rgba(208,168,78,.14); outline: 1px solid rgba(208,168,78,.5); }
+.lnlist .mk { width: 1.2em; text-align: center; color: var(--mute); }
+.lnlist li.d .mk { color: #6fd08f; }
+.lnlist li.cur .mk { color: var(--brass); }
+.lnlist .lt { flex: 1; }
+.lnlist .ls { color: var(--mute); font-size: 12.5px; }
+.lnbar { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; }
+.lnbar .btn { white-space: nowrap; flex: none; }
+.hdtop h3 { color: var(--text); }
+.lnttl { display: flex; flex-direction: column; }
+.lnttl b { font-size: 17px; }
+.lnsteps { list-style: none; display: flex; gap: 6px; padding: 0; margin: 0 0 10px; }
+.lnsteps li { flex: 1; text-align: center; font-size: 13px; padding: 5px 0; border-radius: 6px; background: rgba(255,255,255,.05); color: var(--mute); }
+.lnsteps li.on { background: var(--brass); color: #2b2410; font-weight: 700; }
+.lnsteps li.d { color: #6fd08f; }
+.lnread { font-size: 15.5px; line-height: 1.7; }
+.lnread p { margin: 8px 0; }
+.lntip { border-left: 4px solid var(--brass); background: rgba(208,168,78,.10); padding: 8px 12px; border-radius: 6px; margin: 10px 0; font-size: 15px; line-height: 1.7; }
+.lngo2 { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 14px 0 4px; }
+.lnq { font-size: 16px; }
+.lnqtop { display: flex; justify-content: space-between; color: var(--mute); font-size: 13px; }
+.lntime { height: 6px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; margin: 6px 0; }
+.lntime i { display: block; height: 100%; width: 0; background: #e0b04a; }
+.lnprompt { font-size: 17px; font-weight: 600; margin: 10px 0; line-height: 1.6; }
+.lnvis { margin: 6px 0 10px; }
+.lnrow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 4px 0; }
+.lnrow .lbl { color: var(--mute); font-size: 13px; min-width: 3em; }
+.lnname { font-size: 18px; font-weight: 700; margin-left: 8px; display: flex; flex-direction: column; }
+.lnname small { font-size: 12px; color: var(--mute); font-weight: 400; }
+.lnpair { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.lnpair .vs { color: var(--mute); }
+.lnopts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lnopts.many { grid-template-columns: 1fr 1fr; }
+.lnopt { position: relative; min-height: 52px; border: 1px solid var(--line); background: var(--felt2); color: var(--text); border-radius: 10px; font-size: 16px; padding: 10px 12px 10px 34px; text-align: left; cursor: pointer; }
+.lnopt .k { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--mute); }
+.lnopt:hover:not(:disabled) { border-color: var(--brass); }
+.lnopt.right { background: #2f7a52; border-color: #6fd08f; }
+.lnopt.wrong { background: #7a2f26; border-color: #f08a7a; }
+.lnopt.dim { opacity: .45; }
+.lnfb { margin: 12px 0 0; padding: 10px 12px; border-radius: 8px; line-height: 1.7; font-size: 15px; cursor: pointer; }
+.lnfb.ok { background: rgba(63,157,106,.18); border: 1px solid rgba(111,208,143,.5); }
+.lnfb.no { background: rgba(201,70,46,.16); border: 1px solid rgba(240,138,122,.5); }
+.lnres { font-size: 16px; }
+.lnbig { font-size: 22px; font-weight: 800; margin: 4px 0 8px; }
+.lnwrong .lnw { border-top: 1px solid var(--line); padding: 6px 0; }
+.lnplace { list-style: none; padding: 0; }
+.lnplace li { padding: 3px 0; }
+.lnplace li.ok::before { content: '✓ '; color: #6fd08f; }
+.lnplace li.no::before { content: '✗ '; color: #f08a7a; }
+.lnseats { width: 100%; max-width: 360px; display: block; }
+.lnseats .felt { fill: #1f5a45; stroke: #3c7a62; }
+.lnseats .lseat circle { fill: #10261f; stroke: #5f8d7c; stroke-width: 1.5; }
+.lnseats .lseat.me circle { stroke: var(--brass); stroke-width: 2.5; }
+.lnseats text { fill: #e8efe9; font-size: 13px; text-anchor: middle; font-weight: 700; }
+.lnseats text.pl { font-size: 10px; font-weight: 600; }
+.lnseats .dbtn { fill: #f4efe2; stroke: #c9462e; stroke-width: 2; }
+.lnseats .dt { fill: #c9462e; font-size: 11px; }
+.lncats { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0; }
+.lncats td, .lncats th { border-bottom: 1px solid var(--line); padding: 6px 4px; text-align: left; vertical-align: top; }
+.lncats .r { text-align: right; white-space: nowrap; }
+.lncats small { display: block; color: var(--mute); font-size: 12px; }
+.lncats .cs { white-space: nowrap; }
+.lnleg { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--mute); margin: 8px 0; }
+.lnleg i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+.lngrid .cell { cursor: pointer; }
+.lngrid .cell span { position: relative; z-index: 1; }
+.lngrid .cell.t1 { background: #c9462e; } .lngrid .cell.t2 { background: #d98a2b; } .lngrid .cell.t3 { background: #b9a234; color: #1b1a10; }
+.lngrid .cell.t4 { background: #3f9d6a; } .lngrid .cell.t5 { background: #233d35; color: #9fb7ad; }
+.lngrid .cell.sel { outline: 3px solid #fff; outline-offset: -3px; }
+.lnhands { list-style: none; padding: 0; margin: 8px 0; }
+.lnhand { display: flex; gap: 10px; width: 100%; text-align: left; background: rgba(255,255,255,.03); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; margin: 6px 0; color: var(--text); cursor: pointer; font-size: 14.5px; line-height: 1.6; }
+.lnhand:hover { border-color: var(--brass); }
+.lnhand .hc { display: flex; gap: 2px; flex: none; }
+.lnhand .hl, .hl { color: #f0dca6; }
+.lnh4 { margin: 14px 0 6px; font-size: 15.5px; }
+.lnchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lnh { border: 1px solid var(--line); background: var(--felt2); color: var(--text); border-radius: 8px; padding: 4px 8px; font-size: 13.5px; cursor: pointer; }
+.lnh small { color: var(--mute); margin-left: 4px; font-size: 11px; }
+.lnh.t1 { border-color: #c9462e; } .lnh.t2 { border-color: #d98a2b; } .lnh.t3 { border-color: #b9a234; } .lnh.t4 { border-color: #3f9d6a; }
+.lnh.tr { opacity: .7; }
+.lndiff { padding-left: 1.2em; } .lndiff li { margin: 8px 0; } .lndiff .lnh { margin: 2px 3px 2px 0; }
+.lndict { display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 900px) { .lndict { grid-template-columns: 1fr; } }
+.hdtop { display: flex; gap: 12px; align-items: center; }
+.hdtop .hc { display: flex; gap: 3px; }
+.hdtop h3 { margin: 0; font-size: 22px; }
+.hdtop h3 small { font-size: 13px; color: var(--mute); margin-left: 8px; font-weight: 400; }
+.hdtop p { margin: 4px 0; }
+.tierb { padding: 1px 8px; border-radius: 10px; font-size: 13px; }
+.tierb.t1 { background: #c9462e; } .tierb.t2 { background: #d98a2b; } .tierb.t3 { background: #b9a234; color: #1b1a10; } .tierb.t4 { background: #3f9d6a; } .tierb.t5 { background: #3b5a50; }
+.fcs { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 4px 0; }
+.fcs .note { width: 4em; }
+.fc { font-size: 12.5px; padding: 2px 7px; border-radius: 8px; border: 1px solid var(--line); }
+.fc.y { background: #2f7a52; border-color: #6fd08f; } .fc.m { background: #6b5a1c; border-color: #d0a84e; } .fc.n { opacity: .5; }
+.rz { color: #f08a7a; } .cz { color: #6fd08f; } .fz { color: var(--mute); }
+.hdnav { justify-content: space-between; }
+.lnmbox { max-width: 640px; }
+@media (max-width: 600px) {
+  .lnopts, .lnopts.many { grid-template-columns: 1fr; }
+  .lnopt { min-height: 48px; }
+  .learncard { flex-direction: column; align-items: stretch; }
+}
 .tinfo span { white-space: nowrap; }
 .rvline { margin: 2px 0 8px; font-size: 15px; color: var(--mute); min-height: 1.4em; }
 .rvline b { color: var(--brass); font-size: 18px; }
@@ -632,6 +756,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   <nav class="topnav" aria-label="主選單">
     <button class="chip" id="nHome">首頁</button>
     <button class="chip" id="nGame" hidden>回到牌局</button>
+    <button class="chip" id="nLearn">大師之路</button>
     <button class="chip" id="nRanks">牌型大小</button>
     <button class="chip" id="nStats">統計</button>
     <button class="chip" id="nTools">工具</button>
@@ -643,6 +768,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   <div class="home">
     <h2 class="hometitle">坐下來，打一手德州撲克</h2>
     <p class="homelede">發牌、下注、比大小，教練每一步都會說明現在發生什麼、你的牌有多強、該怎麼做和為什麼。</p>
+    <div class="learncard"><div><b>🎓 大師之路</b><span class="note" id="hLearnTxt"></span></div><button class="btn main" id="bLearn">開始 ▶</button></div>
     <div class="field"><div class="flabel">幾個人一起玩（含你）</div><div class="pills" id="hN"></div></div>
     <div class="field"><div class="flabel">怎麼進行（打牌中也可以隨時暫停、改成一步一步）</div>
       <div class="modes" id="hMode">
@@ -670,6 +796,10 @@ body.noexplain .xp, body.noexplain .how { display: none; }
     </div>
     <p class="note">想自己查勝率、用 GTO 工作室分析一手牌：右上角「工具」。<button type="button" class="linkbtn" id="bResetTips">重新顯示新手說明</button></p>
   </div>
+</section>
+
+<section id="vLearn" class="view" hidden>
+  <div class="learn" id="lnRoot"></div>
 </section>
 
 <section id="vTable" class="view" hidden>
@@ -707,6 +837,9 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   <div class="mbox"><h2 id="ranksTitle">牌型大小（由大到小）</h2><div id="ranksList"></div><p class="note">用自己 2 張＋公牌 5 張裡最好的 5 張比。同牌型再比點數，A 最大（A2345 的順子 A 當 1）。花色不分大小。</p><button class="btn main" id="ranksClose">知道了</button></div>
 </div>
 
+<div id="lnModal" class="modal" hidden role="dialog" aria-modal="true" aria-label="起手牌">
+  <div class="mbox rbox lnmbox"><div id="lnModalBody"></div><div class="strow rmbtns"><button class="btn main" id="lnModalClose">關閉</button></div></div>
+</div>
 <div id="statsModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="statsTitle">
   <div class="mbox rbox"><h2 id="statsTitle">你的統計</h2><div id="statsBody"></div>
     <div class="strow rmbtns"><button class="btn" id="statsReset">清除這一種的統計</button><button class="btn main" id="statsClose">關閉</button></div></div>

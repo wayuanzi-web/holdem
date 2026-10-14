@@ -19,13 +19,15 @@ function rich(s) { return esc(s).replace(/\{c(\d+)\}/g, (m, c) => cardSpan(+c));
 
 /* ===== 畫面切換 ===== */
 function showView(v) {
-  for (const k of ['Home', 'Table', 'Tools']) $('v' + k).hidden = k.toLowerCase() !== v;
+  for (const k of ['Home', 'Table', 'Tools', 'Learn']) $('v' + k).hidden = k.toLowerCase() !== v;
+  $('nLearn').classList.toggle('on', v === 'learn');
   document.body.classList.toggle('intable', v === 'table');
   $('nHome').hidden = v === 'home';
   $('nGame').hidden = v === 'table' || !G.H;
-  $('subTitle').textContent = v === 'tools' ? '工具：勝率計算機、翻牌前圖表、GTO 工作室、效能測試' : '德州撲克教練：一步一步帶你打';
+  $('subTitle').textContent = v === 'tools' ? '工具：勝率計算機、翻牌前圖表、GTO 工作室、效能測試' : v === 'learn' ? '大師之路：一課一課練到大師' : '德州撲克教練：一步一步帶你打';
+  if (v !== 'learn' && typeof clearLnTimers === 'function') clearLnTimers();
   if (v !== 'table') clearTimeout(G.timer);
-  if (v === 'home') renderHome();
+  if (v === 'home') { renderHome(); renderLearnHome(); }
   window.scrollTo(0, 0);
 }
 

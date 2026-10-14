@@ -21,4 +21,5 @@ node test/charts.js
 node test/rvr.js
 node test/tourney.js 60
 node test/batch.js
+node test/learn.js 300
 echo 全部通過
