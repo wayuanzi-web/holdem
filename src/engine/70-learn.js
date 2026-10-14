@@ -281,7 +281,7 @@ QGEN.stronger = (rng, o) => {
 };
 /* 沒人加注：開不開（只出明確的題：圖表 ≥ 75% 加注，或 ≤ 10%） */
 QGEN.openOrFold = (rng, o) => {
-  const t = (o && o.t) || pickOne(['6', '6', '9'], rng), poss = CHART_POS[t].filter((p) => !(o && o.late) || ['CO', 'BTN', 'SB', 'HJ'].indexOf(p) >= 0);
+  const t = (o && o.t) || pickOne(['6', '6', '9'], rng), poss = CHART_POS[t].filter((p) => (!(o && o.late) || ['CO', 'BTN', 'SB', 'HJ'].indexOf(p) >= 0) && (!(o && o.pos) || o.pos.indexOf(p) >= 0));
   const pool = poolFromTiers(o && o.tiers);
   for (let i = 0; i < 200; i++) {
     const pos = pickOne(poss, rng), key = t + '/rfi/' + pos;
@@ -304,14 +304,17 @@ QGEN.openOrFold = (rng, o) => {
   return QGEN.combos(rng);
 };
 /* 第 4 階：大盲（或小盲）面對開牌 */
-QGEN.defend = (rng) => {
-  const spots = [['BB', 'BTN'], ['BB', 'CO'], ['BB', 'EP'], ['BB', 'SB'], ['SB', 'BTN']];
-  for (let i = 0; i < 300; i++) {
+/* o：{ spots:[[防守的人, 開牌的人]], want:'raise'|'call'|'fold'（只出這種答案）, hands:'A5s,A4s'（只出這些牌） } */
+QGEN.defend = (rng, o) => {
+  const spots = (o && o.spots) || [['BB', 'BTN'], ['BB', 'CO'], ['BB', 'EP'], ['BB', 'SB'], ['SB', 'BTN'], ['IP', 'CO']];
+  const only = o && o.hands ? (function () { const w = parseRange(o.hands), a = []; for (let g = 0; g < 169; g++) if (w[CLASS_COMBOS[g][0]] > 0) a.push(g); return a; })() : null;
+  const wantMap = { raise: '再加注（3-bet）', call: '跟注', fold: '棄牌' };
+  for (let i = 0; i < 600; i++) {
     const [d, og] = pickOne(spots, rng), key = '6/vsOpen/' + d + '/' + og;
     if (!chartText(key)) continue;
-    const g = (rng() * 169) | 0, r = chartFreq(key, g, 'raise'), c = chartFreq(key, g, 'call'), f = 1 - r - c;
+    const g = only ? pickOne(only, rng) : (rng() * 169) | 0, r = chartFreq(key, g, 'raise'), c = chartFreq(key, g, 'call'), f = 1 - r - c;
     const best = r >= 0.75 ? '再加注（3-bet）' : c >= 0.75 ? '跟注' : f >= 0.85 ? '棄牌' : null;
-    if (!best || (best === '棄牌' && rng() < 0.6)) continue;
+    if (!best || (o && o.want && wantMap[o.want] !== best) || (!(o && o.want) && !only && best === '棄牌' && rng() < 0.6)) continue;
     const ogZh = openerZh('6', og);
     return { gen: 'defend', prompt: '6 人桌，' + ogZh + '加注開局，其他人都棄牌。你在' + DEFENDER_ZH[d] + '拿 ' + NAMEZH(g) + '：', vis: { k: 'cls', g }, opts: ['再加注（3-bet）', '跟注', '棄牌'].map((x) => ({ t: x, ok: x === best })),
       explain: '圖表：' + NAMEZH(g) + ' 在這裡 3-bet ' + Math.round(r * 100) + '%、跟注 ' + Math.round(c * 100) + '%、棄牌 ' + Math.round(Math.max(0, f) * 100) + '%。' + (d === 'BB' ? '大盲已經放了 1 個大盲，跟注比較便宜，所以防守得比較寬。' : '') + (og === 'EP' ? '槍口開牌範圍很緊，要更好的牌才繼續。' : og === 'BTN' || og === 'SB' ? '後位開牌範圍很寬，可以防守得寬一點。' : ''), key: 'def|' + key + '|' + g };
@@ -384,10 +387,10 @@ function makeQ(spec, rng) {
 /* 一組題目：照 gens 輪流出、同一題不重複 */
 function makeQuiz(gens, n, rng) {
   const out = [], seen = new Set();
-  for (let i = 0, tries = 0; out.length < n && tries < n * 30; tries++) {
+  for (let i = 0, tries = 0; out.length < n && tries < n * 40; tries++, i++) {     // 題庫用完的種類會自動換下一種
     const q = makeQ(gens[i % gens.length], rng);
     if (seen.has(q.key)) continue;
-    seen.add(q.key); out.push(q); i++;
+    seen.add(q.key); out.push(q);
   }
   return out;
 }

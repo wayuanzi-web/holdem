@@ -33,6 +33,18 @@ for (const gen of Object.keys(E.QGEN)) {
       if (ans !== Math.round(bet / (pot + 2 * bet) * 100) + '%') fail('potOdds 答案錯 ' + q.prompt);
     }
     if (gen === 'firstAct' || gen === 'posName') { if (!q.vis || q.vis.k !== 'seats') fail(gen + ' 沒有座位圖'); }
+    const kp = (q.key || '').split('|');
+    if (gen === 'betNeed') { const fr = E.BET_FR.find((x) => q.prompt.indexOf(x[2]) >= 0), f = fr[0] / fr[1]; if (ans !== Math.round(f / (1 + 2 * f) * 100) + '%') fail('betNeed 錯 ' + q.prompt); }
+    if (gen === 'bbOdds') { const x = +kp[1], need = (x - 1) / (0.5 + 2 * x); if (ans !== Math.round(need * 100) + '%') fail('bbOdds 錯 ' + x); }
+    if (gen === 'stealMath') { const r = +kp[1]; if (ans !== Math.round(r / (r + 1.5) * 100) + '%') fail('stealMath 錯'); }
+    if (gen === 'openSize') { const bb = +kp[1], limp = +kp[2], sb = kp[3] === 'true'; if (+ans !== (sb ? 3 : 2.5 + limp) * bb) fail('openSize 錯 ' + q.key); }
+    if (gen === 'callOrFold' && kp[0] === 'cof') { const pot = +kp[1], bet = +kp[2], eq = +kp[3], ev = eq * (pot + 2 * bet) - bet; if ((ans === '跟注') !== (ev > 0)) fail('callOrFold 錯 ' + q.key); }
+    if (gen === 'pushFold' && kp[0] === 'pf') { const B = +kp[1], bb = +kp[2], g = +kp[3]; if ((ans === '全下') !== (E.PRE_PCT[g] < E.pushPct(bb, B))) fail('pushFold 錯 ' + q.key); }
+    if (gen === 'callShove' && kp[0] === 'cs') { const B = +kp[1], st = +kp[2], g = +kp[3], eq = E.eqVsTop(g, E.pushPct(st, B)), need = (st - 1) / (2 * st + 0.5); if ((ans === '跟注') !== (eq >= need)) fail('callShove 錯 ' + q.key); }
+    if (gen === 'vs3bet' && kp[0] === 'v3') { const key = '6/vs3bet/' + kp[1], g = +kp[2], r = E.chartFreq(key, g, 'raise'), c = E.chartFreq(key, g, 'call'); const exp = r >= 0.75 ? '4-bet' : c >= 0.75 ? '跟注' : '棄牌'; if (ans !== exp || E.chartFreq('6/rfi/' + E.OG_RFI6[kp[1]], g) < 0.75) fail('vs3bet 錯 ' + q.key); }
+    if (gen === 'setMine' && kp[0] === 'sm') { const r = +kp[2] / +kp[1]; if ((ans === '棄牌') !== (r < 20) || (r > 10 && r < 20)) fail('setMine 錯 ' + q.key); }
+    if (gen === 'outsRand' && kp[0] === 'or') { const r = E.drawOuts(q.vis.hole, q.vis.board); if (!r || +ans !== r.n) fail('outsRand 錯 ' + q.key); }
+    if (gen === 'rule24') { const n = +kp[1], flop = kp[2] === 'true'; if (ans !== (flop ? n * 4 - Math.max(0, n - 8) : n * 2) + '%') fail('rule24 錯'); }
   }
 }
 // 出牌數：照引擎數一次
@@ -78,6 +90,19 @@ const st = (oks) => E.placementStart(pl.map((q, i) => ({ stage: q.stage, ok: oks
 if (st(() => true) !== 8) fail('全對應該從第 8 階');
 if (st(() => false) !== 1) fail('全錯應該從第 1 階');
 if (st((q) => q.stage <= 2) !== 3) fail('前兩階對應該從第 3 階');
+// 錯題本
+{
+  const L2 = E.learnBlank(), q = E.makeQ('whoWins', rng);
+  E.wrongAdd(L2, q); E.wrongAdd(L2, q);
+  if (L2.wrong.length !== 1) fail('錯題本重複加');
+  E.wrongResult(L2, q.key, true); if (L2.wrong.length !== 1) fail('答對一次就拿掉了');
+  E.wrongResult(L2, q.key, false); E.wrongResult(L2, q.key, true); E.wrongResult(L2, q.key, true);
+  if (L2.wrong.length !== 0) fail('連對兩次沒拿掉');
+  for (let i = 0; i < 100; i++) E.wrongAdd(L2, E.makeQ('outsRand', rng));
+  if (L2.wrong.length > 80) fail('錯題本超過 80 題');
+  if (E.wrongSession(L2, rng).length !== 15) fail('一次複習應該 15 題');
+}
+for (const d of E.DRILLS) if (E.makeQuiz(d.gens, 20, rng).length !== 20) fail('快答 ' + d.id + ' 不夠 20 題');
 // 進度
 const LP = E.learnBlank();
 if (E.learnNext(LP).id !== '1-1') fail('第一課不是 1-1');

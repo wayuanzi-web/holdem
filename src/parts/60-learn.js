@@ -25,7 +25,7 @@ function renderLearn() {
   if (LN.mode === 'map') R.innerHTML = mapHTML();
   else if (LN.mode === 'lesson') R.innerHTML = lessonHTML();
   else if (LN.mode === 'dict') { R.innerHTML = dictHTML(); }
-  else if (LN.mode === 'place' || LN.mode === 'skip') R.innerHTML = testHTML();
+  else R.innerHTML = testHTML();
   if (LN.mode === 'dict' && LN.dictScroll) { LN.dictScroll = false; const d = $('lnDictDetail'); if (d && window.innerWidth < 900) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 
@@ -40,6 +40,9 @@ function mapHTML() {
   else h += '<p class="lndone">🏆 全部完成！</p>';
   h += '<div class="strow"><button class="btn" data-ln="place">' + (LP.place ? '重新做分級測驗' : '分級測驗：找到你的起點（12 題）') + '</button><button class="btn" data-ln="dict">起手牌字典（169 手）</button></div>';
   if (LP.place) h += '<p class="note">分級測驗建議從第 ' + LP.place.start + ' 階開始。</p>';
+  const nw = (LP.wrong || []).length;
+  if (nw) h += '<div class="strow"><button class="btn lnwbtn" data-ln="review">📕 錯題本（' + nw + ' 題）：複習答錯過的題目</button></div>';
+  h += '<details class="lndrills"><summary>⚡ 快答訓練場：計時練速度，記最好成績</summary><div class="lndgrid">' + DRILLS.map((d) => { const b = LP.best[d.id]; return '<button type="button" class="lndr" data-ln="drill" data-d="' + d.id + '"><b>' + esc(d.name) + '</b><span class="note">20 題・每題 ' + d.sec + ' 秒' + (b ? '<br>最好 ' + b.ok + '／' + b.n + '・' + fmt(b.ms / 1000, 1) + ' 秒' : '') + '</span></button>'; }).join('') + '</div></details>';
   h += '</div>';
   for (const s of COURSE) {
     const tot = s.lessons.length, done = s.lessons.filter((l) => lessonDone(LP, l.id)).length, ready = s.lessons.some((l) => l.ready);
@@ -122,6 +125,9 @@ function answerQ(i) {
   const q = LN.qs[LN.qi], ok = i >= 0 && q.opts[i].ok;
   LN.answered = true;
   LN.res.push({ ok, pick: i, timeout: i < 0, key: q.key, stage: q.stage, ms: LN.sec ? Date.now() - LN.t0 : 0 });
+  if (LN.mode === 'review') wrongResult(LP, q.key, ok);
+  else if (!ok && LN.mode !== 'place') wrongAdd(LP, q);
+  if (LN.mode === 'review' || (!ok && LN.mode !== 'place')) lpSave();
   renderLearn();
   const nb = $('lnNext');
   if (nb) nb.focus({ preventScroll: true });
@@ -146,6 +152,14 @@ function finishQs() {
     LN.placeRes = P; LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0); return;
   }
   if (LN.mode === 'skip') { LN.pass = ok >= 7; if (LN.pass) { LP.skip[LN.stage] = true; lpSave(); } LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0); }
+  if (LN.mode === 'drill') {
+    const timed = LN.res.filter((r) => r.ms > 0), avg = timed.length ? timed.reduce((a, r) => a + r.ms, 0) / timed.length : 0;
+    const b = LP.best[LN.drill.id];
+    LN.newBest = !b || ok > b.ok || (ok === b.ok && avg < b.ms);
+    if (LN.newBest) { LP.best[LN.drill.id] = { ok, n: LN.res.length, ms: Math.round(avg), at: Date.now() }; lpSave(); }
+    LN.avg = avg; LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0);
+  }
+  if (LN.mode === 'review') { LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0); }
 }
 function resultHTML() {
   const ok = LN.res.filter((r) => r.ok).length, l = LN.lesson;
@@ -163,12 +177,15 @@ function resultHTML() {
 /* ===== 分級測驗、跳級測驗 ===== */
 function startTest(mode, stage) {
   clearLnTimers();
-  LN.mode = mode; LN.stage = stage || 0; LN.phase = 'intro'; LN.rng = lnRng(); LN.sec = 0; LN.kind = 'quiz';
+  LN.mode = mode; LN.stage = typeof stage === 'number' ? stage : 0; LN.phase = 'intro'; LN.rng = lnRng(); LN.sec = 0; LN.kind = 'quiz';
+  if (mode === 'drill') LN.drill = DRILLS.find((d) => d.id === stage) || DRILLS[0];
   showView('learn'); renderLearn(); window.scrollTo(0, 0);
 }
 function testHTML() {
   const isP = LN.mode === 'place', s = COURSE.find((x) => x.id === LN.stage);
-  let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><b>' + (isP ? '分級測驗' : '第 ' + s.id + ' 階跳級測驗：' + esc(s.name)) + '</b></div></div>';
+  const title = isP ? '分級測驗' : LN.mode === 'drill' ? '⚡ 快答：' + LN.drill.name : LN.mode === 'review' ? '📕 錯題本' : '第 ' + s.id + ' 階跳級測驗：' + esc(s.name);
+  let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><b>' + title + '</b></div></div>';
+  if (LN.mode === 'drill' || LN.mode === 'review') return h + drillHTML();
   if (LN.phase === 'intro') {
     h += '<div class="panel lnres">' + (isP ? '<p>12 題，大約 3 分鐘：從規則、起手牌、翻牌前、數學、翻牌後、範圍到 GTO，每一階 1–2 題。</p><p>不會的直接按「不知道」，不扣分——第一個答錯的地方，就是你該開始的地方。</p>'
       : '<p>8 題，答對 7 題這一階就直接算通過（課程表上標成「已跳過」，之後還是可以回來上）。</p>')
@@ -190,8 +207,29 @@ function testHTML() {
     + '<div class="lngo2"><button class="btn main big" data-ln="map">回課程表</button>' + (LN.pass ? '' : '<button class="btn" data-ln="skip" data-s="' + s.id + '">再考一次</button>') + '</div></div>';
   return h;
 }
+/* 快答訓練場、錯題本 */
+function drillHTML() {
+  const isD = LN.mode === 'drill';
+  if (LN.phase === 'intro') {
+    const b = isD && LP.best[LN.drill.id];
+    return '<div class="panel lnres">' + (isD ? '<p>20 題，每題 <b>' + LN.drill.sec + ' 秒</b>。目標：全部答對、越快越好。</p>' + (b ? '<p class="note">你的最好成績：' + b.ok + '／' + b.n + '，平均 ' + fmt(b.ms / 1000, 1) + ' 秒。</p>' : '')
+      : '<p>錯題本有 ' + (LP.wrong || []).length + ' 題：之前答錯的題目，一題答對兩次就會拿掉。這一次複習最舊的 ' + Math.min(15, (LP.wrong || []).length) + ' 題，不限時。</p>')
+      + '<div class="lngo2"><button class="btn main big" data-ln="tstart">開始 ▶</button></div></div>';
+  }
+  if (LN.phase === 'q') return qHTML();
+  const ok = LN.res.filter((r) => r.ok).length;
+  let h = '<div class="panel lnres">';
+  if (isD) h += '<p class="lnbig">' + (LN.newBest ? '🏅 新紀錄！' : '完成') + '</p><p>答對 <b>' + ok + '／' + LN.res.length + '</b>，平均每題 ' + fmt(LN.avg / 1000, 1) + ' 秒。</p>';
+  else h += '<p class="lnbig">複習完了</p><p>答對 <b>' + ok + '／' + LN.res.length + '</b>。錯題本還有 ' + (LP.wrong || []).length + ' 題。</p>';
+  const wrong = LN.res.map((r, i) => (r.ok ? null : LN.qs[i])).filter(Boolean);
+  if (wrong.length) h += '<details class="lnwrong"><summary>看答錯的 ' + wrong.length + ' 題</summary>' + wrong.map((q) => '<div class="lnw"><p>' + richH(q.prompt) + '</p><p class="note">答案：' + esc(q.opts.find((o) => o.ok).t) + '。' + richH(q.explain) + '</p></div>').join('') + '</details>';
+  h += '<div class="lngo2"><button class="btn main big" data-ln="' + (isD ? 'drill" data-d="' + LN.drill.id : 'review') + '">再一次 ▶</button><button class="btn" data-ln="map">課程表</button></div></div>';
+  return h;
+}
 function testStart() {
-  if (LN.mode === 'place') {
+  if (LN.mode === 'drill') { LN.qs = makeQuiz(LN.drill.gens, 20, LN.rng); LN.sec = LN.drill.sec; }
+  else if (LN.mode === 'review') { LN.qs = wrongSession(LP, LN.rng); LN.sec = 0; if (!LN.qs.length) { openLearn('map'); return; } }
+  else if (LN.mode === 'place') {
     LN.qs = makePlacement(LN.rng);
     for (const q of LN.qs) q.opts.push({ t: '不知道', ok: false });
   } else {
@@ -200,7 +238,7 @@ function testStart() {
     for (const q of LN.qs) q.stage = LN.stage;
   }
   LN.qi = 0; LN.res = []; LN.answered = false; LN.phase = 'q';
-  renderLearn(); window.scrollTo(0, 0);
+  renderLearn(); window.scrollTo(0, 0); startQTimer();
 }
 
 /* ===== 題目的圖 ===== */
@@ -237,8 +275,38 @@ function blockHTML(b) {
   if (b.k === 'seats') return seatsHTML(b.n, b.btn, -1, b.label);
   if (b.k === 'grid') return tierGridHTML('lnGridR') + tierLegend();
   if (b.k === 'tier') return tierBlockHTML(b.t);
+  if (b.k === 'chart') return chartBlockHTML(b.key, b.title);
+  if (b.k === 'defStats') return defStatsHTML();
+  if (b.k === 'betTable') return '<table class="stt lnt"><tr><th>對手下注</th><th class="r">勝率至少要</th></tr>' + BET_FR.map(([a, c, t]) => { const f = a / c; return '<tr><td>' + t + '</td><td class="r num"><b>' + Math.round(f / (1 + 2 * f) * 100) + '%</b></td></tr>'; }).join('') + '</table>';
+  if (b.k === 'outsTable') return '<table class="stt lnt"><tr><th>出牌</th><th class="r">翻牌→河牌<br><small>心算／實際</small></th><th class="r">轉牌→河牌<br><small>心算／實際</small></th></tr>' + [2, 4, 6, 8, 9, 12, 15].map((n) => '<tr><td>' + n + ' 張</td><td class="r num">' + (n * 4 - Math.max(0, n - 8)) + '%／' + Math.round(exactHit(n, 1) * 100) + '%</td><td class="r num">' + n * 2 + '%／' + Math.round(exactHit(n, 2) * 100) + '%</td></tr>').join('') + '</table>';
+  if (b.k === 'pushTable') return '<div class="tscroll"><table class="stt lnt"><tr><th>位置＼籌碼</th>' + PUSH_BB.map((x) => '<th class="r">' + x + ' 大盲</th>').join('') + '</tr>' + [5, 4, 3, 2, 1].map((B) => '<tr><td>' + PUSH_POS[B] + '</td>' + PUSH_BB.map((x) => '<td class="r num">' + Math.round(pushPct(x, B) * 100) + '%</td>').join('') + '</tr>').join('') + '</table></div><p class="note">數字是「前百分之幾的牌全下」（6 人桌，前面都棄牌）。</p>';
   if (b.k === 'openDiff') return '<ol class="lndiff">' + openDiffs(b.t).map((d) => '<li><b>' + esc(POS_ZH[d.pos]) + '</b><span class="note">（開 ' + Math.round(d.pct * 100) + '%）</span>' + (d.pos === 'UTG' ? '：' : '：多開 ') + d.add.map((g) => '<button type="button" class="lnh t' + HAND_TIER[g] + '" data-ln="hand" data-g="' + g + '">' + NAMEZH(g) + '</button>').join('') + '</li>').join('') + '</ol>';
   return '';
+}
+/* 一張圖表的 13×13（紅＝加注、綠＝跟注）＋範圍文字 */
+function chartBlockHTML(key, title) {
+  const R = chartRanges(key), T = chartText(key);
+  if (!R) return '';
+  let h = '<div class="lnchart"><div class="lnct"><b>' + esc(title || key) + '</b>', sr = 0, sc = 0;
+  for (let k = 0; k < NCOMBO; k++) { sr += R.raise[k]; sc += R.call[k]; }
+  h += '<span class="note">　' + (sc > 0.5 ? '加注 ' + pct(sr / NCOMBO, 0) + '%、跟注 ' + pct(sc / NCOMBO, 0) + '%' : '開 ' + pct(sr / NCOMBO, 0) + '%') + '</span></div><div class="grid13 lncg">';
+  for (let g = 0; g < 169; g++) {
+    const cs = CLASS_COMBOS[g]; let r = 0, c = 0;
+    for (const k of cs) { r += R.raise[k]; c += R.call[k]; }
+    r = r / cs.length * 100; c = c / cs.length * 100;
+    const bg = r + c < 0.5 ? '' : 'background:linear-gradient(90deg,#c9462e ' + r.toFixed(0) + '%,#3f9d6a ' + r.toFixed(0) + '% ' + (r + c).toFixed(0) + '%,#1c2a25 ' + (r + c).toFixed(0) + '%)';
+    h += '<button type="button" class="cell" data-ln="hand" data-g="' + g + '" style="' + bg + '"><span>' + className(g) + '</span></button>';
+  }
+  h += '</div><p class="note lnrt">' + (T.raise ? (sc > 0.5 ? '加注：' : '') + esc(T.raise) : '') + (T.call ? '<br>跟注：' + esc(T.call) : '') + '</p></div>';
+  return h;
+}
+function defStatsHTML() {
+  const rows = [['BB', 'EP'], ['BB', 'CO'], ['BB', 'BTN'], ['BB', 'SB'], ['SB', 'BTN'], ['IP', 'EP'], ['IP', 'CO']];
+  return '<table class="stt lnt"><tr><th>6 人桌</th><th class="r">3-bet</th><th class="r">跟注</th></tr>' + rows.map(([d, o]) => {
+    const R = chartRanges('6/vsOpen/' + d + '/' + o); if (!R) return '';
+    let r = 0, c = 0; for (let k = 0; k < NCOMBO; k++) { r += R.raise[k]; c += R.call[k]; }
+    return '<tr><td>' + DEFENDER_ZH[d].replace('（非盲注）', '') + '面對' + openerZh('6', o) + '</td><td class="r num">' + pct(r / NCOMBO, 0) + '%</td><td class="r num">' + pct(c / NCOMBO, 0) + '%</td></tr>';
+  }).join('') + '</table>';
 }
 function tierLegend() { return '<div class="lnleg">' + [1, 2, 3, 4, 5].map((t) => '<span><i style="background:' + TIER_COL[t] + '"></i>' + TIER_NAME[t] + '</span>').join('') + '</div>'; }
 function tierGridHTML(id, sel) {
@@ -329,6 +397,8 @@ function initLearn() {
     else if (a === 'dict') openLearn('dict');
     else if (a === 'place') startTest('place');
     else if (a === 'skip') startTest('skip', +b.dataset.s);
+    else if (a === 'drill') startTest('drill', b.dataset.d);
+    else if (a === 'review') startTest('review');
     else if (a === 'tstart') testStart();
     else if (a === 'pstart') { const s = +b.dataset.s; LP.place = { start: s, at: Date.now() }; for (let k = 1; k < s; k++) LP.skip[k] = true; lpSave(); openLearn('map'); }
     else if (a === 'hand') {
@@ -341,7 +411,7 @@ function initLearn() {
   document.addEventListener('keydown', (e) => {
     if ($('vLearn').hidden || e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input,textarea,select')) return;
     if (!$('lnModal').hidden) { if (e.key === 'Escape') $('lnModal').hidden = true; return; }
-    const inQ = (LN.mode === 'lesson' && (LN.phase === 'practice' || LN.phase === 'quiz')) || ((LN.mode === 'place' || LN.mode === 'skip') && LN.phase === 'q');
+    const inQ = (LN.mode === 'lesson' && (LN.phase === 'practice' || LN.phase === 'quiz')) || (LN.mode !== 'lesson' && LN.mode !== 'map' && LN.mode !== 'dict' && LN.phase === 'q');
     if (!inQ) return;
     if (!LN.answered && /^[1-6]$/.test(e.key)) { const i = +e.key - 1; if (LN.qs[LN.qi] && i < LN.qs[LN.qi].opts.length) { e.preventDefault(); answerQ(i); } }
     else if (LN.answered && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight')) { e.preventDefault(); nextQ(); }
