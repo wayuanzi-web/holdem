@@ -44,6 +44,18 @@ for (const gen of Object.keys(E.QGEN)) {
     if (gen === 'vs3bet' && kp[0] === 'v3') { const key = '6/vs3bet/' + kp[1], g = +kp[2], r = E.chartFreq(key, g, 'raise'), c = E.chartFreq(key, g, 'call'); const exp = r >= 0.75 ? '4-bet' : c >= 0.75 ? '跟注' : '棄牌'; if (ans !== exp || E.chartFreq('6/rfi/' + E.OG_RFI6[kp[1]], g) < 0.75) fail('vs3bet 錯 ' + q.key); }
     if (gen === 'setMine' && kp[0] === 'sm') { const r = +kp[2] / +kp[1]; if ((ans === '棄牌') !== (r < 20) || (r > 10 && r < 20)) fail('setMine 錯 ' + q.key); }
     if (gen === 'outsRand' && kp[0] === 'or') { const r = E.drawOuts(q.vis.hole, q.vis.board); if (!r || +ans !== r.n) fail('outsRand 錯 ' + q.key); }
+    if (gen === 'madeHand' && kp[0] === 'mh') { if (ans !== E.CATG[E.handCategory(q.vis.hole[0], q.vis.hole[1], q.vis.board)]) fail('madeHand 錯 ' + q.key); }
+    if (gen === 'textureType') { if (ans !== E.flopTexture(q.vis.board).type) fail('textureType 錯 ' + q.key); }
+    if (gen === 'texture' && kp[0] === 'tx') { const ws = q.vis.fs.map((b) => E.flopTexture(b).wet); if (ans !== '第 ' + (ws.indexOf(Math.max(...ws)) + 1) + ' 個') fail('texture 錯'); }
+    if (gen === 'cbet' && kp[0] === 'cb') { if (ans !== E.CBET_OPT[E.cbetRule(q.vis.board)]) fail('cbet 錯 ' + q.key); }
+    if (gen === 'mdf') { const fr = E.BET_FR.find((x) => x[2] === kp[1]), f = fr[0] / fr[1]; if (ans !== Math.round(100 / (1 + f)) + '%') fail('mdf 錯 ' + q.key); }
+    if (gen === 'rangeAdv' && kp[0] === 'ra') { const a = E.RANGE_ADV.find((x) => x[0] === kp[1]), b = E.RANGE_ADV.find((x) => x[0] === kp[2]); if (ans !== (a[1] > b[1] ? '第 1 個' : '第 2 個')) fail('rangeAdv 錯'); }
+    if (gen === 'combosOnBoard' && kp[0] === 'cob') {
+      const nm = kp[1], r1 = E.RANKS.indexOf(nm[0]), r2 = E.RANKS.indexOf(nm[1]), dead = new Set(q.vis.board); let n = 0;
+      for (let x = 0; x < 52; x++) for (let y = x + 1; y < 52; y++) { if (dead.has(x) || dead.has(y)) continue; const a = x >> 2, b = y >> 2; if ((a === r1 && b === r2) || (a === r2 && b === r1)) n++; }
+      if (+ans !== n) fail('combosOnBoard 錯 ' + q.key + ' ' + n);
+    }
+    if (gen === 'faceBet' && kp[0] === 'fb' && ['棄牌', '跟注', '加注'].indexOf(ans) < 0) fail('faceBet 答案怪');
     if (gen === 'rule24') { const n = +kp[1], flop = kp[2] === 'true'; if (ans !== (flop ? n * 4 - Math.max(0, n - 8) : n * 2) + '%') fail('rule24 錯'); }
   }
 }
@@ -77,11 +89,40 @@ for (const t of ['6', '9']) { const d = E.openDiffs(t); for (let i = 1; i < d.le
 // 課表
 const ls = E.allLessons(), ids = new Set(ls.map((l) => l.id));
 if (ids.size !== ls.length) fail('課號重複');
-for (const l of ls.filter((x) => x.ready)) {
+for (const l of ls.filter((x) => x.exam)) if (!E.EXAMS[l.exam] || !E.EXAM_SPOTS[E.EXAMS[l.exam].spots]) fail(l.id + ' 考核設定不見了');
+for (const l of ls.filter((x) => x.ready && !x.exam)) {
   const a = E.makeQuiz(l.practice.gens, l.practice.n, rng), b = E.makeQuiz(l.quiz.gens, l.quiz.n, rng);
   if (a.length !== l.practice.n || b.length !== l.quiz.n) fail(l.id + ' 題目不夠');
   if (l.quiz.pass > l.quiz.n) fail(l.id + ' 過關門檻比題數多');
   for (const blk of l.read) if (typeof blk === 'string' && /\[[2-9TJQKA][shdc]/.test(blk)) fail(l.id + ' 有牌沒換成符號');
+}
+// 牌力分級表的例子
+E.CATG_EX.forEach(([h, b], i) => { const H = E.parseCards(h), B = E.parseCards(b); if (E.handCategory(H[0], H[1], B) !== i) fail('牌力分級例子錯：' + E.CATG[i]); });
+// 指定牌局：任何人數、任何按鈕位置，指定的座位拿到指定的牌、公牌照指定的發
+for (let t = 0; t < 300; t++) {
+  const n = 2 + (t % 8), seat = (rng() * n) | 0, cs = E.dealN(rng, 7), hole = cs.slice(0, 2), board = cs.slice(2);
+  const T = E.newTable({ n, names: Array(n).fill('x'), styles: Array(n).fill('station'), level: 2, button: (rng() * n) | 0 });
+  const H = E.newHand(T, rng);
+  E.stackDeck(H, seat, hole, board);
+  let guard = 0;
+  while (H.phase !== 'done' && guard++ < 500) { if (H.phase === 'bet') { const L = E.legalActions(H); E.applyAction(H, L.canCheck ? { t: 'x' } : { t: 'c' }); } else E.gameStep(H); }
+  const got = H.players[seat].cards;
+  if (got.length !== 2 || got[0] !== hole[0] || got[1] !== hole[1] || H.board.join() !== board.join()) { fail('指定牌局發錯 n=' + n + ' seat=' + seat); break; }
+  const all = new Set(H.board); for (const p of H.players) for (const c of p.cards) all.add(c);
+  if (all.size !== 5 + 2 * n) { fail('指定牌局有重複的牌'); break; }
+}
+// 實戰考核：題庫的牌不重複；分數
+for (const k of Object.keys(E.EXAM_SPOTS)) for (const [h, b] of E.EXAM_SPOTS[k]) { const c = E.parseCards(h + b); if (c.length !== 7 || new Set(c).size !== 7) fail('考核題庫牌不對 ' + h + ' ' + b); }
+{
+  const X = E.examNew('6-7', rng);
+  if (X.spots.length !== 16) fail('考核題庫不是 16 個');
+  const seen = new Set(); for (let i = 0; i < 16; i++) seen.add(E.examNextSpot(X, rng)); if (seen.size !== 16) fail('考核前 16 手有重複');
+  E.examNextSpot(X, rng);
+  if (E.examAdd(X, Array(12).fill('good'))) fail('12 個就結束了');
+  if (!E.examAdd(X, ['good', 'good', 'good', 'ok', 'ok', 'bad', 'bad', 'bad', 'bad']) || X.grades.length !== 21) fail('評滿沒結束');
+  if (Math.abs(X.score - 16 / 21) > 1e-9 || !X.pass) fail('考核分數算錯 ' + X.score);
+  if (E.examAdd(X, ['good'])) fail('結束了還在加');
+  if (E.examScore(['ok', 'ok', 'bad', 'good']) !== 0.5) fail('examScore 錯');
 }
 // 分級
 const pl = E.makePlacement(rng);

@@ -60,23 +60,27 @@ function initHome() {
 }
 
 /* ===== 開新的一桌、新的一手 ===== */
-/* kind：false 一般、true GTO 訓練、'tourney' 錦標賽 */
-function newGame(kind) {
+/* kind：false 一般、true GTO 訓練、'tourney' 錦標賽、'exam' 實戰考核（examId＝哪一次考核） */
+function newGame(kind, examId) {
   G.rng = makeRng((Date.now() ^ (Math.random() * 1e9)) >>> 0);
-  const train = kind === true, tour = kind === 'tourney';
+  const train = kind === true, tour = kind === 'tourney', exam = kind === 'exam';
   GS.train = train; gsSave();
-  const n = train ? 2 : tour ? GS.tn || 6 : GS.n, level = train ? 4 : GS.level;
+  G.exam = exam ? examNew(examId, G.rng) : null;
+  const n = train || exam ? 2 : tour ? GS.tn || 6 : GS.n, level = train ? 4 : exam ? 2 : GS.level;
   const opp = makeOpponents(n, level, G.rng);
+  if (exam) opp[0].style = examVillain(G.exam);
   G.T = newTable({ n, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level, button: (G.rng() * n) | 0, tourney: tour });
   G.tEnd = null;
-  G.ctx = { hero: 0, seen: new Set(GS.seen) };
+  G.ctx = { hero: 0, seen: new Set(GS.seen), exam: exam };
   showView('table');
   nextHand();
 }
 function nextHand() {
   clearTimeout(G.timer);
-  if (G.tEnd) return;
+  if (G.tEnd || (G.exam && G.exam.done)) return;
+  if (G.exam) examPrep();
   G.H = newHand(G.T, G.rng);
+  if (G.exam) examDeal(G.H);
   G.steps = []; G.view = -1; G.review = []; G.over = false; G.replay = false; G.waitingHero = false; G.pendingAI = null; G.adv = null; G.lastRender = null; G.flash = null; G.paused = false;
   $('cOdds').open = false;
   forward();
@@ -96,7 +100,7 @@ function produce() {
     gtoReset();
     endHand(G.T, H);
     const net = H.result.net[0];
-    if (!G.T.tourney && !GS.train) { GS.hands++; GS.net += net; if (net > 0) GS.won++; }   // 首頁的數字只算一般桌
+    if (!G.T.tourney && !GS.train && !G.exam) { GS.hands++; GS.net += net; if (net > 0) GS.won++; }   // 首頁的數字只算一般桌
     gsSave();
     if (G.T.tourney) {
       const alive = G.T.seats.filter((x) => x.stack > 0).length, R = G.T.tourney;
@@ -109,7 +113,8 @@ function produce() {
       }
       else if (alive === 1) G.tEnd = { place: 1, prize: prize(1), n: R.start };
     }
-    try { statsHand(H, G.review); } catch (e) { console.error(e); }
+    if (G.exam) examHandEnd();
+    else try { statsHand(H, G.review); } catch (e) { console.error(e); }
     G.over = true;
     G.steps.push({ kind: 'summary', snap: snap(H) });
     return;
@@ -246,7 +251,7 @@ function renderTable(st) {
   for (let k = 0; k < n; k++) {
     const p = S.players[k], hero = k === 0;
     const xy = seatXY(n, k, 1);
-    const open = hero || G.replay || GS.peek || (showdown && !p.folded);
+    const open = hero || G.replay || (GS.peek && !G.exam) || (showdown && !p.folded);
     let cards = '';
     if (p.cards.length === 2 && !(p.folded && !hero && !G.replay)) {
       const cls = hero ? 'heroc' : 'small';
@@ -288,7 +293,9 @@ function renderTable(st) {
     tb.innerHTML = ['盲注 ' + S.sb + '／' + S.bb, lv >= TOURNEY_LEVELS.length - 1 ? '最高級' : rem ? rem + ' 手後升級' : '下一手升級', '剩 ' + alive + ' 人', '你排第 ' + order + '（' + fmt(S.players[0].start / S.bb, 0) + ' 大盲）'].map((x) => '<span>' + x + '</span>').join('・');
     tb.title = '錦標賽第 ' + (lv + 1) + ' 級；盲注每 ' + R.per + ' 手升一級';
     if (G.tEnd && G.over && G.view === G.steps.length - 1) tb.textContent = G.tEnd.place === 1 ? '錦標賽結束：你拿到第 1 名' : '錦標賽結束：你第 ' + G.tEnd.place + ' 名出局';
-  } else tb.hidden = true;
+  } else if (G.exam) { tb.hidden = false; tb.innerHTML = examBarHTML(); tb.title = ''; }
+  else tb.hidden = true;
+  tb.classList.toggle('exam', !!G.exam);
   $('streetBar').innerHTML = STREETBAR.map((t, i) => '<li class="' + (i === si ? 'on' : i < si ? 'done' : '') + '">' + (i === 5 && S.result && S.result.uncontested ? '結束' : t) + '</li>').join('');
   G.lastRender = { view: G.view, board: S.board.length };
 }
@@ -296,12 +303,12 @@ function renderTable(st) {
 /* ===== 教練框 ===== */
 function renderCoach(st) {
   const S = st.snap;
-  $('handNo').textContent = (GS.train ? 'GTO 訓練・' : G.T && G.T.tourney ? '錦標賽・' : '') + '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
-  $('peekWrap').hidden = G.replay;
+  $('handNo').textContent = (G.exam ? '實戰考核・' : GS.train ? 'GTO 訓練・' : G.T && G.T.tourney ? '錦標賽・' : '') + '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
+  $('peekWrap').hidden = G.replay || !!G.exam;
   $('peekChk').checked = GS.peek;
   let h = '';
   if (st.kind === 'summary') h = summaryHTML(S);
-  else if (st.kind === 'hero') h = heroHTML(st, S);
+  else if (st.kind === 'hero') h = examHiding() ? examHeroHTML(S) : heroHTML(st, S);
   else {
     h += '<h3>' + rich(st.title) + '</h3>';
     if (st.grade) {
@@ -363,6 +370,7 @@ function summaryHTML(S) {
     }
     h += '</ul>';
   } else h += '<p class="note">這一手你不用做決定。</p>';
+  if (G.exam) h += examSummaryHTML();
   h += studioOfferHTML();
   return h;
 }
@@ -403,7 +411,8 @@ function renderCtrl(st) {
     const adv = st.adv, L = legalSnapshot(st.snap);
     const e = adv.eff === undefined ? adv.eq : adv.eff;
     const why = adv.need > 0 ? '你的勝率約 ' + PCT0(e) + (e < adv.eq - 0.005 ? '（打折後）' : '') + '，跟注要 ' + PCT0(adv.need) + ' 以上' : '你的勝率約 ' + PCT0(e);
-    if (gtoAdvUsable()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<b class="rec">GTO</b> ' + gtoLine() + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
+    if (examHiding()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">考核中：自己決定，按完評分（已評 ' + G.exam.grades.length + '／' + G.exam.need + '）</span>';
+    else if (gtoAdvUsable()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<b class="rec">GTO</b> ' + gtoLine() + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
     else m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　建議 <b class="rec">' + esc(adv.label) + '</b><span class="why">（' + why + '）</span>'
       + (G.gto && !G.gto.lost && G.gto.seats.indexOf(0) >= 0 && GS.gtoCoach ? '<span class="why">　GTO 計算中…</span>' : '') + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
   } else if (G.over && atHead()) {
@@ -417,6 +426,7 @@ function renderCtrl(st) {
       m = '<b>' + (E.place === 1 ? '🏆 你拿到第 1 名！' : '你在第 ' + E.place + ' 名出局') + '</b>（' + E.n + ' 人）' + (E.prize ? '　獎金 ' + E.prize + ' 點（每人報名 100 點）' : '　沒有進獎金圈（前 ' + G.T.tourney.pay.length + ' 名）') + (marks ? '　這手：' + marks : '') + '<button type="button" class="linkbtn" data-c="why">檢討</button>';
       b = '<button class="btn main" data-c="newtourney" id="bNext">再開一場 ▶</button><button class="btn" data-c="replay">重看這一手</button><button class="btn" data-c="home">回首頁</button>';
     }
+    if (G.exam) { const x = examOverCtrl(net, marks); m = x.m; b = x.b; }
   } else if (!atHead()) {
     m = '你在看前面的步驟（第 ' + (G.view + 1) + ' 步）。';
     b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀</button><button class="btn main" data-c="next" id="bNext">下一步 ▶</button><button class="btn" data-c="now">回到現在</button>';
@@ -438,6 +448,7 @@ function renderActBtns(st) {
   let recF = adv.act.t === 'f', recP = adv.act.t === 'x' || adv.act.t === 'c', recA = adv.act.t === 'r';
   let allinRec = recA && adv.act.to >= L.maxTo;
   G.recTo = recA ? adv.act.to : 0;
+  if (examHiding()) { recF = recP = recA = allinRec = false; G.recTo = 0; }
   if (gtoAdvUsable()) {                                     // GTO 最常用的動作
     const ta = G.gtoAdv.acts[gtoBest()], b = gtoActBtn(ta, L);
     recF = b === 'f'; recP = b === 'x' || b === 'c'; recA = b === 'size' || b === 'allin'; allinRec = b === 'allin';
@@ -472,6 +483,8 @@ function ctrlCmd(c) {
   else if (c === 'skip') skipAhead();
   else if (c === 'nexthand') nextHand();
   else if (c === 'newtourney') newGame('tourney');
+  else if (c === 'exam' && G.exam) newGame('exam', G.exam.id);
+  else if (c === 'learn' && G.exam) { const l = lessonById(G.exam.id); openLearn('lesson', l); }
   else if (c === 'home') showView('home');
   else if (c === 'replay') { G.replay = true; G.view = 0; G.lastRender = null; clearTimeout(G.timer); renderCur(); }
   else if (c === 'endreplay') { G.replay = false; G.view = G.steps.length - 1; G.lastRender = null; renderCur(); }
@@ -546,7 +559,7 @@ function renderCur() {
   renderCoach(st);
   renderCtrl(st);
   if ($('cOdds').open) renderOdds();
-  $('cOdds').hidden = st.snap.players[0].folded && !G.replay;
+  $('cOdds').hidden = (st.snap.players[0].folded || (G.exam && !G.over)) && !G.replay;
 }
 
 /* ===== 牌型大小 ===== */

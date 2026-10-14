@@ -376,7 +376,7 @@ function narrate(ev, H, ctx) {
   } else if (ev.k === 'deal') {
     title = '發手牌';
     const g = heroCls(hero.cards);
-    L.push('每人兩張，只有自己看得到。你拿到 ' + CARDS_TOK(sortedCards(hero.cards)) + '（' + clsWords(g) + '）：在 169 種起手牌排第 ' + PRE_RANK[g] + ' 名，' + strengthWord(PRE_PCT[g], PRE_RANK[g]) + '。');
+    L.push('每人兩張，只有自己看得到。你拿到 ' + CARDS_TOK(sortedCards(hero.cards)) + '（' + clsWords(g) + '）' + (ctx.exam ? '。' : '：在 169 種起手牌排第 ' + PRE_RANK[g] + ' 名，' + strengthWord(PRE_PCT[g], PRE_RANK[g]) + '。'));
     if (H.toAct >= 0) L.push('翻牌前從' + name(H.toAct) + '開始說話' + (H.n > 2 ? '（大盲左邊那一位）' : '（兩人時按鈕先說話）') + '，順時針一個一個來。');
     tip = tipOnce(ctx, 'deal', '之後中間會陸續發 5 張公牌，大家共用。最後每個人用自己 2 張加 5 張公牌，挑最好的 5 張比大小。說話時可以：棄牌（放棄這一手）、跟注（跟到目前最高的注）、加注（下更多）。');
   } else if (ev.k === 'act') {
@@ -397,9 +397,9 @@ function narrate(ev, H, ctx) {
     const live = H.players.filter((q) => !q.folded);
     if (!hero.folded) {
       const v = evalCards(hero.cards.concat(H.board));
-      L.push('你現在：' + handWords(hero.cards, H.board) + '。');
+      if (!ctx.exam) L.push('你現在：' + handWords(hero.cards, H.board) + '。');      // 實戰考核：牌力、勝率都自己判斷
       void v;
-      if (ctx.info) {
+      if (ctx.info && !ctx.exam) {
         const I = ctx.info;
         if (I.draws) L.push('你有' + I.draws + '：下一張有 ' + I.outs.total + ' 張牌讓你變強。');
         const ta = live.length - 1 > 1 ? '他們' : '他';

@@ -53,7 +53,7 @@ function mapHTML() {
       const d = lessonDone(LP, l.id), cur = nx && nx.id === l.id, sc = LP.done[l.id];
       h += '<li class="' + (d ? 'd' : '') + (cur ? ' cur' : '') + '">' + (l.ready ? '<button type="button" data-ln="lesson" data-id="' + l.id + '">' : '<span class="nr">')
         + '<span class="mk">' + (d ? '✓' : cur ? '▶' : '○') + '</span><span class="lt">' + esc(l.id + '　' + l.title) + '</span>'
-        + (l.ready ? (sc ? '<span class="ls num">' + sc.s + '／' + sc.n + '</span>' : '') : '<span class="ls">製作中</span>') + (l.ready ? '</button>' : '</span>') + '</li>';
+        + (l.ready ? (sc ? '<span class="ls num">' + (sc.pct ? sc.s + '%' : sc.s + '／' + sc.n) + '</span>' : '') : '<span class="ls">製作中</span>') + (l.ready ? '</button>' : '</span>') + '</li>';
     }
     h += '</ol>';
     if (done < tot && !LP.skip[s.id] && canSkipTest(s.id)) h += '<div class="strow"><button class="btn sm" data-ln="skip" data-s="' + s.id + '">跳級測驗：8 題答對 7 題，這一階直接通過</button></div>';
@@ -66,6 +66,7 @@ function mapHTML() {
 /* ===== 上課：講解 → 練習 → 過關測驗 ===== */
 function lessonHTML() {
   const l = LN.lesson, s = COURSE.find((x) => x.id === l.stage);
+  if (l.exam) return examLessonHTML(l, s);
   const steps = [['read', '講解'], ['practice', '練習'], ['quiz', '過關測驗']];
   const curI = LN.phase === 'result' ? 2 : steps.findIndex((x) => x[0] === LN.phase);
   let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><span class="note">第 ' + s.id + ' 階　' + esc(s.name) + '</span><b>' + esc(l.id + '　' + l.title) + '</b></div></div>'
@@ -79,6 +80,22 @@ function lessonHTML() {
     h += '<div class="panel lnres"><p>練習完了：答對 <b>' + ok + '／' + LN.res.length + '</b>。</p><p>過關測驗：' + l.quiz.n + ' 題答對 ' + l.quiz.pass + ' 題過關' + (l.quiz.sec ? '，每題 <b>' + l.quiz.sec + ' 秒</b>內要答' : '') + '。</p>'
       + '<div class="lngo2"><button class="btn main big" data-ln="quiz">開始過關測驗 ▶</button><button class="btn" data-ln="practice">再練一次</button><button type="button" class="linkbtn" data-ln="reread">回去看講解</button></div></div>';
   } else if (LN.phase === 'result') h += resultHTML();
+  return h;
+}
+/* 實戰考核的課：講解 → 到牌桌；回來看上一次的成績 */
+function examLessonHTML(l, s) {
+  const X = EXAMS[l.exam], R = (LP.exam || {})[l.exam];
+  let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><span class="note">第 ' + s.id + ' 階　' + esc(s.name) + '</span><b>' + esc(l.id + '　' + l.title) + '</b></div></div>'
+    + '<ol class="lnsteps"><li class="' + (R ? 'd' : 'on') + '">講解</li><li class="' + (R ? 'on' : '') + '">實戰考核</li></ol>';
+  if (R) {
+    h += '<div class="panel lnres"><p class="lnbig">' + (R.pass ? '🎉 考核過關' : '上一次還差一點') + '</p><p>' + R.n + ' 個決定：✓ ' + R.good + '、△ ' + R.ok + '、✗ ' + R.bad + '，平均 <b>' + Math.round(R.score * 100) + '%</b>（要 ' + Math.round(X.pass * 100) + '%）。</p>';
+    const nx = learnNext(LP);
+    if (R.pass && nx && nx.id !== l.id) h += '<div class="lngo2">' + (nx.ready ? '<button class="btn main big" data-ln="go" data-id="' + nx.id + '">下一課：' + esc(nx.title) + ' ▶</button>' : '') + '<button class="btn" data-ln="exam" data-id="' + l.id + '">再考一次</button><button class="btn" data-ln="map">課程表</button></div>' + (nx.ready ? '' : '<p class="note">下一課「' + esc(nx.title) + '」還在製作中，下一批更新會上線。</p>');
+    else h += '<div class="lngo2"><button class="btn main big" data-ln="exam" data-id="' + l.id + '">' + (R.pass ? '再考一次' : '再考一次（新的牌）') + ' ▶</button><button class="btn" data-ln="map">課程表</button></div>';
+    h += '</div>';
+  }
+  h += '<div class="panel lnread">' + l.read.map(blockHTML).join('') + '</div>';
+  if (!R) h += '<div class="lngo2"><button class="btn main big" data-ln="exam" data-id="' + l.id + '">開始實戰考核（到牌桌）▶</button></div>';
   return h;
 }
 function startQs(kind) {
@@ -244,11 +261,12 @@ function testStart() {
 /* ===== 題目的圖 ===== */
 function visHTML(v) {
   if (!v) return '';
-  if (v.k === 'hand') return '<div class="lnvis"><div class="lnrow"><span class="lbl">你的牌</span>' + v.hole.map((c) => cardHTML(c)).join('') + '</div>' + (v.board && v.board.length ? '<div class="lnrow"><span class="lbl">公牌</span>' + v.board.map((c) => cardHTML(c, 'sm')).join('') + '</div>' : '') + '</div>';
+  if (v.k === 'hand') return '<div class="lnvis">' + (v.hole.length ? '<div class="lnrow"><span class="lbl">你的牌</span>' + v.hole.map((c) => cardHTML(c)).join('') + '</div>' : '') + (v.board && v.board.length ? '<div class="lnrow"><span class="lbl">公牌</span>' + v.board.map((c) => cardHTML(c, 'sm')).join('') + '</div>' : '') + '</div>';
   if (v.k === 'two') return '<div class="lnvis"><div class="lnrow"><span class="lbl">A</span>' + v.a.map((c) => cardHTML(c, 'sm')).join('') + '<span class="lbl">B</span>' + v.b.map((c) => cardHTML(c, 'sm')).join('') + '</div><div class="lnrow"><span class="lbl">公牌</span>' + v.board.map((c) => cardHTML(c, 'sm')).join('') + '</div></div>';
   if (v.k === 'cls') return '<div class="lnvis"><div class="lnrow">' + (v.pos ? '<span class="lbl">' + esc(v.pos) + '</span>' : '') + classCards(v.g).map((c) => cardHTML(c)).join('') + '<span class="lnname">' + esc(NAMEZH(v.g)) + '<small>' + esc(clsWords(v.g)) + '</small></span></div></div>';
   if (v.k === 'cls2') return '<div class="lnvis lnpair">' + [v.a, v.b].map((g) => '<div class="lnrow">' + classCards(g).map((c) => cardHTML(c, 'sm')).join('') + '<span class="lnname">' + esc(NAMEZH(g)) + '</span></div>').join('<span class="vs">vs</span>') + '</div>';
   if (v.k === 'seats') return seatsHTML(v.n, v.btn, v.hero, false);
+  if (v.k === 'flops') return '<div class="lnvis">' + v.fs.map((b, i) => '<div class="lnrow"><span class="lbl">第 ' + (i + 1) + ' 個</span>' + b.map((c) => cardHTML(c, 'sm')).join('') + '</div>').join('') + '</div>';
   return '';
 }
 /* 座位圖：順時針，D 是按鈕；label＝標位置名稱 */
@@ -280,6 +298,8 @@ function blockHTML(b) {
   if (b.k === 'betTable') return '<table class="stt lnt"><tr><th>對手下注</th><th class="r">勝率至少要</th></tr>' + BET_FR.map(([a, c, t]) => { const f = a / c; return '<tr><td>' + t + '</td><td class="r num"><b>' + Math.round(f / (1 + 2 * f) * 100) + '%</b></td></tr>'; }).join('') + '</table>';
   if (b.k === 'outsTable') return '<table class="stt lnt"><tr><th>出牌</th><th class="r">翻牌→河牌<br><small>心算／實際</small></th><th class="r">轉牌→河牌<br><small>心算／實際</small></th></tr>' + [2, 4, 6, 8, 9, 12, 15].map((n) => '<tr><td>' + n + ' 張</td><td class="r num">' + (n * 4 - Math.max(0, n - 8)) + '%／' + Math.round(exactHit(n, 1) * 100) + '%</td><td class="r num">' + n * 2 + '%／' + Math.round(exactHit(n, 2) * 100) + '%</td></tr>').join('') + '</table>';
   if (b.k === 'pushTable') return '<div class="tscroll"><table class="stt lnt"><tr><th>位置＼籌碼</th>' + PUSH_BB.map((x) => '<th class="r">' + x + ' 大盲</th>').join('') + '</tr>' + [5, 4, 3, 2, 1].map((B) => '<tr><td>' + PUSH_POS[B] + '</td>' + PUSH_BB.map((x) => '<td class="r num">' + Math.round(pushPct(x, B) * 100) + '%</td>').join('') + '</tr>').join('') + '</table></div><p class="note">數字是「前百分之幾的牌全下」（6 人桌，前面都棄牌）。</p>';
+  if (b.k === 'cats2') return '<table class="lncats"><thead><tr><th>牌力</th><th>例子（手牌｜公牌）</th></tr></thead><tbody>' + CATG_GRP.map(([cs, gn]) => '<tr class="lngrp"><td colspan="2">' + esc(gn) + '</td></tr>' + cs.map((c) => '<tr><td><b>' + CATG[c] + '</b><small>' + esc(CATG_NOTE[c]) + '</small></td><td class="cs">' + parseCards(CATG_EX[c][0]).map((x) => cardSpan(x)).join('') + '｜' + parseCards(CATG_EX[c][1]).map((x) => cardSpan(x)).join('') + '</td></tr>').join('')).join('') + '</tbody></table>';
+  if (b.k === 'radvTable') return '<div class="tscroll"><table class="stt lnt lnradv"><tr><th>翻牌</th><th class="r">按鈕勝率</th><th class="r">兩對以上<br><small>按鈕／大盲</small></th></tr>' + RANGE_ADV.slice().sort((x, y) => y[1] - x[1]).map(([f, e, nb, nbb]) => '<tr><td class="cs">' + parseCards(f).map((x) => cardSpan(x)).join('') + '</td><td class="r num"><span class="' + (e >= 0.535 ? 'rz' : e <= 0.505 ? 'cz' : '') + '">' + Math.round(e * 100) + '%</span></td><td class="r num">' + (nb > nbb ? '<b>' + pct(nb, 1) + '%</b>' : pct(nb, 1) + '%') + '／' + (nbb > nb ? '<b>' + pct(nbb, 1) + '%</b>' : pct(nbb, 1) + '%') + '</td></tr>').join('') + '</table></div><p class="note">照 6 人桌圖表的範圍（按鈕開牌、大盲跟注）一手一手算到攤牌。紅＝按鈕明顯有利，綠＝接近或大盲有利；粗體＝那一邊的大牌比較多。</p>';
   if (b.k === 'openDiff') return '<ol class="lndiff">' + openDiffs(b.t).map((d) => '<li><b>' + esc(POS_ZH[d.pos]) + '</b><span class="note">（開 ' + Math.round(d.pct * 100) + '%）</span>' + (d.pos === 'UTG' ? '：' : '：多開 ') + d.add.map((g) => '<button type="button" class="lnh t' + HAND_TIER[g] + '" data-ln="hand" data-g="' + g + '">' + NAMEZH(g) + '</button>').join('') + '</li>').join('') + '</ol>';
   return '';
 }
@@ -371,7 +391,7 @@ function renderLearnHome() {
 
 function initLearn() {
   lpLoad();
-  if (/[?&]lntest/.test(location.search)) window.__LN = LN;          // 自動測試用
+  if (/[?&]lntest/.test(location.search)) { window.__LN = LN; window.__G = G; }          // 自動測試用
   $('nLearn').addEventListener('click', () => openLearn('map'));
   $('bLearn').addEventListener('click', () => openLearn('map'));
   $('lnModalClose').addEventListener('click', () => { $('lnModal').hidden = true; });
@@ -390,6 +410,7 @@ function initLearn() {
     if (a === 'map') openLearn('map');
     else if (a === 'go' || a === 'lesson') { const l = lessonById(b.dataset.id); if (l && l.ready) openLearn('lesson', l); }
     else if (a === 'practice') startQs('practice');
+    else if (a === 'exam') { const l = lessonById(b.dataset.id); if (l && l.exam) newGame('exam', l.exam); }
     else if (a === 'quiz') startQs('quiz');
     else if (a === 'reread') { clearLnTimers(); LN.phase = 'read'; renderLearn(); window.scrollTo(0, 0); }
     else if (a === 'ans') answerQ(+b.dataset.i);

@@ -20,7 +20,7 @@ function gtoInit() {
 }
 /* 需要 GTO 嗎：單挑、你在裡面（而且開著 GTO 教練）或有 GTO 電腦 */
 function gtoWanted(seats) {
-  if (seats.indexOf(0) >= 0 && GS.gtoCoach) return true;
+  if (seats.indexOf(0) >= 0 && GS.gtoCoach && !G.exam) return true;           // 考核時不幫你算
   return seats.some((k) => G.H.players[k].style === 'gto');
 }
 /* 發了轉牌或河牌 */
