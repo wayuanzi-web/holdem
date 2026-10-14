@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1d19"><meta name="description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="德州軍師"><meta property="og:type" content="website"><meta property="og:title" content="德州軍師"><meta property="og:description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><meta property="og:image" content="https://wayuanzi-web.github.io/holdem/og.png"><meta property="og:url" content="https://wayuanzi-web.github.io/holdem/"><meta name="twitter:card" content="summary_large_image"><title>德州軍師</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%9F%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A5%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BD%86%E4%BD%8D%E4%BD%8E%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%B3%E5%83%8F%E5%83%B9%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AC%E5%85%B1%E5%85%B6%E5%85%B7%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%BE%E5%8C%85%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%AB%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%9F%E5%96%AE%E5%99%A8%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%8B%E5%9F%BA%E5%A1%97%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AD%B8%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%8D%E5%B0%8F%E5%B0%91%E5%B0%B1%E5%B0%BA%E5%B1%80%E5%B1%95%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%AB%E5%BB%BA%E5%BC%84%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%97%E5%BF%A0%E5%BF%AB%E6%80%8E%E6%80%95%E6%80%9D%E6%83%85%E6%83%B3%E6%84%8F%E6%85%A2%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%88%90%E6%88%91%E6%88%96%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%BE%E6%8A%8A%E6%8A%95%E6%8A%98%E6%8B%96%E6%8B%BF%E6%8C%89%E6%8C%91%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A8%E6%8F%90%E6%8F%9B%E6%90%B6%E6%92%9E%E6%92%AD%E6%92%B2%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%B4%E6%95%B8%E6%96%87%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%97%81%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%9B%B3%E6%9B%B4%E6%9C%80%E6%9C%83%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9F%A5%E6%A0%B8%E6%A0%BC%E6%A1%86%E6%A1%8C%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%B5%E6%A6%82%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A3%E6%AD%A5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%88%BE%E7%89%8C%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%90%86%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%99%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%B3%E7%A2%BA%E7%A2%BC%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A9%8D%E7%A9%BA%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%84%E7%B4%9A%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B6%93%E7%B6%B2%E7%B7%8A%E7%B7%9A%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8E%8A%E8%90%AC%E8%91%97%E8%91%AB%E8%92%99%E8%98%86%E8%99%9B%E8%99%A7%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%BD%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%98%E8%A8%AD%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AB%8B%E8%AB%96%E8%AD%B0%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B7%91%E8%B7%9B%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8E%E9%81%93%E9%81%A9%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%9D%E9%88%95%E9%8C%A2%E9%8C%AF%E9%90%98%E9%95%B7%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%BF%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%90%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%86%E9%A1%8F%E9%A1%9E%E9%A1%AF%E9%A6%96%E9%A9%9F%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%9F%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BD%86%E4%BD%8D%E4%BD%8E%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%B3%E5%83%8F%E5%83%B9%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AC%E5%85%B1%E5%85%B6%E5%85%B7%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%BE%E5%8C%85%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%AB%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%9F%E5%96%AE%E5%99%A8%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%8B%E5%9F%BA%E5%A1%97%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%8D%E5%B0%8F%E5%B0%91%E5%B0%B1%E5%B0%BA%E5%B1%80%E5%B1%95%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%AB%E5%BB%BA%E5%BC%84%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%97%E5%BF%A0%E5%BF%AB%E6%80%8E%E6%80%95%E6%80%9D%E6%83%85%E6%83%B3%E6%84%8F%E6%85%A2%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%88%90%E6%88%91%E6%88%96%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%BE%E6%8A%8A%E6%8A%95%E6%8A%98%E6%8B%96%E6%8B%BF%E6%8C%89%E6%8C%91%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A8%E6%8F%9B%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%B4%E6%95%B8%E6%96%87%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9C%80%E6%9C%83%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9F%A5%E6%A0%B8%E6%A0%BC%E6%A1%86%E6%A1%8C%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%B5%E6%A6%82%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A3%E6%AD%A5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%88%BE%E7%89%8C%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%90%86%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%99%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%B3%E7%A2%BA%E7%A2%BC%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A9%8D%E7%A9%BA%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%84%E7%B4%9A%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B6%93%E7%B6%B2%E7%B7%8A%E7%B7%9A%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8E%8A%E8%90%AC%E8%91%97%E8%91%AB%E8%92%99%E8%98%86%E8%99%9B%E8%99%A7%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%BD%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%98%E8%A8%AD%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AB%8B%E8%AB%96%E8%AD%B0%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B7%91%E8%B7%9B%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8E%E9%81%93%E9%81%A9%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%9D%E9%88%95%E9%8C%A2%E9%8C%AF%E9%90%98%E9%95%B7%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%BF%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%90%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8F%E9%A1%9E%E9%A1%AF%E9%A6%96%E9%A9%9F%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
 <style>
 :root {
   --ink: #0e1d19;        /* 牌桌陰影裡的深綠 */
@@ -335,7 +335,24 @@ body.intable .brand p { display: none; }
 .cd.dim { filter: brightness(.55); }
 
 /* 動作列 */
-.actbar { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+/* 控制列 */
+.ctrl { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; background: rgba(8,20,16,.92); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+.ctrlmsg { font-size: 15px; line-height: 1.45; min-height: 1.45em; }
+.ctrlmsg .rec { color: var(--brass); }
+.ctrlmsg .why { color: var(--mute); font-size: 14px; }
+.ctrlmsg .linkbtn { font-size: 14px; }
+.ctrlmsg .flash b { font-size: 17px; }
+.ctrlmsg .flash.good b { color: #6fd08f; } .ctrlmsg .flash.ok b { color: #f0c05a; } .ctrlmsg .flash.bad b { color: #f08a7a; }
+.ctrlbtns { display: flex; gap: 8px; flex-wrap: wrap; }
+.ctrlbtns .btn { flex: 1 1 auto; }
+.ctrlbtns .btn.main { flex: 2 1 auto; font-size: 17px; }
+.coach.pulse { box-shadow: 0 0 0 3px var(--brass), 0 10px 30px rgba(0,0,0,.35); }
+.loglist { margin: 4px 0; padding-left: 1.8em; max-height: 220px; overflow-y: auto; font-size: 13.5px; }
+.loglist li { padding: 2px 0; cursor: pointer; }
+.loglist li.st { font-weight: 700; margin-top: 4px; }
+.loglist li.cur { background: #efe3bf; border-radius: 4px; }
+.loglist .lmk { font-weight: 900; margin-right: 4px; }
+.loglist .lmk.good { color: #23773f; } .loglist .lmk.ok { color: #a86b06; } .loglist .lmk.bad { color: #b62d24; }
 .acts2 { display: flex; gap: 8px; flex-wrap: wrap; }
 .acts2 button { flex: 1 1 120px; padding: 12px 10px; font-size: 17px; border-radius: 12px; border: 1px solid var(--line); background: var(--felt2); cursor: pointer; position: relative; font-weight: 600; }
 .acts2 button:hover { border-color: var(--brass); }
@@ -411,8 +428,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 .codds .bar { background: #e8dcbc; margin: 0 8px; height: 8px; }
 .codds .bar i { background: #a8822e; }
 .codds tr.hl td { font-weight: 800; }
-.cnav { display: flex; gap: 8px; align-items: center; padding-top: 10px; border-top: 1px solid #e3d7b7; flex-wrap: wrap; }
-.cnav #bNext { flex: 1 1 auto; font-size: 17px; }
+
 .tog { font-size: 13px; display: flex; gap: 5px; align-items: center; cursor: pointer; user-select: none; }
 
 /* 牌型大小 */
@@ -427,6 +443,9 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 
 @media (max-width: 1000px) {
   .tv { grid-template-columns: 1fr; padding: 8px 12px 20px; }
+  /* 直向：控制列固定在畫面底部，不用往下滑就能按 */
+  body.intable .ctrl { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; margin: 0; border-radius: 14px 14px 0 0; border-width: 1px 0 0; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); box-shadow: 0 -8px 24px rgba(0,0,0,.45); background: rgba(10,24,19,.97); }
+  body.intable { padding-bottom: var(--ctrlH, 130px); }
   .coach { position: static; max-height: none; }
   #oddsBox { max-height: none; }
   .cbody { max-height: none; }
@@ -457,7 +476,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   .tv { grid-template-columns: minmax(0, 1fr) 300px; padding: 4px 8px; gap: 8px; }
   .streetbar { margin-bottom: 2px; font-size: 11px; }
   .streetbar li { padding: 1px 8px; }
-  .felt { aspect-ratio: auto; height: calc(100vh - 82px); max-height: none; }
+  .felt { aspect-ratio: auto; height: calc(100vh - 124px); max-height: none; }
   .rail { inset: 8% 5%; }
   .seat { width: 78px; gap: 1px; }
   .seat:not(.hero) .cd.back { display: none; }
@@ -474,14 +493,20 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   .board .cd { --w: 32px; } .board .slot { width: 32px; height: 45px; }
   .pot { font-size: 12px; padding: 0 10px; }
   .live { display: none; }
-  .actbar { margin-top: 4px; }
+  body.intable .ctrl { position: static; margin-top: 4px; border-radius: 12px; border-width: 1px; padding: 6px 8px; box-shadow: none; }
+  body.intable { padding-bottom: 0; }
+  .ctrl { gap: 5px; }
+  .ctrlmsg { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 0; }
+  .acts2 { flex-wrap: nowrap; gap: 6px; }
+  .acts2 button { flex: 1 1 0; min-width: 0; }
+  .acts2 button.rec::after { top: -8px; font-size: 10px; }
+  .ctrlbtns .btn { padding: 5px 10px; font-size: 14px; }
+  .ctrlbtns .btn.main { font-size: 15px; }
   .acts2 button { padding: 6px; font-size: 14px; border-radius: 9px; }
   .coach { position: sticky; top: 4px; max-height: calc(100vh - 8px); padding: 8px 10px; }
   #oddsBox { max-height: 48vh; }
   .cbody { font-size: 13.5px; min-height: 60px; }
   .cbody h3 { font-size: 15px; }
-  .cnav .btn { padding: 5px 10px; font-size: 14px; }
-  .cnav #bNext { font-size: 15px; }
 }
 
 @media (max-width: 900px) {
@@ -534,12 +559,13 @@ body.noexplain .xp, body.noexplain .how { display: none; }
     <h2 class="hometitle">坐下來，打一手德州撲克</h2>
     <p class="homelede">發牌、下注、比大小，教練每一步都會說明現在發生什麼、你的牌有多強、該怎麼做和為什麼。</p>
     <div class="field"><div class="flabel">幾個人一起玩（含你）</div><div class="pills" id="hN"></div></div>
-    <div class="field"><div class="flabel">模式</div>
+    <div class="field"><div class="flabel">怎麼進行（打牌中也可以隨時暫停、改成一步一步）</div>
       <div class="modes" id="hMode">
-        <button type="button" data-m="teach"><b>教學模式</b><span>建議新手。每一步都停下來，按「下一步」才繼續</span></button>
-        <button type="button" data-m="play"><b>一般對局</b><span>只有輪到你時才停，教練在旁邊提示</span></button>
+        <button type="button" data-m="auto"><b>自動進行</b><span>電腦自己出牌，輪到你才停；建議直接寫在動作鈕上面，想看原因再看教練框</span></button>
+        <button type="button" data-m="step"><b>逐步解說</b><span>每一件事都停下來，按「下一步」才繼續；第一次玩可以用</span></button>
       </div>
     </div>
+    <div class="field"><div class="flabel">電腦出牌的速度</div><div class="pills" id="hS"></div></div>
     <div class="field"><div class="flabel">對手強度</div><div class="pills" id="hL"></div></div>
     <div class="homego">
       <button class="btn main big" id="bStart">開始發牌</button>
@@ -557,12 +583,14 @@ body.noexplain .xp, body.noexplain .how { display: none; }
       <div class="felt" id="felt"><div class="rail"></div><div id="seats"></div>
         <div class="center"><div class="pot num" id="potTxt"></div><div class="board" id="board"></div><div class="live" id="liveTxt"></div></div>
       </div>
-      <div class="actbar" id="actBar" hidden>
-        <div class="acts2" id="actBtns"></div>
+      <div class="ctrl" id="ctrl" aria-live="polite">
         <div class="sizer" id="sizer" hidden>
           <div class="presets" id="presets"></div>
           <div class="sizerow"><input type="range" id="sizeRange" aria-label="下注大小"><button class="btn main" id="bBetGo"></button><button class="btn" id="bBetCancel">取消</button></div>
         </div>
+        <div class="ctrlmsg" id="ctrlMsg"></div>
+        <div class="acts2" id="actBtns" hidden></div>
+        <div class="ctrlbtns" id="ctrlBtns"></div>
       </div>
     </div>
     <aside class="coach" id="coach" aria-live="polite">
@@ -573,12 +601,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
       </div>
       <div class="cbody" id="cBody"></div>
       <details class="codds" id="cOdds"><summary>看勝率表</summary><div id="oddsBox"></div></details>
-      <div class="cnav" id="cNav">
-        <button class="btn" id="bPrev">◀ 上一步</button>
-        <button class="btn main" id="bNext">下一步 ▶</button>
-        <button class="btn" id="bSkip" hidden>跳到這一手結束</button>
-        <label class="tog"><input type="checkbox" id="autoChk">自動播放</label>
-      </div>
+      <details class="codds clog" id="cLog"><summary>這一手的過程</summary><ol class="loglist" id="logList"></ol><p class="note">點一行可以回去看那一步。</p></details>
     </aside>
   </div>
 </section>
@@ -2733,7 +2756,8 @@ function coachAdvice(H, rng) {
   const I = heroInfo(H, L.seat, rng, 3000);
   const pot = potTotal(H), need = L.callAmt > 0 ? L.callAmt / (pot + L.callAmt) : 0;
   const R = [], M = [];
-  const mk = (act, label) => ({ act, label, reasons: R, more: M, need, eq: I.est, rand: I.rand, info: I });
+  let effNow = null;                                   // 打折後的勝率（有算的話），控制列的一行建議用
+  const mk = (act, label) => ({ act, label, reasons: R, more: M, need, eq: I.est, eff: effNow === null ? I.est : effNow, rand: I.rand, info: I });
   const sizeLbl = (to) => (L.isBet ? '下注 ' : '加注到 ') + to;
   if (H.street === 0) {
     const raises = preflopRaises(H), limpers = preflopLimpers(H);
@@ -2778,6 +2802,7 @@ function coachAdvice(H, rng) {
     const play = isPair ? 0.95 : suited ? (pairOrSc ? 1 : 0.88) : (RANKS.indexOf(cn[1]) >= 8 ? 0.9 : 0.78);
     const real = big || L.callAmt >= p.stack ? 1 : (ip ? 0.92 : 0.8) * play * (I.nOpp > 1 ? 0.95 : 1);   // 全下就沒有之後的街，不用打折
     const eff = I.est * real;
+    effNow = eff;
     R.push(head);
     if (raises >= 2 && I.pct < 0.032 && L.canRaise) {
       const to = big ? L.maxTo : Math.min(L.maxTo, Math.round(H.curBet * 2.4));
@@ -2838,6 +2863,7 @@ function coachAdvice(H, rng) {
   }
   const ipNow = p.seat === lastToActSeat(H);
   const eff = H.street === 3 || COACH_NO_DISCOUNT ? I.est : I.est * (ipNow ? 0.97 : 0.9);
+  effNow = eff;
   if (eff >= need) { R.push(PCT0(I.est) + (eff < I.est - 0.005 ? '（沒位置打個折，約 ' + PCT0(eff) + '）' : '') + ' ≥ ' + PCT0(need) + '，跟注划算。'); return mk({ t: 'c' }, '跟注 ' + L.callAmt); }
   if (eff + implied >= need) {
     R.push('勝率差一點，但你在聽牌：中了的時候對手常常還會再付錢（隱含賠率），可以跟。');
@@ -4254,13 +4280,18 @@ function eqHowHTML(o) {
 
 /* ===== 50-game：牌局（首頁、牌桌、教練框、上一步／下一步、動作列、一手結束的檢討與重看） ===== */
 const SAVE_KEY = 'dezhou-game-1';
-const GS = { n: 6, mode: 'teach', level: 2, peek: false, auto: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false };
-function gsLoad() { try { Object.assign(GS, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) { /* 沒有存檔 */ } }
+/* flow：auto 電腦自己出牌、輪到你才停（預設）；step 每一件事都停，按「下一步」。speed：1 慢、2 中、3 快 */
+const GS = { n: 6, flow: 'auto', speed: 2, level: 2, peek: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false };
+function gsLoad() {
+  try { Object.assign(GS, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) { /* 沒有存檔 */ }
+  if (GS.flow !== 'auto' && GS.flow !== 'step') GS.flow = 'auto';     // 舊版的 teach／play 都改成自動
+  if (!(GS.speed >= 1 && GS.speed <= 3)) GS.speed = 2;
+}
 function gsSave() {
   if (G.ctx) GS.seen = [...G.ctx.seen];
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(GS)); } catch (e) { /* 存不了也能玩 */ }
 }
-const G = { T: null, H: null, steps: [], view: -1, ctx: null, rng: null, timer: 0, waitingHero: false, adv: null, review: [], replay: false, over: false, pendingAI: null, lastRender: null, oddsTok: 0 };
+const G = { T: null, H: null, steps: [], view: -1, ctx: null, rng: null, timer: 0, waitingHero: false, adv: null, review: [], replay: false, over: false, pendingAI: null, lastRender: null, oddsTok: 0, paused: false, flash: null };
 const LEVEL_ZH = { 1: '新手', 2: '普通', 3: '高手' };
 
 /* 文字裡的 {c數字} 換成有顏色的牌 */
@@ -4284,14 +4315,16 @@ function renderHome() {
   for (let k = 2; k <= 9; k++) h += '<button type="button" data-n="' + k + '" aria-pressed="' + (k === GS.n) + '">' + k + '</button>';
   $('hN').innerHTML = h;
   $('hL').innerHTML = [1, 2, 3].map((k) => '<button type="button" data-l="' + k + '" aria-pressed="' + (k === GS.level) + '">' + LEVEL_ZH[k] + '</button>').join('');
-  $('hMode').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === GS.mode)));
+  $('hMode').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === GS.flow)));
+  $('hS').innerHTML = [[1, '慢'], [2, '中'], [3, '快']].map(([k, t]) => '<button type="button" data-s="' + k + '" aria-pressed="' + (k === GS.speed) + '">' + t + '</button>').join('');
   $('bResume').hidden = !G.H;
   $('homeStats').textContent = GS.hands ? '你總共打了 ' + GS.hands + ' 手，' + (GS.net >= 0 ? '贏了 ' : '輸了 ') + Math.abs(GS.net) + ' 籌碼（' + (GS.net / GAME_BB >= 0 ? '+' : '') + (GS.net / GAME_BB).toFixed(0) + ' 個大盲）。' : '';
 }
 function initHome() {
   $('hN').addEventListener('click', (e) => { const b = e.target.closest('button[data-n]'); if (!b) return; GS.n = +b.dataset.n; gsSave(); renderHome(); });
   $('hL').addEventListener('click', (e) => { const b = e.target.closest('button[data-l]'); if (!b) return; GS.level = +b.dataset.l; gsSave(); renderHome(); });
-  $('hMode').addEventListener('click', (e) => { const b = e.target.closest('button[data-m]'); if (!b) return; GS.mode = b.dataset.m; gsSave(); renderHome(); });
+  $('hMode').addEventListener('click', (e) => { const b = e.target.closest('button[data-m]'); if (!b) return; GS.flow = b.dataset.m; gsSave(); renderHome(); });
+  $('hS').addEventListener('click', (e) => { const b = e.target.closest('button[data-s]'); if (!b) return; GS.speed = +b.dataset.s; gsSave(); renderHome(); });
   $('bStart').addEventListener('click', newGame);
   $('bResume').addEventListener('click', () => { showView('table'); renderCur(); scheduleAuto(); });
 }
@@ -4308,7 +4341,7 @@ function newGame() {
 function nextHand() {
   clearTimeout(G.timer);
   G.H = newHand(G.T, G.rng);
-  G.steps = []; G.view = -1; G.review = []; G.over = false; G.replay = false; G.waitingHero = false; G.pendingAI = null; G.adv = null; G.lastRender = null;
+  G.steps = []; G.view = -1; G.review = []; G.over = false; G.replay = false; G.waitingHero = false; G.pendingAI = null; G.adv = null; G.lastRender = null; G.flash = null; G.paused = false;
   $('cOdds').open = false;
   forward();
 }
@@ -4346,7 +4379,7 @@ function produce() {
   }
   const decide = () => { if (G.pendingAI && G.pendingAI.seat === H.toAct) { const a = G.pendingAI.a; G.pendingAI = null; return a; } return aiDecide(H, G.rng, G.T.level); };
   const ev = applyAction(H, decide());
-  if (ev.t === 'f' && GS.mode === 'teach') {
+  if (ev.t === 'f') {
     const folds = [ev.seat];
     while (H.phase === 'bet' && H.toAct > 0) {
       const a = aiDecide(H, G.rng, G.T.level);
@@ -4368,31 +4401,33 @@ function forward() {
   renderCur();
   scheduleAuto();
 }
-/* 你已經棄牌：直接跳到這一手結束 */
-function skipToEnd() {
-  clearTimeout(G.timer);
-  let guard = 0;
-  while (!G.over && !G.waitingHero && guard++ < 300) produce();
-  G.view = G.steps.length - 1;
-  renderCur();
-}
 function back() {
   clearTimeout(G.timer);
   if (G.view > 0) { G.view--; renderCur(); }
 }
+/* 自動模式：電腦的動作照速度一件一件播；你已經棄牌就快轉 */
+function isRunning() { return GS.flow === 'auto' && !G.paused && !G.replay && atHead() && !G.waitingHero && !G.over; }
+function stepDelay(st) {
+  const k = st.ev ? st.ev.k : st.kind;
+  let d = k === 'act' ? (st.ev.seat === 0 ? 450 : 750) : k === 'street' ? 950 : k === 'win' ? 1500 : k === 'show' ? 1500 : k === 'folds' ? 650 : k === 'deal' ? 700 : 450;
+  if (st.grade) d = st.grade.mark === 'good' ? 800 : 2200;                // 你剛做完決定：讓評分停久一點
+  if (st.tip) d += 2500;                                                   // 第一次遇到的規則說明
+  d *= [0, 1.6, 1, 0.55][GS.speed];
+  if (st.snap.players[0].folded && !st.grade) d = Math.min(d, 280);        // 你棄牌了：快轉
+  return d;
+}
 function scheduleAuto() {
   clearTimeout(G.timer);
-  if (!atHead() || G.waitingHero || G.over || G.replay || $('vTable').hidden) return;
-  const st = G.steps[G.view];
-  let d = 0;
-  if (GS.mode === 'play') {
-    const k = st.ev ? st.ev.k : st.kind;
-    d = k === 'act' ? (st.ev.seat === 0 ? 500 : 750) : k === 'street' ? 900 : k === 'win' ? 1600 : k === 'show' ? 1400 : k === 'folds' ? 600 : 500;
-  } else if (GS.auto) {
-    const len = (st.title || '').length + (st.lines || []).join('').length + (st.tip || '').length;
-    d = Math.min(7000, 1600 + len * 35);
-  } else return;
-  G.timer = setTimeout(forward, d);
+  if (!isRunning() || $('vTable').hidden) return;
+  G.timer = setTimeout(() => { forward(); }, stepDelay(G.steps[G.view]));
+}
+/* 跳過：一路做到輪到你或這一手結束 */
+function skipAhead() {
+  clearTimeout(G.timer);
+  let guard = 0;
+  while (!G.over && !G.waitingHero && guard++ < 400) produce();
+  G.view = G.steps.length - 1;
+  renderCur(); scheduleAuto();
 }
 /* 你按了動作 */
 function heroAct(a) {
@@ -4404,9 +4439,10 @@ function heroAct(a) {
   G.waitingHero = false;
   pushStep(eventStep(ev, { grade: g, adv }));
   G.view = G.steps.length - 1;
+  G.flash = { mark: g.mark, text: g.text, adv: adv.label, view: G.view };
+  G.sizerStep = -1;
   renderCur();
-  if (GS.mode === 'play') G.timer = setTimeout(forward, g.mark === 'good' ? 700 : 1800);
-  else scheduleAuto();
+  scheduleAuto();
 }
 
 /* ===== 畫牌桌 ===== */
@@ -4451,7 +4487,7 @@ function renderTable(st) {
   for (let k = 0; k < n; k++) {
     const p = S.players[k], hero = k === 0;
     const xy = seatXY(n, k, 1);
-    const open = hero || G.replay || (GS.peek && GS.mode === 'teach') || (showdown && !p.folded);
+    const open = hero || G.replay || GS.peek || (showdown && !p.folded);
     let cards = '';
     if (p.cards.length === 2 && !(p.folded && !hero && !G.replay)) {
       const cls = hero ? 'heroc' : 'small';
@@ -4491,11 +4527,9 @@ function renderTable(st) {
 /* ===== 教練框 ===== */
 function renderCoach(st) {
   const S = st.snap;
-  $('handNo').textContent = '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '') + (G.steps.length > 1 ? '・第 ' + (G.view + 1) + ' 步' : '');
-  $('peekWrap').hidden = GS.mode !== 'teach' || G.replay;
+  $('handNo').textContent = '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
+  $('peekWrap').hidden = G.replay;
   $('peekChk').checked = GS.peek;
-  $('autoChk').checked = GS.auto;
-  $('autoChk').parentElement.hidden = GS.mode !== 'teach' || G.replay;
   let h = '';
   if (st.kind === 'summary') h = summaryHTML(S);
   else if (st.kind === 'hero') h = heroHTML(st, S);
@@ -4509,22 +4543,27 @@ function renderCoach(st) {
     for (const l of st.lines) h += '<p>' + glossify(rich(l), used) + '</p>';
     if (st.tip) h += '<div class="tip"><b>第一次遇到，說明一下</b>' + glossify(rich(st.tip), used) + '</div>';
   }
-  if (!atHead() && !G.replay) h += '<p class="note">你在看前面的步驟；按「下一步」回到現在。</p>';
   $('cBody').innerHTML = h;
   $('cBody').scrollTop = 0;
-  // 下一步按鈕
-  const nb = $('bNext');
-  $('bPrev').disabled = G.view <= 0;
-  if (atHead() && G.waitingHero && !G.replay) { nb.disabled = true; nb.textContent = '輪到你：請選一個動作'; }
-  else if (atHead() && G.over) { nb.disabled = false; nb.textContent = '再來一手 ▶'; }
-  else { nb.disabled = false; nb.textContent = '下一步 ▶'; }
-  $('cNav').classList.toggle('playmode', GS.mode === 'play');
-  $('bSkip').hidden = !(atHead() && !G.over && !G.replay && S.players[0].folded);
+  renderLog();
+}
+/* 這一手的過程：每一步一行（自動模式播很快，想看再看） */
+function renderLog() {
+  let h = '';
+  const last = Math.min(G.view, G.steps.length - 1);
+  for (let i = 0; i <= last; i++) {
+    const st = G.steps[i];
+    if (st.kind === 'hero' || st.kind === 'summary') continue;
+    const mk = st.grade ? '<span class="lmk ' + st.grade.mark + '">' + { good: '✓', ok: '△', bad: '✗' }[st.grade.mark] + '</span>' : '';
+    h += '<li class="' + (i === G.view ? 'cur' : '') + (st.ev && st.ev.k === 'street' ? ' st' : '') + '" data-i="' + i + '">' + mk + rich(st.title) + '</li>';
+  }
+  $('logList').innerHTML = h;
+  const box = $('logList');
+  box.scrollTop = box.scrollHeight;
 }
 function heroHTML(st, S) {
   const adv = st.adv, L = legalSnapshot(S);
   let h = '<h3>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '：可以過牌') + '</h3>';
-  if (atHead() && !G.replay) h += '<p class="note">' + (GS.mode === 'teach' ? '先看看教練的建議和原因，再選一個動作；有黃框的那顆是建議。' : '選一個動作；有黃框的那顆是建議。') + '</p>';
   const used = new Set();
   h += '<div class="adv"><div class="rec">建議：' + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
   if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
@@ -4549,7 +4588,6 @@ function summaryHTML(S) {
     }
     h += '</ul>';
   } else h += '<p class="note">這一手你不用做決定。</p>';
-  h += '<div class="endbtns"><button class="btn main" data-end="next">再來一手</button><button class="btn" data-end="replay">從頭一步一步重看</button><button class="btn" data-end="home">回首頁</button>' + studioQuickBtn() + '</div>';
   h += studioOfferHTML();
   return h;
 }
@@ -4567,17 +4605,51 @@ function studioOfferHTML() {
   for (const x of ok) h += '<button class="btn' + (x === best ? ' main' : '') + '" data-studio="' + x.street + '">從' + STREET_NAME[x.street] + '開始' + (x.street === 1 ? '（很慢）' : '') + '</button>';
   return h + '</div></div>';
 }
-/* 檢討畫面的按鈕列：可以分析的話多一顆，按了捲到下面的選項 */
-function studioQuickBtn() {
-  if (!G.H || G.replay) return '';
-  return importableStreets(G.H).some((x) => x.ok) ? '<button class="btn" data-end="gto">GTO 分析這一手 ▾</button>' : '';
+/* 這一手可以送去工作室的話，回傳最好的那條街 */
+function studioBest() {
+  if (!G.H || G.replay || !G.over) return 0;
+  const ok = importableStreets(G.H).filter((x) => x.ok);
+  return ok.length ? (ok.find((x) => x.street >= 2) || ok[0]).street : 0;
 }
 
-/* ===== 動作列 ===== */
-function renderActBar(st) {
-  const show = st.kind === 'hero' && atHead() && G.waitingHero && !G.replay;
-  $('actBar').hidden = !show;
-  if (!show) return;
+/* ===== 控制列：永遠在牌桌下面（手機固定在畫面底部）。輪到你＝動作鈕；電腦在動＝暫停／跳過；結束＝再來一手 ===== */
+const MK = { good: '✓', ok: '△', bad: '✗' };
+function renderCtrl(st) {
+  const msg = $('ctrlMsg'), btns = $('ctrlBtns');
+  const heroTurn = st.kind === 'hero' && atHead() && G.waitingHero && !G.replay;
+  $('actBtns').hidden = !heroTurn;
+  let m = '', b = '';
+  // 你剛做完決定：評分留在控制列上，直到下一次輪到你
+  const fl = G.flash && !G.replay && G.flash.view === G.view ? '<span class="flash ' + G.flash.mark + '"><b>' + MK[G.flash.mark] + '</b> ' + esc(G.flash.text) + (G.flash.mark !== 'good' ? '（建議：' + esc(G.flash.adv) + '）' : '') + '</span>' : '';
+  if (G.replay) {
+    m = '重看：第 ' + (G.view + 1) + ' 步／共 ' + G.steps.length + ' 步。' + (st.title ? rich(st.title) : '');
+    b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀ 上一步</button><button class="btn main" data-c="next" id="bNext"' + (atHead() ? ' disabled' : '') + '>下一步 ▶</button><button class="btn" data-c="endreplay">結束重看</button>';
+  } else if (heroTurn) {
+    const adv = st.adv, L = legalSnapshot(st.snap);
+    const e = adv.eff === undefined ? adv.eq : adv.eff;
+    const why = adv.need > 0 ? '你的勝率約 ' + PCT0(e) + (e < adv.eq - 0.005 ? '（打折後）' : '') + '，跟注要 ' + PCT0(adv.need) + ' 以上' : '你的勝率約 ' + PCT0(e);
+    m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　建議 <b class="rec">' + esc(adv.label) + '</b><span class="why">（' + why + '）</span><button type="button" class="linkbtn" data-c="why">為什麼？</button>';
+  } else if (G.over && atHead()) {
+    const net = st.snap.result ? st.snap.result.net[0] : 0;
+    const marks = G.review.map((x) => MK[x.grade.mark]).join('');
+    m = '<b>' + (net > 0 ? '你贏了 ' + net + '！' : net < 0 ? '你輸了 ' + (-net) : '沒輸沒贏') + '</b>' + (marks ? '　你的決定：' + marks : '') + '<button type="button" class="linkbtn" data-c="why">檢討</button>';
+    b = '<button class="btn main" data-c="nexthand" id="bNext">再來一手 ▶</button><button class="btn" data-c="replay">重看這一手</button>' + (studioBest() ? '<button class="btn" data-c="gto">GTO 分析</button>' : '');
+  } else if (!atHead()) {
+    m = '你在看前面的步驟（第 ' + (G.view + 1) + ' 步）。';
+    b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀</button><button class="btn main" data-c="next" id="bNext">下一步 ▶</button><button class="btn" data-c="now">回到現在</button>';
+  } else {
+    m = fl || rich(st.title || '');
+    const folded = st.snap.players[0].folded;
+    if (isRunning()) b = '<button class="btn" data-c="pause">⏸ 暫停</button><button class="btn" data-c="skip">⏭ ' + (folded ? '跳到這一手結束' : '跳到輪到你') + '</button>';
+    else b = '<button class="btn" data-c="prev"' + (G.view <= 0 ? ' disabled' : '') + '>◀</button><button class="btn main" data-c="next" id="bNext">下一步 ▶</button><button class="btn" data-c="play">▶ 自動</button>';
+  }
+  msg.innerHTML = m;
+  btns.innerHTML = b;
+  btns.hidden = !b;
+  if (heroTurn) renderActBtns(st);
+  else $('sizer').hidden = true;
+}
+function renderActBtns(st) {
   const H = G.H, L = legalActions(H), adv = G.adv, p = H.players[0];
   const recF = adv.act.t === 'f', recP = adv.act.t === 'x' || adv.act.t === 'c', recA = adv.act.t === 'r';
   const allinRec = recA && adv.act.to >= L.maxTo;
@@ -4591,6 +4663,20 @@ function renderActBar(st) {
   $('actBtns').innerHTML = h;
   if (G.sizerStep === G.view) { const v = +$('sizeRange').value; openSizer(); if (v) { $('sizeRange').value = v; sizerLabel(); } }   // 重畫時保持打開
   else $('sizer').hidden = true;
+}
+/* 控制列的按鈕 */
+function ctrlCmd(c) {
+  if (c === 'next') { G.paused = GS.flow === 'step' ? G.paused : true; forward(); }
+  else if (c === 'prev') { G.paused = true; back(); }
+  else if (c === 'now') { G.view = G.steps.length - 1; G.paused = GS.flow === 'step'; renderCur(); scheduleAuto(); }
+  else if (c === 'pause') { G.paused = true; clearTimeout(G.timer); renderCur(); }
+  else if (c === 'play') { G.paused = false; if (GS.flow === 'step') { GS.flow = 'auto'; gsSave(); } G.view = G.steps.length - 1; renderCur(); forward(); }
+  else if (c === 'skip') skipAhead();
+  else if (c === 'nexthand') nextHand();
+  else if (c === 'replay') { G.replay = true; G.view = 0; G.lastRender = null; clearTimeout(G.timer); renderCur(); }
+  else if (c === 'endreplay') { G.replay = false; G.view = G.steps.length - 1; G.lastRender = null; renderCur(); }
+  else if (c === 'gto') { const s = studioBest(); if (s) studioFromGame(s); }
+  else if (c === 'why') { const t = $('coach'); t.classList.add('pulse'); setTimeout(() => t.classList.remove('pulse'), 900); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 function openSizer() {
   const H = G.H, L = legalActions(H), adv = G.adv;
@@ -4658,7 +4744,7 @@ function renderCur() {
   if (!st) return;
   renderTable(st);
   renderCoach(st);
-  renderActBar(st);
+  renderCtrl(st);
   if ($('cOdds').open) renderOdds();
   $('cOdds').hidden = st.snap.players[0].folded && !G.replay;
 }
@@ -4673,10 +4759,11 @@ function renderRanks() {
 function initGame() {
   gsLoad();
   initHome();
-  $('bNext').addEventListener('click', forward);
-  $('bPrev').addEventListener('click', back);
-  $('bSkip').addEventListener('click', skipToEnd);
-  $('autoChk').addEventListener('change', (e) => { GS.auto = e.target.checked; gsSave(); scheduleAuto(); });
+  $('ctrl').addEventListener('click', (e) => { const b = e.target.closest('[data-c]'); if (b && !b.disabled) ctrlCmd(b.dataset.c); });
+  if (window.ResizeObserver) new ResizeObserver(() => document.documentElement.style.setProperty('--ctrlH', ($('ctrl').offsetHeight + 14) + 'px')).observe($('ctrl'));
+  $('cLog').open = !!GS.logOpen;
+  $('cLog').addEventListener('toggle', () => { GS.logOpen = $('cLog').open; gsSave(); if ($('cLog').open) renderLog(); });
+  $('logList').addEventListener('click', (e) => { const li = e.target.closest('li[data-i]'); if (!li) return; G.paused = true; clearTimeout(G.timer); G.view = +li.dataset.i; renderCur(); });
   $('peekChk').addEventListener('change', (e) => { GS.peek = e.target.checked; gsSave(); renderCur(); });
   $('cOdds').addEventListener('toggle', () => { if ($('cOdds').open) renderOdds(); });
   $('oddsBox').addEventListener('toggle', (e) => { if (e.target.matches('details.how')) G.howOpen = e.target.open; }, true);
@@ -4702,14 +4789,8 @@ function initGame() {
   $('bBetCancel').addEventListener('click', () => { $('sizer').hidden = true; G.sizerStep = -1; });
   $('cBody').addEventListener('click', (e) => {
     const sb = e.target.closest('button[data-studio]');
-    if (sb) { studioFromGame(+sb.dataset.studio); return; }
-    const b = e.target.closest('button[data-end]'); if (!b) return;
-    if (b.dataset.end === 'next') nextHand();
-    else if (b.dataset.end === 'home') showView('home');
-    else if (b.dataset.end === 'gto') { const o = $('studioOffer'); if (o) o.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-    else if (b.dataset.end === 'replay') { G.replay = true; G.view = 0; G.lastRender = null; renderCur(); }
+    if (sb) studioFromGame(+sb.dataset.studio);
   });
-  // 重看時按到最後一步：回到檢討畫面
   $('nHome').addEventListener('click', () => showView('home'));
   $('bHomeSeal').addEventListener('click', () => showView('home'));
   $('nTools').addEventListener('click', () => showView('tools'));
@@ -4718,11 +4799,20 @@ function initGame() {
   $('nRanks').addEventListener('click', () => { renderRanks(); $('ranksModal').hidden = false; $('ranksClose').focus(); });
   $('ranksClose').addEventListener('click', () => { $('ranksModal').hidden = true; });
   $('ranksModal').addEventListener('click', (e) => { if (e.target === $('ranksModal')) $('ranksModal').hidden = true; });
+  // 鍵盤：→／空白＝下一步或再來一手；←＝上一步；輪到你時 F 棄牌、C 過牌／跟注、B 下注／加注、A 全下
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') $('ranksModal').hidden = true;
-    if ($('vTable').hidden || e.target.closest('input,textarea')) return;
-    if (e.key === 'ArrowRight' || e.key === 'Enter' && e.target === document.body) { if (!$('bNext').disabled) forward(); }
-    else if (e.key === 'ArrowLeft') back();
+    if (e.key === 'Escape') { $('ranksModal').hidden = true; $('rangeModal').hidden = true; }
+    if ($('vTable').hidden || e.target.closest('input,textarea,select') || e.ctrlKey || e.metaKey || e.altKey) return;
+    const k = e.key.toLowerCase();
+    if (!$('actBtns').hidden) {
+      const pick = { f: 'f', c: 'c', x: 'x', b: 'size', r: 'size', a: 'allin' }[k];
+      let btn = pick && $('actBtns').querySelector('[data-a="' + pick + '"]');
+      if (!btn && (k === 'c' || k === 'x')) btn = $('actBtns').querySelector('[data-a="x"],[data-a="c"]');
+      if (btn) { e.preventDefault(); btn.click(); }
+      return;
+    }
+    if (e.key === 'ArrowRight' || e.key === ' ' || (e.key === 'Enter' && e.target === document.body)) { const nb = $('bNext'); if (nb && !nb.disabled) { e.preventDefault(); nb.click(); } }
+    else if (e.key === 'ArrowLeft') ctrlCmd('prev');
   });
   let rt = 0;
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (!$('vTable').hidden && G.H && G.steps[G.view]) { G.lastRender = { view: G.view, board: G.steps[G.view].snap.board.length }; renderTable(G.steps[G.view]); } /* 只重畫桌面：教練框裡打開的解釋、下注框都保留 */ }, 150); });

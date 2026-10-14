@@ -93,7 +93,8 @@ function coachAdvice(H, rng) {
   const I = heroInfo(H, L.seat, rng, 3000);
   const pot = potTotal(H), need = L.callAmt > 0 ? L.callAmt / (pot + L.callAmt) : 0;
   const R = [], M = [];
-  const mk = (act, label) => ({ act, label, reasons: R, more: M, need, eq: I.est, rand: I.rand, info: I });
+  let effNow = null;                                   // 打折後的勝率（有算的話），控制列的一行建議用
+  const mk = (act, label) => ({ act, label, reasons: R, more: M, need, eq: I.est, eff: effNow === null ? I.est : effNow, rand: I.rand, info: I });
   const sizeLbl = (to) => (L.isBet ? '下注 ' : '加注到 ') + to;
   if (H.street === 0) {
     const raises = preflopRaises(H), limpers = preflopLimpers(H);
@@ -138,6 +139,7 @@ function coachAdvice(H, rng) {
     const play = isPair ? 0.95 : suited ? (pairOrSc ? 1 : 0.88) : (RANKS.indexOf(cn[1]) >= 8 ? 0.9 : 0.78);
     const real = big || L.callAmt >= p.stack ? 1 : (ip ? 0.92 : 0.8) * play * (I.nOpp > 1 ? 0.95 : 1);   // 全下就沒有之後的街，不用打折
     const eff = I.est * real;
+    effNow = eff;
     R.push(head);
     if (raises >= 2 && I.pct < 0.032 && L.canRaise) {
       const to = big ? L.maxTo : Math.min(L.maxTo, Math.round(H.curBet * 2.4));
@@ -198,6 +200,7 @@ function coachAdvice(H, rng) {
   }
   const ipNow = p.seat === lastToActSeat(H);
   const eff = H.street === 3 || COACH_NO_DISCOUNT ? I.est : I.est * (ipNow ? 0.97 : 0.9);
+  effNow = eff;
   if (eff >= need) { R.push(PCT0(I.est) + (eff < I.est - 0.005 ? '（沒位置打個折，約 ' + PCT0(eff) + '）' : '') + ' ≥ ' + PCT0(need) + '，跟注划算。'); return mk({ t: 'c' }, '跟注 ' + L.callAmt); }
   if (eff + implied >= need) {
     R.push('勝率差一點，但你在聽牌：中了的時候對手常常還會再付錢（隱含賠率），可以跟。');

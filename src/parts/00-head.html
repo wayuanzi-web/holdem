@@ -334,7 +334,24 @@ body.intable .brand p { display: none; }
 .cd.dim { filter: brightness(.55); }
 
 /* 動作列 */
-.actbar { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+/* 控制列 */
+.ctrl { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; background: rgba(8,20,16,.92); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+.ctrlmsg { font-size: 15px; line-height: 1.45; min-height: 1.45em; }
+.ctrlmsg .rec { color: var(--brass); }
+.ctrlmsg .why { color: var(--mute); font-size: 14px; }
+.ctrlmsg .linkbtn { font-size: 14px; }
+.ctrlmsg .flash b { font-size: 17px; }
+.ctrlmsg .flash.good b { color: #6fd08f; } .ctrlmsg .flash.ok b { color: #f0c05a; } .ctrlmsg .flash.bad b { color: #f08a7a; }
+.ctrlbtns { display: flex; gap: 8px; flex-wrap: wrap; }
+.ctrlbtns .btn { flex: 1 1 auto; }
+.ctrlbtns .btn.main { flex: 2 1 auto; font-size: 17px; }
+.coach.pulse { box-shadow: 0 0 0 3px var(--brass), 0 10px 30px rgba(0,0,0,.35); }
+.loglist { margin: 4px 0; padding-left: 1.8em; max-height: 220px; overflow-y: auto; font-size: 13.5px; }
+.loglist li { padding: 2px 0; cursor: pointer; }
+.loglist li.st { font-weight: 700; margin-top: 4px; }
+.loglist li.cur { background: #efe3bf; border-radius: 4px; }
+.loglist .lmk { font-weight: 900; margin-right: 4px; }
+.loglist .lmk.good { color: #23773f; } .loglist .lmk.ok { color: #a86b06; } .loglist .lmk.bad { color: #b62d24; }
 .acts2 { display: flex; gap: 8px; flex-wrap: wrap; }
 .acts2 button { flex: 1 1 120px; padding: 12px 10px; font-size: 17px; border-radius: 12px; border: 1px solid var(--line); background: var(--felt2); cursor: pointer; position: relative; font-weight: 600; }
 .acts2 button:hover { border-color: var(--brass); }
@@ -410,8 +427,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 .codds .bar { background: #e8dcbc; margin: 0 8px; height: 8px; }
 .codds .bar i { background: #a8822e; }
 .codds tr.hl td { font-weight: 800; }
-.cnav { display: flex; gap: 8px; align-items: center; padding-top: 10px; border-top: 1px solid #e3d7b7; flex-wrap: wrap; }
-.cnav #bNext { flex: 1 1 auto; font-size: 17px; }
+
 .tog { font-size: 13px; display: flex; gap: 5px; align-items: center; cursor: pointer; user-select: none; }
 
 /* 牌型大小 */
@@ -426,6 +442,9 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 
 @media (max-width: 1000px) {
   .tv { grid-template-columns: 1fr; padding: 8px 12px 20px; }
+  /* 直向：控制列固定在畫面底部，不用往下滑就能按 */
+  body.intable .ctrl { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; margin: 0; border-radius: 14px 14px 0 0; border-width: 1px 0 0; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); box-shadow: 0 -8px 24px rgba(0,0,0,.45); background: rgba(10,24,19,.97); }
+  body.intable { padding-bottom: var(--ctrlH, 130px); }
   .coach { position: static; max-height: none; }
   #oddsBox { max-height: none; }
   .cbody { max-height: none; }
@@ -456,7 +475,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   .tv { grid-template-columns: minmax(0, 1fr) 300px; padding: 4px 8px; gap: 8px; }
   .streetbar { margin-bottom: 2px; font-size: 11px; }
   .streetbar li { padding: 1px 8px; }
-  .felt { aspect-ratio: auto; height: calc(100vh - 82px); max-height: none; }
+  .felt { aspect-ratio: auto; height: calc(100vh - 124px); max-height: none; }
   .rail { inset: 8% 5%; }
   .seat { width: 78px; gap: 1px; }
   .seat:not(.hero) .cd.back { display: none; }
@@ -473,14 +492,20 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   .board .cd { --w: 32px; } .board .slot { width: 32px; height: 45px; }
   .pot { font-size: 12px; padding: 0 10px; }
   .live { display: none; }
-  .actbar { margin-top: 4px; }
+  body.intable .ctrl { position: static; margin-top: 4px; border-radius: 12px; border-width: 1px; padding: 6px 8px; box-shadow: none; }
+  body.intable { padding-bottom: 0; }
+  .ctrl { gap: 5px; }
+  .ctrlmsg { font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 0; }
+  .acts2 { flex-wrap: nowrap; gap: 6px; }
+  .acts2 button { flex: 1 1 0; min-width: 0; }
+  .acts2 button.rec::after { top: -8px; font-size: 10px; }
+  .ctrlbtns .btn { padding: 5px 10px; font-size: 14px; }
+  .ctrlbtns .btn.main { font-size: 15px; }
   .acts2 button { padding: 6px; font-size: 14px; border-radius: 9px; }
   .coach { position: sticky; top: 4px; max-height: calc(100vh - 8px); padding: 8px 10px; }
   #oddsBox { max-height: 48vh; }
   .cbody { font-size: 13.5px; min-height: 60px; }
   .cbody h3 { font-size: 15px; }
-  .cnav .btn { padding: 5px 10px; font-size: 14px; }
-  .cnav #bNext { font-size: 15px; }
 }
 
 @media (max-width: 900px) {
@@ -532,12 +557,13 @@ body.noexplain .xp, body.noexplain .how { display: none; }
     <h2 class="hometitle">坐下來，打一手德州撲克</h2>
     <p class="homelede">發牌、下注、比大小，教練每一步都會說明現在發生什麼、你的牌有多強、該怎麼做和為什麼。</p>
     <div class="field"><div class="flabel">幾個人一起玩（含你）</div><div class="pills" id="hN"></div></div>
-    <div class="field"><div class="flabel">模式</div>
+    <div class="field"><div class="flabel">怎麼進行（打牌中也可以隨時暫停、改成一步一步）</div>
       <div class="modes" id="hMode">
-        <button type="button" data-m="teach"><b>教學模式</b><span>建議新手。每一步都停下來，按「下一步」才繼續</span></button>
-        <button type="button" data-m="play"><b>一般對局</b><span>只有輪到你時才停，教練在旁邊提示</span></button>
+        <button type="button" data-m="auto"><b>自動進行</b><span>電腦自己出牌，輪到你才停；建議直接寫在動作鈕上面，想看原因再看教練框</span></button>
+        <button type="button" data-m="step"><b>逐步解說</b><span>每一件事都停下來，按「下一步」才繼續；第一次玩可以用</span></button>
       </div>
     </div>
+    <div class="field"><div class="flabel">電腦出牌的速度</div><div class="pills" id="hS"></div></div>
     <div class="field"><div class="flabel">對手強度</div><div class="pills" id="hL"></div></div>
     <div class="homego">
       <button class="btn main big" id="bStart">開始發牌</button>
@@ -555,12 +581,14 @@ body.noexplain .xp, body.noexplain .how { display: none; }
       <div class="felt" id="felt"><div class="rail"></div><div id="seats"></div>
         <div class="center"><div class="pot num" id="potTxt"></div><div class="board" id="board"></div><div class="live" id="liveTxt"></div></div>
       </div>
-      <div class="actbar" id="actBar" hidden>
-        <div class="acts2" id="actBtns"></div>
+      <div class="ctrl" id="ctrl" aria-live="polite">
         <div class="sizer" id="sizer" hidden>
           <div class="presets" id="presets"></div>
           <div class="sizerow"><input type="range" id="sizeRange" aria-label="下注大小"><button class="btn main" id="bBetGo"></button><button class="btn" id="bBetCancel">取消</button></div>
         </div>
+        <div class="ctrlmsg" id="ctrlMsg"></div>
+        <div class="acts2" id="actBtns" hidden></div>
+        <div class="ctrlbtns" id="ctrlBtns"></div>
       </div>
     </div>
     <aside class="coach" id="coach" aria-live="polite">
@@ -571,12 +599,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
       </div>
       <div class="cbody" id="cBody"></div>
       <details class="codds" id="cOdds"><summary>看勝率表</summary><div id="oddsBox"></div></details>
-      <div class="cnav" id="cNav">
-        <button class="btn" id="bPrev">◀ 上一步</button>
-        <button class="btn main" id="bNext">下一步 ▶</button>
-        <button class="btn" id="bSkip" hidden>跳到這一手結束</button>
-        <label class="tog"><input type="checkbox" id="autoChk">自動播放</label>
-      </div>
+      <details class="codds clog" id="cLog"><summary>這一手的過程</summary><ol class="loglist" id="logList"></ol><p class="note">點一行可以回去看那一步。</p></details>
     </aside>
   </div>
 </section>
