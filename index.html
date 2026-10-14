@@ -2566,11 +2566,11 @@ function presetSpot(key) {
 }
 
 /* 估計一次迭代要多久（毫秒）：用這台機器實測的「運算量 → 時間」比例；之後用效能測試或實際跑的速度修正 */
-const SPEED = { k: 1.9e-5, c: 1 };          // 一次迭代 ≈ work × k ＋ c 毫秒（雲端測試機）；工作室跑過一次就換成這台裝置實際的速度
+const SPEED = { k: 1.9e-5, c: 1, par: 0.8 };   // par：多執行緒時每個執行緒的效率（效能測試會照這台裝置更新）          // 一次迭代 ≈ work × k ＋ c 毫秒（雲端測試機）；工作室跑過一次就換成這台裝置實際的速度
 /* threads：幾個背景執行緒一起算（翻牌、轉牌才分得開）；compress：16 位元儲存大約慢 40% */
 function estimateTime(est, target, threads, compress) {
   const iters = target <= 0.3 ? 330 : target <= 0.5 ? 220 : 140;
-  const sp = threads >= 2 ? threads * 0.8 : 1;
+  const sp = threads >= 2 ? Math.max(1, threads * SPEED.par) : 1;
   return { iters, ms: iters * (est.work * SPEED.k + SPEED.c) * 1.1 * (compress ? 1.4 : 1) / sp };
 }
 
@@ -4726,7 +4726,7 @@ function initRvr() {
 }
 
 /* ===== 30-studio：GTO 工作室（設定局面 → 求解 → 看結果；範圍編輯器；分享連結；從牌局帶入） ===== */
-const ST_KEY = 'dezhou-studio-1', SPEED_KEY = 'dezhou-speed', MINE_KEY = 'dezhou-ranges';
+const ST_KEY = 'dezhou-studio-1', SPEED_KEY = 'dezhou-speed', PAR_KEY = 'dezhou-par', MINE_KEY = 'dezhou-ranges';
 const ST = {
   spot: null, treeKey: 'simple', target: 0.5, slot: 0,
   running: false, curId: 0, tag: 0, solved: null, solvedCfg: null, est: null,
@@ -4756,6 +4756,8 @@ function stLoad() {
     if (o && o.threads >= 0) ST.threads = o.threads;
     const r = +localStorage.getItem(SPEED_KEY);
     if (r > 0.05 && r < 50) ST.ratio = r;
+    const pe = +localStorage.getItem(PAR_KEY);
+    if (pe >= 0.2 && pe <= 1) SPEED.par = pe;
   } catch (e) { /* 忽略 */ }
   if (!ST.spot) { ST.spot = presetSpot('river'); ST.treeKey = 'custom'; ST.target = ST.spot.target; }
   normTree();
@@ -4975,7 +4977,7 @@ W.on('solve-done', (m) => {
   // 照這次的速度修正之後的估計
   const P = ST.pending;
   if (P && m.t >= 10 && P.est && P.est.work > 1e6) {         // 小的樹時間都花在固定開銷上，拿來推估大樹不準
-    const pred = (P.est.work * SPEED.k + SPEED.c) * (P.compress ? 1.4 : 1) / (P.k >= 2 ? P.k * 0.8 : 1), act = m.ms / m.t / 1.1;
+    const pred = (P.est.work * SPEED.k + SPEED.c) * (P.compress ? 1.4 : 1) / (P.k >= 2 ? Math.max(1, P.k * SPEED.par) : 1), act = m.ms / m.t / 1.1;
     const r = act / pred;
     if (r > 0.05 && r < 50) { ST.ratio = ST.ratio === 1 ? r : ST.ratio * 0.5 + r * 0.5; try { localStorage.setItem(SPEED_KEY, String(ST.ratio)); } catch (e) { /* 忽略 */ } }
   }
@@ -5805,7 +5807,7 @@ function btEstimate(sp) {
   const maxMB = deviceMB();
   BT.compress = mb > maxMB * 0.6;
   const k = threadsFor({ board: flops[0] }), iters = BT.target <= 1 ? 100 : 60;
-  const per = iters * (work * SPEED.k + SPEED.c) * 1.1 * 1.09 * (BT.compress ? 1.4 : 1) / (k >= 2 ? k * 0.8 : 1) * ST.ratio / 1000;
+  const per = iters * (work * SPEED.k + SPEED.c) * 1.1 * 1.09 * (BT.compress ? 1.4 : 1) / (k >= 2 ? Math.max(1, k * SPEED.par) : 1) * ST.ratio / 1000;
   const left = flops.length - btFilled(), tot = per * left;
   const ts = (s) => (s < 60 ? Math.max(1, Math.round(s)) + ' 秒' : s < 3600 ? Math.round(s / 60) + ' 分鐘' : (s / 3600).toFixed(1) + ' 小時');
   BT.est = { per, tot, k, mb: BT.compress ? mb / 2 : mb };
@@ -6008,12 +6010,23 @@ function benchText() {
   L.push('總時間 ' + fmt((Date.now() - BENCH.t0) / 1000, 0) + ' 秒');
   return L.join('\n');
 }
-W.on('bench-item', (m) => { BENCH.res.push(m.r); renderBench(); });
+W.on('bench-item', (m) => { BENCH.res.push(m.r); renderBench(); benchCalibrate(m.r); });
+/* 用效能測試的翻牌（3-bet 底池）速度，校正工作室和多翻牌報告的時間估計（不用先真的解一次） */
+function benchCalibrate(r) {
+  if (!r || r.key !== 'par' || !(r.per1 > 0)) return;
+  try {
+    const est = estimateSolve(presetCfg('flop3bet', { maxMB: 0 }));
+    const ratio = r.per1 / (est.work * SPEED.k + SPEED.c);
+    if (ratio > 0.05 && ratio < 50) { ST.ratio = ratio; localStorage.setItem(SPEED_KEY, String(ratio)); }
+    if (r.perK > 0 && r.k >= 2) { const pe = Math.max(0.2, Math.min(1, r.per1 / r.perK / r.k)); SPEED.par = pe; localStorage.setItem(PAR_KEY, String(pe)); }
+    BENCH.calibrated = true;
+  } catch (e) { /* 估不出來就算了 */ }
+}
 W.on('bench-step', (m) => { $('benchMsg').textContent = m.key === 'flop3bet' ? '正在測翻牌（好幾個執行緒一起算）…' : '正在解' + (PRESETS[m.key] ? PRESETS[m.key].name : '') + '：第 ' + m.t + ' 次，可剝削度 ' + fmt(m.pct, 2) + '%'; });
 W.on('bench-done', () => {
   BENCH.running = false;
   $('bBench').disabled = false; $('bCopy').disabled = false;
-  $('benchMsg').textContent = '跑完了，總共 ' + fmt((Date.now() - BENCH.t0) / 1000, 0) + ' 秒。按「複製結果」貼回對話。';
+  $('benchMsg').textContent = '跑完了，總共 ' + fmt((Date.now() - BENCH.t0) / 1000, 0) + ' 秒。' + (BENCH.calibrated ? 'GTO 工作室的時間估計已經照這台裝置的速度更新。' : '') + '按「複製結果」貼回對話。';
 });
 
 function initBench() {

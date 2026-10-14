@@ -38,12 +38,23 @@ function benchText() {
   L.push('總時間 ' + fmt((Date.now() - BENCH.t0) / 1000, 0) + ' 秒');
   return L.join('\n');
 }
-W.on('bench-item', (m) => { BENCH.res.push(m.r); renderBench(); });
+W.on('bench-item', (m) => { BENCH.res.push(m.r); renderBench(); benchCalibrate(m.r); });
+/* 用效能測試的翻牌（3-bet 底池）速度，校正工作室和多翻牌報告的時間估計（不用先真的解一次） */
+function benchCalibrate(r) {
+  if (!r || r.key !== 'par' || !(r.per1 > 0)) return;
+  try {
+    const est = estimateSolve(presetCfg('flop3bet', { maxMB: 0 }));
+    const ratio = r.per1 / (est.work * SPEED.k + SPEED.c);
+    if (ratio > 0.05 && ratio < 50) { ST.ratio = ratio; localStorage.setItem(SPEED_KEY, String(ratio)); }
+    if (r.perK > 0 && r.k >= 2) { const pe = Math.max(0.2, Math.min(1, r.per1 / r.perK / r.k)); SPEED.par = pe; localStorage.setItem(PAR_KEY, String(pe)); }
+    BENCH.calibrated = true;
+  } catch (e) { /* 估不出來就算了 */ }
+}
 W.on('bench-step', (m) => { $('benchMsg').textContent = m.key === 'flop3bet' ? '正在測翻牌（好幾個執行緒一起算）…' : '正在解' + (PRESETS[m.key] ? PRESETS[m.key].name : '') + '：第 ' + m.t + ' 次，可剝削度 ' + fmt(m.pct, 2) + '%'; });
 W.on('bench-done', () => {
   BENCH.running = false;
   $('bBench').disabled = false; $('bCopy').disabled = false;
-  $('benchMsg').textContent = '跑完了，總共 ' + fmt((Date.now() - BENCH.t0) / 1000, 0) + ' 秒。按「複製結果」貼回對話。';
+  $('benchMsg').textContent = '跑完了，總共 ' + fmt((Date.now() - BENCH.t0) / 1000, 0) + ' 秒。' + (BENCH.calibrated ? 'GTO 工作室的時間估計已經照這台裝置的速度更新。' : '') + '按「複製結果」貼回對話。';
 });
 
 function initBench() {

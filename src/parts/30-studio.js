@@ -1,5 +1,5 @@
 /* ===== 30-studio：GTO 工作室（設定局面 → 求解 → 看結果；範圍編輯器；分享連結；從牌局帶入） ===== */
-const ST_KEY = 'dezhou-studio-1', SPEED_KEY = 'dezhou-speed', MINE_KEY = 'dezhou-ranges';
+const ST_KEY = 'dezhou-studio-1', SPEED_KEY = 'dezhou-speed', PAR_KEY = 'dezhou-par', MINE_KEY = 'dezhou-ranges';
 const ST = {
   spot: null, treeKey: 'simple', target: 0.5, slot: 0,
   running: false, curId: 0, tag: 0, solved: null, solvedCfg: null, est: null,
@@ -29,6 +29,8 @@ function stLoad() {
     if (o && o.threads >= 0) ST.threads = o.threads;
     const r = +localStorage.getItem(SPEED_KEY);
     if (r > 0.05 && r < 50) ST.ratio = r;
+    const pe = +localStorage.getItem(PAR_KEY);
+    if (pe >= 0.2 && pe <= 1) SPEED.par = pe;
   } catch (e) { /* 忽略 */ }
   if (!ST.spot) { ST.spot = presetSpot('river'); ST.treeKey = 'custom'; ST.target = ST.spot.target; }
   normTree();
@@ -248,7 +250,7 @@ W.on('solve-done', (m) => {
   // 照這次的速度修正之後的估計
   const P = ST.pending;
   if (P && m.t >= 10 && P.est && P.est.work > 1e6) {         // 小的樹時間都花在固定開銷上，拿來推估大樹不準
-    const pred = (P.est.work * SPEED.k + SPEED.c) * (P.compress ? 1.4 : 1) / (P.k >= 2 ? P.k * 0.8 : 1), act = m.ms / m.t / 1.1;
+    const pred = (P.est.work * SPEED.k + SPEED.c) * (P.compress ? 1.4 : 1) / (P.k >= 2 ? Math.max(1, P.k * SPEED.par) : 1), act = m.ms / m.t / 1.1;
     const r = act / pred;
     if (r > 0.05 && r < 50) { ST.ratio = ST.ratio === 1 ? r : ST.ratio * 0.5 + r * 0.5; try { localStorage.setItem(SPEED_KEY, String(ST.ratio)); } catch (e) { /* 忽略 */ } }
   }

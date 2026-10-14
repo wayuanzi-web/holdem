@@ -53,7 +53,7 @@ function btEstimate(sp) {
   const maxMB = deviceMB();
   BT.compress = mb > maxMB * 0.6;
   const k = threadsFor({ board: flops[0] }), iters = BT.target <= 1 ? 100 : 60;
-  const per = iters * (work * SPEED.k + SPEED.c) * 1.1 * 1.09 * (BT.compress ? 1.4 : 1) / (k >= 2 ? k * 0.8 : 1) * ST.ratio / 1000;
+  const per = iters * (work * SPEED.k + SPEED.c) * 1.1 * 1.09 * (BT.compress ? 1.4 : 1) / (k >= 2 ? Math.max(1, k * SPEED.par) : 1) * ST.ratio / 1000;
   const left = flops.length - btFilled(), tot = per * left;
   const ts = (s) => (s < 60 ? Math.max(1, Math.round(s)) + ' 秒' : s < 3600 ? Math.round(s / 60) + ' 分鐘' : (s / 3600).toFixed(1) + ' 小時');
   BT.est = { per, tot, k, mb: BT.compress ? mb / 2 : mb };

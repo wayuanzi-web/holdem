@@ -128,11 +128,11 @@ function presetSpot(key) {
 }
 
 /* 估計一次迭代要多久（毫秒）：用這台機器實測的「運算量 → 時間」比例；之後用效能測試或實際跑的速度修正 */
-const SPEED = { k: 1.9e-5, c: 1 };          // 一次迭代 ≈ work × k ＋ c 毫秒（雲端測試機）；工作室跑過一次就換成這台裝置實際的速度
+const SPEED = { k: 1.9e-5, c: 1, par: 0.8 };   // par：多執行緒時每個執行緒的效率（效能測試會照這台裝置更新）          // 一次迭代 ≈ work × k ＋ c 毫秒（雲端測試機）；工作室跑過一次就換成這台裝置實際的速度
 /* threads：幾個背景執行緒一起算（翻牌、轉牌才分得開）；compress：16 位元儲存大約慢 40% */
 function estimateTime(est, target, threads, compress) {
   const iters = target <= 0.3 ? 330 : target <= 0.5 ? 220 : 140;
-  const sp = threads >= 2 ? threads * 0.8 : 1;
+  const sp = threads >= 2 ? Math.max(1, threads * SPEED.par) : 1;
   return { iters, ms: iters * (est.work * SPEED.k + SPEED.c) * 1.1 * (compress ? 1.4 : 1) / sp };
 }
 
