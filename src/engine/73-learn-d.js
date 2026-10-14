@@ -17,8 +17,12 @@ const GTO_RIVER = [
 });
 const GTO_RIVER_PROMPT = '河牌單挑：底池 5.5、雙方還有 97.5（翻牌、轉牌都過牌）。大盲過牌給你（按鈕）。';
 function gtoRowWord(r) { return r.f >= 70 ? '大多下注' : r.f <= 30 ? '大多過牌' : '混合（一半一半）'; }
+/* 照「勝率 e、下注頻率 f」一起解釋（不能只看勝率：有些強牌 GTO 反而過牌） */
 function gtoRowWhy(r) {
-  const k = r.e >= 75 ? '很強的牌：下注拿價值' : r.e <= 20 ? (r.f >= 70 ? '攤牌幾乎一定輸：拿來詐唬（不下注就一定輸）' : '攤牌幾乎一定輸') : '中等的牌：過牌攤牌（下注的話，比你差的會棄、比你好的會跟）';
+  let k;
+  if (r.f > 30 && r.f < 70) k = '混合：下注和過牌差不多好，照頻率做';
+  else if (r.f >= 70) k = r.e >= 60 ? '很強的牌：下注拿價值' : r.e <= 25 ? '攤牌幾乎一定輸：拿來詐唬（不下注就一定輸）' : '勝率不高還下注：這裡 GTO 把它當詐唬用';
+  else k = r.e >= 60 ? '夠強，但下注時只有比它好的牌會跟：過牌攤牌（或抓詐唬）' : r.e <= 25 ? '最弱的牌，但詐唬已經夠多了：過牌放棄' : '中等的牌：過牌攤牌（下注的話，比你差的會棄、比你好的會跟）';
   return 'GTO 下注 ' + r.f + '%；這手牌對大盲過牌範圍的勝率 ' + r.e + '%——' + k + '。';
 }
 /* 這手牌 GTO 怎麼打（只出明確的：≥ 70%、≤ 30%、或 40–60% 混合） */
@@ -27,9 +31,9 @@ QGEN.gtoRiver = (rng) => {
     const S = pickOne(GTO_RIVER, rng), r = pickOne(S.rows, rng);
     if ((r.f > 30 && r.f < 40) || (r.f > 60 && r.f < 70)) continue;
     const ans = gtoRowWord(r);
-    return { gen: 'gtoRiver', prompt: GTO_RIVER_PROMPT + '照 GTO 的解，這手牌通常怎麼打？', vis: { k: 'hand', hole: r.h, board: S.board },
+    return { gen: 'gtoRiver', prompt: GTO_RIVER_PROMPT + '照 GTO 的解，這手牌通常怎麼打？', vis: { k: 'hand', hole: sortedCards(r.h), board: S.board },
       opts: ['大多下注', '大多過牌', '混合（一半一半）'].map((t) => ({ t, ok: t === ans })),
-      explain: gtoRowWhy(r) + '這就是<b>兩極化</b>：按鈕下注的是最強的牌和最弱的牌，中間的牌過牌（整個範圍下注約 ' + S.ip + '%）。', key: 'gr|' + S.bs + '|' + r.h.join(',') };
+      explain: gtoRowWhy(r) + '整個範圍是<b>兩極化</b>的：按鈕下注的大多是最強的牌和最弱的牌，中間的牌過牌（整個範圍下注約 ' + S.ip + '%；個別的牌會有例外）。', key: 'gr|' + S.bs + '|' + r.h.join(',') };
   }
   return QGEN.bluffRatio(rng);
 };
@@ -41,9 +45,9 @@ QGEN.gtoPolar = (rng) => {
     if (!val.length || !mid.length || !air.length) continue;
     const three = shuffleArr([pickOne(val, rng), pickOne(mid, rng), pickOne(air, rng)], rng);
     const askBluff = rng() < 0.5, ans = three.findIndex((r) => (askBluff ? r.e <= 15 : r.e >= 25 && r.e <= 70));
-    return { gen: 'gtoPolar', prompt: GTO_RIVER_PROMPT + '這三手牌裡，' + (askBluff ? '哪一手是 GTO 拿來<b>詐唬</b>的？' : '哪一手 GTO <b>幾乎都過牌</b>？'), vis: { k: 'hands3', hs: three.map((r) => r.h), board: S.board },
+    return { gen: 'gtoPolar', prompt: GTO_RIVER_PROMPT + '這三手牌裡，' + (askBluff ? '哪一手是 GTO 拿來<b>詐唬</b>的？' : '哪一手 GTO <b>幾乎都過牌</b>？'), vis: { k: 'hands3', hs: three.map((r) => sortedCards(r.h)), board: S.board },
       opts: three.map((r, k) => ({ t: '第 ' + (k + 1) + ' 手', ok: k === ans })),
-      explain: three.map((r, k) => '第 ' + (k + 1) + ' 手 ' + cardsTok(r.h) + '：' + gtoRowWhy(r)).join('<br>') + '<br>最強的牌拿價值、最弱的牌詐唬，中等的牌過牌——兩極化。', key: 'gp|' + S.bs + '|' + three.map((r) => r.h.join('.')).join(',') + '|' + askBluff };
+      explain: three.map((r, k) => '第 ' + (k + 1) + ' 手 ' + cardsTok(sortedCards(r.h)) + '：' + gtoRowWhy(r)).join('<br>') + '<br>最強的牌拿價值、最弱的牌詐唬，中等的牌過牌——兩極化。', key: 'gp|' + S.bs + '|' + three.map((r) => r.h.join('.')).join(',') + '|' + askBluff };
   }
   return QGEN.gtoRiver(rng);
 };
@@ -106,8 +110,8 @@ addStatic('s8b', [
 addStatic('s8c', [
   { prompt: 'GTO 的解說某一手牌「下注 55%、過牌 45%」。這代表？', opts: ['這兩個動作的 EV 幾乎一樣，照頻率混著做', '下注比較好，過牌是錯的', '這手牌一定要下注', '解還沒算好'], ans: 0,
     explain: '會混合的牌，兩個動作在均衡時 EV 一樣（不然 GTO 會全部選比較好的那個）。照頻率做讓範圍平衡；偶爾選錯邊，損失也很小。' },
-  { prompt: '為什麼 GTO 不讓一種牌永遠下注、另一種牌永遠過牌？', opts: ['太好猜：對手可以針對你過牌時一定沒有強牌', '因為電腦喜歡亂數', '為了讓遊戲比較有趣', '因為兩種一樣好'], ans: 0,
-    explain: '如果某種強牌永遠下注，你過牌時就一定沒有它，對手可以放心攻擊你的過牌。混合讓兩邊的範圍都有強牌。' },
+  { prompt: '為什麼 GTO 過牌的範圍裡也要放一些強牌？', opts: ['不然對手知道你過牌就一定不強，可以放心攻擊', '因為電腦喜歡亂數', '為了讓遊戲比較有趣', '因為強牌過牌一定賺比較多'], ans: 0,
+    explain: '如果強牌全部都下注，你過牌時就一定沒有強牌，對手可以放心下注、詐唬你的過牌。過牌範圍裡留一些強牌（有時用混合、有時是整種牌都過牌），對手就不敢亂攻擊。' },
   { prompt: '真人實戰，GTO 說某手牌「下注 90%、過牌 10%」。最實際的做法？', opts: ['直接下注（當成一定這樣做）', '一定要用隨機數', '過牌', '每次都換'], ans: 0,
     explain: '頻率很高的（約 80% 以上）當成純策略就好；偏離一點點損失很小。真正要用隨機數的是接近一半一半的混合。' },
   { prompt: '真正讓你虧大錢的是哪一種錯？', opts: ['該下注的強牌過牌、該棄的牌跟到底這種大錯', '混合頻率差 10%', '下注尺寸差一點點', '隨機數用秒數而不是骰子'], ans: 0,
@@ -119,7 +123,7 @@ addStatic('s8d', [
   { prompt: '想知道「對手翻牌下注太少時，我該怎麼打」，工作室要用哪一個功能？', opts: ['節點鎖定：把對手那裡的打法固定成你看到的樣子，再重新求解', '換一張公牌', '把下注尺寸改大', '看下一張牌報告'], ans: 0,
     explain: '節點鎖定讓你假設對手偏離 GTO（例如很少下注），求解器會算出針對他的最好打法——這就是用工作室研究剝削。' },
   { prompt: '工作室算到「可剝削度 3%」就停了。這個解可以拿來學嗎？', opts: ['大方向可以參考，但細的頻率還不準；最好算到 0.5% 以下', '完全準確', '完全不能用', '3% 比 0.5% 更準'], ans: 0,
-    explain: '可剝削度越低越接近 GTO。牌局的 GTO 評分也是等解算到夠準（約 3% 以下）才用。' },
+    explain: '可剝削度越低越接近 GTO。研究、記結論最好算到 0.5% 以下；牌局裡為了速度，解算到約 3% 以下就先拿來評分（大方向已經對了，細的頻率還會變）。' },
   { prompt: '牌局結束時「GTO 分析」按鈕會做什麼？', opts: ['把這一手照每個人的動作估好範圍，帶進工作室求解，再對照你實際怎麼打', '重新發一次一樣的牌', '直接告訴你對手的牌', '把這一手刪掉'], ans: 0,
     explain: '從牌局帶入：範圍照每個人在這一手的動作估，下注選項包含你們實際用的大小；算完可以一步一步對照你的打法。' },
 ]);
@@ -131,10 +135,12 @@ function makeGradQuiz(rng) {
   GRAD_W.per.forEach((k, i) => { const s = i + 1; for (const q of makeQuiz(STAGE_GENS[s], k, rng)) { q.stage = s; out.push(q); } });
   return out;
 }
-/* 兩部分都過了就畢業：回傳是不是剛剛畢業 */
+/* 畢業前還沒完成的課（不含畢業考本身；跳過的階段算完成） */
+function gradMissing(LP) { return allLessons().filter((l) => l.id !== '8-5' && !lessonDone(LP, l.id)); }
+/* 兩部分都過、其他課也都完成了就畢業：回傳是不是剛剛畢業 */
 function gradCheck(LP) {
   const w = LP.gradW, p = LP.exam && LP.exam['8-5'];
-  if (LP.grad || !(w && w.pass && p && p.pass)) return false;
+  if (LP.grad || !(w && w.pass && p && p.pass) || gradMissing(LP).length) return false;
   LP.grad = { at: Date.now(), w: w.s, wn: w.n, p: Math.round(p.score * 100) };
   LP.done['8-5'] = { s: Math.round(p.score * 100), n: 100, pct: true, at: LP.grad.at };
   return true;
@@ -148,7 +154,7 @@ EXAMS['8-5'] = { stage: 8, n: 6, level: 3, need: 25, pass: 0.8, skipTrivial: tru
 COURSE[7].lessons = [
   { id: '8-1', title: 'GTO 是什麼、什麼時候偏離', sum: '不會被占便宜的打法；對手有明顯漏洞時才針對他。', read: [
     '<b>GTO</b>（博弈論最佳策略）是一種<b>平衡</b>的打法：雙方都照它打的時候，任何一方自己改打法都不會比較好。所以它的重點是<b>不會被剝削</b>——對手怎麼調整都占不到你便宜——不是「每一手贏最多」。',
-    '工作室裡的<b>可剝削度</b>就是在量這件事：一個完全知道你打法的對手，每手平均能多贏多少（底池的百分之幾）。GTO 是 0%；算到 0.5% 以下就很接近了。',
+    '下面常看到的 <b>EV</b> 就是第 5-1 課的<b>期望值</b>：平均每次拿回多少。工作室裡的<b>可剝削度</b>則是在量「會不會被占便宜」：一個完全知道你打法的對手，每手平均能多贏多少（底池的百分之幾）。GTO 是 0%；算到 0.5% 以下就很接近了。',
     { k: 'gtoTable' },
     { k: 'tip', html: '河牌 GTO 的骨架就是這張表：<b>下注的人</b>照「詐唬可以佔」的比例配詐唬，抓詐唬的牌跟或棄都一樣；<b>防守的人</b>照「最少要繼續」的比例跟或加注，下注的人拿任何牌詐唬都不會多賺。' },
     '<b>什麼時候偏離（剝削）</b>：對手有明顯、穩定的漏洞時，針對它打比 GTO 賺更多。',

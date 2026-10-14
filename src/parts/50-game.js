@@ -62,6 +62,8 @@ function initHome() {
 /* ===== 開新的一桌、新的一手 ===== */
 /* kind：false 一般、true GTO 訓練、'tourney' 錦標賽、'exam' 實戰考核（examId＝哪一次考核） */
 function newGame(kind, examId) {
+  clearTimeout(G.timer); clearTimeout(G.autoHero); clearTimeout(G.botT); clearTimeout(G.lockT);
+  gtoReset(); G.pendingAI = null;                                      // 上一桌沒做完的 GTO 電腦、代打都清掉
   G.rng = makeRng((Date.now() ^ (Math.random() * 1e9)) >>> 0);
   const train = kind === true, tour = kind === 'tourney', exam = kind === 'exam';
   GS.train = train; gsSave();
@@ -76,8 +78,9 @@ function newGame(kind, examId) {
   nextHand();
 }
 function nextHand() {
-  clearTimeout(G.timer);
+  clearTimeout(G.timer); clearTimeout(G.autoHero); clearTimeout(G.botT); clearTimeout(G.lockT);
   if (G.tEnd || (G.exam && G.exam.done)) return;
+  gtoReset();
   if (G.exam) examPrep();
   G.H = newHand(G.T, G.rng);
   if (G.exam) examDeal(G.H);
@@ -131,7 +134,7 @@ function produce() {
     G.waitingHero = true; G.gtoAdv = null;
     pushStep({ kind: 'hero', adv: G.adv, title: '輪到你', lines: [] });
     gtoHeroTurn(false);
-    if (((GS.train && GS.autoPre) || examAutoNow()) && H.street <= 1) G.autoHero = setTimeout(() => { if (G.waitingHero && atHead() && !G.replay) heroAct(G.adv.act, true); }, 350);
+    armAutoHero();
     return;
   }
   if (gtoBotWait(H.toAct)) return;
@@ -150,6 +153,19 @@ function produce() {
   pushStep(eventStep(ev));
 }
 function atHead() { return G.view === G.steps.length - 1; }
+/* 翻牌前（GTO 訓練的自動打翻牌前）、GTO 訓練場的翻牌前和翻牌：教練代打。離開再回來也會重新排上 */
+function autoHeroWanted() { return G.waitingHero && G.H && G.H.street <= 1 && ((GS.train && GS.autoPre) || examAutoNow()); }
+function armAutoHero() {
+  if (!autoHeroWanted() || G.autoArmed === G.steps.length) return;
+  clearTimeout(G.autoHero);
+  G.autoArmed = G.steps.length;
+  G.autoHero = setTimeout(() => {
+    G.autoArmed = -1;
+    if (!autoHeroWanted()) return;
+    if (atHead() && !G.replay && !$('vTable').hidden) heroAct(G.adv.act, true);
+    else G.autoArmed = -1;                                               // 不在現在這一步：回來時（renderCtrl）再排
+  }, 350);
+}
 function forward() {
   clearTimeout(G.timer);
   if (G.view < G.steps.length - 1) { G.view++; renderCur(); scheduleAuto(); return; }
@@ -177,7 +193,8 @@ function stepDelay(st) {
 }
 function scheduleAuto() {
   clearTimeout(G.timer);
-  if (!isRunning() || $('vTable').hidden || G.waitAI) return;
+  if (!isRunning() || $('vTable').hidden) return;
+  if (G.waitAI) { botPoll(); return; }                                 // GTO 電腦在等解：過一下再問（離開牌桌再回來也接得上）
   G.timer = setTimeout(() => { forward(); }, stepDelay(G.steps[G.view]));
 }
 /* 跳過：一路做到輪到你或這一手結束 */
@@ -187,6 +204,7 @@ function skipAhead() {
   while (!G.over && !G.waitingHero && !G.waitAI && guard++ < 400) produce();
   G.view = G.steps.length - 1;
   renderCur(); scheduleAuto();
+  if (G.waitAI && !G.waitAI.asking) afterBot();
 }
 /* 你按了動作 */
 function heroAct(a, auto) {
@@ -303,12 +321,12 @@ function renderTable(st) {
 /* ===== 教練框 ===== */
 function renderCoach(st) {
   const S = st.snap;
-  $('handNo').textContent = (G.exam ? '實戰考核・' : GS.train ? 'GTO 訓練・' : G.T && G.T.tourney ? '錦標賽・' : '') + '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
+  $('handNo').textContent = (G.exam ? (G.exam.final ? '畢業考・' : G.exam.gto ? 'GTO 訓練場・' : '實戰考核・') : GS.train ? 'GTO 訓練・' : G.T && G.T.tourney ? '錦標賽・' : '') + '第 ' + S.no + ' 手' + (G.replay ? '・重看中' : '');
   $('peekWrap').hidden = G.replay || !!G.exam;
   $('peekChk').checked = GS.peek;
   let h = '';
   if (st.kind === 'summary') h = summaryHTML(S);
-  else if (st.kind === 'hero') h = examHiding() ? examHeroHTML(S) : heroHTML(st, S);
+  else if (st.kind === 'hero') h = G.exam && !G.over && !G.replay ? examHeroHTML(S, st !== G.steps[G.steps.length - 1] || !G.waitingHero) : heroHTML(st, S);   // 考核中：這一手結束前都不顯示建議
   else {
     h += '<h3>' + rich(st.title) + '</h3>';
     if (st.grade) {
@@ -410,6 +428,8 @@ function renderCtrl(st) {
   } else if (heroTurn) {
     const adv = st.adv, L = legalSnapshot(st.snap);
     const e = adv.eff === undefined ? adv.eq : adv.eff;
+    armAutoHero();
+    examLockTick();
     const why = adv.need > 0 ? '你的勝率約 ' + PCT0(e) + (e < adv.eq - 0.005 ? '（打折後）' : '') + '，跟注要 ' + PCT0(adv.need) + ' 以上' : '你的勝率約 ' + PCT0(e);
     if (examHiding() && examAutoNow()) m = '<b>教練代打' + STREET_NAME[G.H.street] + '</b>　<span class="why">GTO 訓練場只評轉牌、河牌</span>';
     else if (examHiding() && examWaitGto()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">GTO 計算中…算好才能按（' + (G.gto.ready && G.gto.pct < 900 ? '可剝削度 ' + fmt(G.gto.pct, 1) + '%，要 3% 以下' : '準備中') + '）</span>';
@@ -452,7 +472,7 @@ function renderActBtns(st) {
   G.recTo = recA ? adv.act.to : 0;
   if (examHiding()) { recF = recP = recA = allinRec = false; G.recTo = 0; }
   const lock = examLockBtns();
-  if (gtoAdvUsable()) {                                     // GTO 最常用的動作
+  if (gtoAdvUsable() && !examHiding()) {                   // GTO 最常用的動作（考核中不顯示）
     const ta = G.gtoAdv.acts[gtoBest()], b = gtoActBtn(ta, L);
     recF = b === 'f'; recP = b === 'x' || b === 'c'; recA = b === 'size' || b === 'allin'; allinRec = b === 'allin';
     G.recTo = b === 'size' ? Math.max(L.minTo, Math.min(L.maxTo, Math.round(ta.to))) : 0;

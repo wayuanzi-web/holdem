@@ -6,7 +6,7 @@ function pctOpts(ans, cands, rng) { return numOpts(ans, cands.map((x) => Math.ro
 /* 開牌加注到多少 */
 QGEN.openSize = (rng) => {
   const bb = pickOne([2, 2, 10, 20], rng), sb = rng() < 0.25, limp = sb ? 0 : pickOne([0, 0, 1, 2], rng);
-  const pos = sb ? '小盲' : pickOne(['槍口', '劫位', '關煞位', '按鈕'], rng);
+  const pos = sb ? '小盲' : pickOne(['槍口', '劫位', '關煞位', '按鈕'].slice(limp), rng);   // 6 人桌：前面要有那麼多人才可能跛入
   const xbb = sb ? 3 : 2.5 + limp, ans = xbb * bb;
   return { gen: 'openSize', prompt: '盲注 ' + bb / 2 + '／' + bb + '，你在' + pos + '，前面' + (limp ? '有 ' + limp + ' 個人跛入（只跟大盲）' : '都棄牌') + '。照標準，加注到多少？', vis: null,
     opts: numOpts(ans, [2 * bb, 3 * bb, 2.5 * bb, (xbb + 1) * bb, 4 * bb, 5 * bb].map((x) => Math.round(x)), rng),
@@ -24,7 +24,7 @@ QGEN.bbOdds = (rng) => {
   const x = pickOne([2, 2.2, 2.5, 3, 3.5], rng), call = x - 1, pot = 0.5 + 1 + x, need = call / (pot + call);
   return { gen: 'bbOdds', prompt: '按鈕開牌加注到 ' + x + ' 個大盲，小盲棄牌。你在大盲要跟注，勝率至少要多少？', vis: null,
     opts: pctOpts(Math.round(need * 100), [call / pot * 100, x / (pot + x) * 100, need * 100 + 10, 50], rng),
-    explain: '底池 ＝ 小盲 0.5 ＋ 你的 1 ＋ 他的 ' + x + ' ＝ ' + fmt1(pot) + '。你只要再補 ' + fmt1(call) + '，跟完的底池是 ' + fmt1(pot + call) + '：' + fmt1(call) + ' ÷ ' + fmt1(pot + call) + ' ≈ ' + pctT(need) + '。這就是大盲可以防守很寬的原因（但翻牌後沒位置，勝率要打折，所以圖表沒有防到這麼寬）。', key: 'bbo|' + x };
+    explain: '底池 ＝ 小盲 0.5 ＋ 你的 1 ＋ 他的 ' + x + ' ＝ ' + fmt1(pot) + '。你只要再補 ' + fmt1(call) + '，跟完的底池是 ' + fmt1(pot + call) + '：' + fmt1(call) + ' ÷ ' + fmt1(pot + call) + ' ≈ ' + pctT(need) + '。這就是大盲可以防守很寬的原因（但翻牌後沒位置，勝率要打折——第 5-4 課——所以圖表沒有防到這麼寬）。', key: 'bbo|' + x };
 };
 /* 3-bet 加到多少 */
 QGEN.threeBetSize = (rng) => {
@@ -130,26 +130,27 @@ QGEN.setMine = (rng) => {
   return QGEN.betNeed(rng);
 };
 /* 勝率打折 */
-const REAL_FAC = [[0.92, '有位置'], [0.8, '沒位置'], [0.9, '不同花'], [0.78, '不同花又不相連'], [0.95, '多人底池'], [0.95, '後面還有人沒說話']];
+const REAL_FAC = [[0.92, '有位置'], [0.8, '沒位置'], [0.9, '不同花的大牌（兩張都 10 以上）'], [0.78, '不同花、有一張小牌'], [0.95, '多人底池'], [0.95, '後面還有人沒說話'], [0.95, '口袋對子'], [0.88, '同花但不相連']];
+function spreadOpts(ans, cands, gap) { const out = []; for (const x0 of cands) { const x = Math.round(x0); if (x > 0 && x < 100 && Math.abs(x - ans) >= gap && out.every((y) => Math.abs(y - x) >= gap)) out.push(x); } return out; }
 QGEN.effEq = (rng) => {
   const est = 0.3 + ((rng() * 30) | 0) / 100, pos = rng() < 0.5 ? REAL_FAC[0] : REAL_FAC[1];
-  const fs = [pos].concat(rng() < 0.6 ? [pickOne([REAL_FAC[2], REAL_FAC[3]], rng)] : []).concat(rng() < 0.4 ? [REAL_FAC[5]] : []);
+  const fs = [pos].concat(rng() < 0.7 ? [pickOne([REAL_FAC[2], REAL_FAC[3], REAL_FAC[6], REAL_FAC[7]], rng)] : []).concat(rng() < 0.4 ? [REAL_FAC[5]] : []);
   const eff = fs.reduce((a, f) => a * f[0], est), ans = Math.round(eff * 100);
   return { gen: 'effEq', prompt: '你的牌「一路比到攤牌」的勝率是 ' + Math.round(est * 100) + '%。這手' + fs.map((f) => f[1]).join('、') + '。照教練的折數，打折後大約多少？', vis: null,
-    opts: pctOpts(ans, [est * 100, ans + 6, ans - 7, est * 90, est * 70], rng),
-    explain: Math.round(est * 100) + '% ' + fs.map((f) => '× ' + f[0].toFixed(2) + '（' + f[1] + '）').join(' ') + ' ≈ ' + ans + '%。記住：有位置 ×0.92、沒位置 ×0.80；不同花 ×0.90、不同花又不相連 ×0.78；多人或後面還有人 ×0.95；全下、河牌不打折。', key: 'eff|' + est + '|' + fs.map((f) => f[1]).join() };
+    opts: pctOpts(ans, spreadOpts(ans, [est * 100, ans + 6, ans - 7, est * 90, est * 70, ans + 12, ans - 13], 3), rng),
+    explain: Math.round(est * 100) + '% ' + fs.map((f) => '× ' + f[0].toFixed(2) + '（' + f[1] + '）').join(' ') + ' ≈ ' + ans + '%。翻牌前教練的折數：有位置 ×0.92、沒位置 ×0.80；口袋對子 ×0.95、同花但不相連 ×0.88、不同花的大牌 ×0.90、不同花有小牌 ×0.78（同花連張不打折）；多人或後面還有人 ×0.95；全下、河牌不打折。', key: 'eff|' + est + '|' + fs.map((f) => f[1]).join() };
 };
 /* 短碼推或棄 */
 const PUSH_POS = { 5: '槍口', 4: '劫位', 3: '關煞位', 2: '按鈕', 1: '小盲' };
 QGEN.pushFold = (rng) => {
   for (let i = 0; i < 400; i++) {
     const B = 1 + ((rng() * 5) | 0), bb = pickOne([3, 4, 5, 6, 7, 8, 9, 10, 11, 12], rng), p = pushPct(bb, B);
-    const g = (rng() * 169) | 0, x = PRE_PCT[g];
+    const g = (rng() * 169) | 0, x = PUSH_PCT[g];
     if (!(x < p * 0.8 || x > p * 1.25)) continue;
     const ans = x < p ? '全下' : '棄牌';
     if (ans === '棄牌' && x > 0.95) continue;
     return { gen: 'pushFold', prompt: '6 人桌，你只剩 ' + bb + ' 個大盲，在' + PUSH_POS[B] + '，前面都棄牌。拿 ' + NAMEZH(g) + '：', vis: { k: 'cls', g, pos: PUSH_POS[B] }, opts: [{ t: '全下', ok: ans === '全下' }, { t: '棄牌', ok: ans === '棄牌' }],
-      explain: '這個籌碼、這個位置大約推前 ' + pctT(p) + ' 的牌；' + NAMEZH(g) + ' 排在前 ' + pctT(x) + '，' + (ans === '全下' ? '在裡面，全下。' : '不在裡面，棄牌。') + '籌碼越短、越後面的位置，推得越寬。', key: 'pf|' + B + '|' + bb + '|' + g };
+      explain: '這個籌碼、這個位置大約推前 ' + pctT(p) + ' 的牌；' + NAMEZH(g) + ' 在推或棄的排名排在前 ' + pctT(x) + '，' + (ans === '全下' ? '在裡面，全下。' : '不在裡面，棄牌。') + '籌碼越短、越後面的位置，推得越寬。', key: 'pf|' + B + '|' + bb + '|' + g };
   }
   return QGEN.betNeed(rng);
 };
@@ -193,8 +194,8 @@ addStatic('s3d', [
 addStatic('s4a', [
   { prompt: '同樣是大盲，面對「槍口開牌」和「按鈕開牌」，防守範圍應該？', opts: ['面對槍口要緊很多', '一樣寬', '面對槍口要更寬', '都只用 AA'], ans: 0,
     explain: '槍口只開約 19% 的好牌，按鈕開約 42%。對手越緊，你要越好的牌才繼續：6 人桌圖表大盲面對槍口防約 19%，面對按鈕防約一半。' },
-  { prompt: '面對加注，「跟注」最適合哪一種牌？', opts: ['有位置、翻牌後能中大牌的（對子、同花連張、同花大牌）', '不同花的弱 A', '任何牌，因為只是跟注', '只有 AA'], ans: 0,
-    explain: '跟注之後要打翻牌：有位置、能中大牌、不怕被壓制的牌最適合。不同花的弱牌被壓制、又難中大牌，棄。' },
+  { prompt: '你在按鈕，前面有人加注開局。「跟注」最適合哪一種牌？', opts: ['翻牌後能中大牌的（對子、同花連張、同花大牌）', '不同花的弱 A', '任何牌，因為只是跟注', '只有 AA'], ans: 0,
+    explain: '跟注之後要打翻牌：有位置、能中大牌、不怕被壓制的牌最適合。不同花的弱 A 被壓制、又難中大牌，棄（只有大盲面對後位開牌時，價錢便宜到可以跟）。' },
 ]);
 addStatic('s4c', [
   { prompt: '對槍口（很緊）的開牌，哪一組是標準的「價值 3-bet」？', opts: ['QQ 以上、AK', 'JJ、TT、AQ', '小對子', '同花連張'], ans: 0,
@@ -213,8 +214,8 @@ addStatic('s5c', [
     explain: '公牌很明顯能成同花時，對手會小心，你中了也贏得少——隱含賠率比你想的小。' },
 ]);
 addStatic('s5d', [
-  { prompt: '哪一種情況勝率打折最多？', opts: ['沒位置、不同花又不相連', '有位置、口袋對子', '全下', '河牌'], ans: 0,
-    explain: '沒位置 ×0.80、不同花不相連 ×0.78，加起來只剩六成多；全下和河牌之後沒有下注，不用打折。' },
+  { prompt: '翻牌前跟注，哪一種情況勝率打折最多？', opts: ['沒位置、不同花又有一張小牌（像 K7o）', '有位置、口袋對子', '全下', '河牌'], ans: 0,
+    explain: '沒位置 ×0.80、不同花有小牌 ×0.78，加起來只剩六成多；全下和河牌之後沒有下注，不用打折。' },
 ]);
 
 /* ===== 第 3–5 階的課 ===== */
@@ -230,11 +231,11 @@ COURSE[2].lessons = [
     '加注大小<b>不要</b>跟著牌的好壞變：好牌加大、普通的加小，對手很快就看得出來。',
   ], practice: { gens: ['openSize', 's3a'], n: 6 }, quiz: { gens: ['openSize', 's3a', 'openSize'], n: 8, pass: 7 } },
   { id: '3-2', title: '前位開牌', sum: '後面越多人，越要緊：前位的範圍和常見錯誤。', read: [
-    '前位（6 人桌的槍口、劫位；9 人桌的槍口到低劫位）開牌最緊：<b>後面越多人沒說話，越可能有人拿到比你好的牌</b>，而且翻牌後你常常要先說話。',
+    '前面的位置（6 人桌的槍口，加上算中位的劫位；9 人桌的槍口到低劫位）開牌最緊：<b>後面越多人沒說話，越可能有人拿到比你好的牌</b>，而且翻牌後你常常要先說話。',
     { k: 'chart', key: '6/rfi/UTG', title: '6 人桌・槍口開牌' },
     { k: 'chart', key: '9/rfi/UTG', title: '9 人桌・槍口開牌' },
     '範圍的寫法：<b>＋ 代表「以上」</b>，44+ 是 44 到 AA；A2s+ 是 A2s 到 AKs；K9s+ 是 K9s 到 KQs。',
-    '前位最常見的錯：開了不同花的弱牌（A9o、KTo）、小對子以為能中三條。被後面的人 3-bet 時這些牌只能棄，白白丟掉開牌的錢。',
+    '前位最常見的錯：開了不同花的弱牌（A9o、KTo），或開了比圖表還小的對子（6 人桌槍口開到 44、9 人桌開到 77）。被後面的人 3-bet 時這些牌只能棄，白白丟掉開牌的錢。',
   ], practice: { gens: OPEN_EARLY, n: 8 }, quiz: { gens: OPEN_EARLY, n: 8, pass: 7 } },
   { id: '3-3', title: '後位開牌與偷盲', sum: '關煞位、按鈕開得寬；偷盲的數學。', read: [
     '關煞位和按鈕是賺最多錢的位置：後面只剩一兩個人（加上盲注），翻牌後常常最後說話。',
@@ -265,7 +266,7 @@ COURSE[3].lessons = [
     '有人加注開局時，你有三個選擇：<b>再加注（3-bet）</b>、<b>跟注</b>、<b>棄牌</b>。',
     '<b>先看他從哪裡開</b>：槍口開的牌最緊（6 人桌約 19%），按鈕、小盲開得很寬（42–48%）。他越緊，你要越好的牌才繼續。',
     '<b>再看你的位置</b>：在他後面（有位置）可以多跟一些；在盲注（沒位置）跟注很難打，所以除了大盲，常常是「3-bet 或棄牌」。',
-    '<b>3-bet</b> 的牌分兩種：價值（比他大部分的牌都好，例如 QQ 以上、AK）和詐唬（擋牌又好打，例如 A5s）。<b>跟注</b>的牌：有位置或價錢便宜、翻牌後能中大牌的（對子、同花連張、同花大牌）。不同花的弱牌——棄。',
+    '<b>3-bet</b> 的牌分兩種：價值（比他大部分的牌都好，例如 QQ 以上、AK）和詐唬（擋牌又好打，例如 A5s）。<b>跟注</b>的牌：有位置或價錢便宜、翻牌後能中大牌的（對子、同花連張、同花大牌）。不同花的弱牌——棄；<b>例外是大盲面對後位（關煞位、按鈕、小盲）開牌</b>：價錢最便宜，很多不同花的牌（像 A5o、K9o、T8o）也要跟（下一課）。',
     { k: 'defStats' },
   ], practice: { gens: [['defend', { spots: DEF_ALL }], 's4a'], n: 8 }, quiz: { gens: [['defend', { spots: DEF_ALL }], 's4a', ['defend', { spots: DEF_ALL }]], n: 8, pass: 7 } },
   { id: '4-2', title: '大盲防守', sum: '價錢最便宜，所以防最寬；但沒位置要打折。', read: [
@@ -283,7 +284,7 @@ COURSE[3].lessons = [
   { id: '4-4', title: '3-bet 的詐唬牌', sum: '為什麼要混詐唬、該用哪些牌。', read: [
     '只用價值牌 3-bet，對手很快就讀得出來：你一 3-bet 他就棄。所以要混一些<b>詐唬 3-bet</b>。',
     '好的詐唬牌：<b>A5s–A2s</b>（擋住他的 A，他拿 AA、AK 的機會變小；被跟還有同花、小順子）、<b>同花連張、同花隔張</b>（被跟了翻牌也能中東西）。不好的詐唬牌：不同花的弱牌（被跟就沒戲）。',
-    '比例大約：<b>價值 2 份、詐唬 1 份</b>。對手很少 4-bet、常常棄牌時可以多詐唬；對手很愛 4-bet 時少詐唬。',
+    '比例照對手的位置變：<b>面對按鈕開牌</b>，大盲的 3-bet 大約價值 3 份、詐唬 2 份；<b>面對槍口開牌</b>幾乎都是價值（詐唬只有一點點 A5s、A4s）。對手很少 4-bet、常常棄牌時可以多詐唬；對手很愛 4-bet 時少詐唬。',
     '詐唬的 3-bet 被 4-bet：<b>直接棄</b>，不要跟。',
   ], practice: { gens: [['defend', { spots: [['BB', 'BTN'], ['BB', 'SB']], hands: 'A5s,A4s,A3s,A2s,K9s,Q9s,J9s,T8s,76s,65s,54s' }], 's4d'], n: 6 }, quiz: { gens: [['defend', { spots: [['BB', 'BTN'], ['BB', 'SB'], ['IP', 'CO']] }], 's4d', ['defend', { spots: [['BB', 'BTN']], hands: 'A5s,A4s,A3s,A2s,K9s,Q9s,J9s,T8s,76s,65s,54s,K7o,Q8o,J8o,T8o,A8o,A7o' }]], n: 8, pass: 7 } },
   { id: '4-5', title: '面對 3-bet 與 4-bet', sum: '開牌被 3-bet、3-bet 被 4-bet 怎麼辦。', read: [
@@ -319,14 +320,14 @@ COURSE[4].lessons = [
   ], practice: { gens: ['setMine', 's5c'], n: 6 }, quiz: { gens: ['setMine', 's5c', 'setMine'], n: 8, pass: 7 } },
   { id: '5-4', title: '勝率實現與打折', sum: '「一路比到攤牌」的勝率要打折才是實際拿得到的。', read: [
     '算出來的勝率是「<b>一定看到最後、攤牌比大小</b>」的勝率。但之後大家還會下注，你沒中牌時常常只能棄——那部分勝率拿不到。實際拿得到的比例叫<b>勝率實現</b>。',
-    { k: 'tip', html: '教練用的折數：<b>有位置 ×0.92、沒位置 ×0.80</b>；不同花 ×0.90、不同花又不相連 ×0.78；多人底池、後面還有人沒說話各 ×0.95；<b>全下、河牌不打折</b>。' },
-    '例：勝率 40%，有位置、不同花、後面還有人沒說話：40% × 0.92 × 0.90 × 0.95 ≈ <b>31%</b>。要跟的價錢要 38% 的話——棄。',
+    { k: 'tip', html: '教練翻牌前用的折數：<b>有位置 ×0.92、沒位置 ×0.80</b>；牌的種類：同花連張不打折、口袋對子 ×0.95、同花但不相連 ×0.88、不同花的大牌（兩張都 10 以上）×0.90、不同花又有一張小牌 ×0.78；多人底池、後面還有人沒說話各 ×0.95。翻牌後：你最後說話 ×0.97、後面還有人說話 ×0.90。<b>全下、河牌不打折</b>。' },
+    '例：勝率 40%，有位置、不同花的大牌（像 KJo）、後面還有人沒說話：40% × 0.92 × 0.90 × 0.95 ≈ <b>31%</b>。要跟的價錢要 38% 的話——棄。',
     '這些折數是經驗值（參考 GTO 解的平均）。要把之後每一條街都真的算進去，要用 GTO 工作室求解（第 8 階）。',
   ], practice: { gens: ['effEq', 's5d'], n: 6 }, quiz: { gens: ['effEq', 's5d', 'effEq'], n: 8, pass: 7 } },
   { id: '5-5', title: '短碼推或棄', sum: '12 個大盲以下：全下或棄；面對全下怎麼算。', read: [
     '籌碼剩 <b>12 個大盲以下</b>：加注之後就沒什麼空間打翻牌了，打法簡化成<b>全下或棄牌</b>。',
     { k: 'pushTable' },
-    '看表：<b>籌碼越短、位置越後，推得越寬</b>（小盲 4 個大盲時推九成的牌）。表裡是「前百分之幾的牌」，排名就是第 2 階教的強度排名。',
+    '看表：<b>籌碼越短、位置越後，推得越寬</b>（小盲 4 個大盲時推九成的牌）。表裡是「前百分之幾的牌」，用的是<b>推或棄的排名</b>：照「被跟的時候的勝率」排，跟第 2 階的開牌排名不一樣——<b>對子和帶 A 的牌比較前面</b>（例如 22 約在前 18%），同花連張比較後面（87s 約在前 33%），因為全下之後沒有翻牌後可以打，只看攤牌的勝率。',
     '面對別人全下：先算你要的勝率（大盲跟短碼全下，價錢通常很好），再估你的牌對他範圍的勝率。短碼全下的範圍很寬，所以 A 高、K 高常常就夠跟。',
   ], practice: { gens: ['pushFold', 'callShove'], n: 8 }, quiz: { gens: ['pushFold', 'callShove'], n: 8, pass: 7 } },
   { id: '5-6', title: '心算快答', sum: '賠率、出牌、推或棄：5 秒內答。', read: [

@@ -39,13 +39,25 @@ for (const gen of Object.keys(E.QGEN)) {
     if (gen === 'stealMath') { const r = +kp[1]; if (ans !== Math.round(r / (r + 1.5) * 100) + '%') fail('stealMath 錯'); }
     if (gen === 'openSize') { const bb = +kp[1], limp = +kp[2], sb = kp[3] === 'true'; if (+ans !== (sb ? 3 : 2.5 + limp) * bb) fail('openSize 錯 ' + q.key); }
     if (gen === 'callOrFold' && kp[0] === 'cof') { const pot = +kp[1], bet = +kp[2], eq = +kp[3], ev = eq * (pot + 2 * bet) - bet; if ((ans === '跟注') !== (ev > 0)) fail('callOrFold 錯 ' + q.key); }
-    if (gen === 'pushFold' && kp[0] === 'pf') { const B = +kp[1], bb = +kp[2], g = +kp[3]; if ((ans === '全下') !== (E.PRE_PCT[g] < E.pushPct(bb, B))) fail('pushFold 錯 ' + q.key); }
+    if (gen === 'pushFold' && kp[0] === 'pf') { const B = +kp[1], bb = +kp[2], g = +kp[3]; if ((ans === '全下') !== (E.PUSH_PCT[g] < E.pushPct(bb, B))) fail('pushFold 錯 ' + q.key); }
     if (gen === 'callShove' && kp[0] === 'cs') { const B = +kp[1], st = +kp[2], g = +kp[3], eq = E.eqVsTop(g, E.pushPct(st, B)), need = (st - 1) / (2 * st + 0.5); if ((ans === '跟注') !== (eq >= need)) fail('callShove 錯 ' + q.key); }
     if (gen === 'vs3bet' && kp[0] === 'v3') { const key = '6/vs3bet/' + kp[1], g = +kp[2], r = E.chartFreq(key, g, 'raise'), c = E.chartFreq(key, g, 'call'); const exp = r >= 0.75 ? '4-bet' : c >= 0.75 ? '跟注' : '棄牌'; if (ans !== exp || E.chartFreq('6/rfi/' + E.OG_RFI6[kp[1]], g) < 0.75) fail('vs3bet 錯 ' + q.key); }
     if (gen === 'setMine' && kp[0] === 'sm') { const r = +kp[2] / +kp[1]; if ((ans === '棄牌') !== (r < 20) || (r > 10 && r < 20)) fail('setMine 錯 ' + q.key); }
     if (gen === 'outsRand' && kp[0] === 'or') { const r = E.drawOuts(q.vis.hole, q.vis.board); if (!r || +ans !== r.n) fail('outsRand 錯 ' + q.key); }
-    if (gen === 'madeHand' && kp[0] === 'mh') { if (ans !== E.CATG[E.handCategory(q.vis.hole[0], q.vis.hole[1], q.vis.board)]) fail('madeHand 錯 ' + q.key); }
-    if (gen === 'textureType') { if (ans !== E.flopTexture(q.vis.board).type) fail('textureType 錯 ' + q.key); }
+    if (gen === 'madeHand' && kp[0] === 'mh') {
+      if (ans !== E.CATG[E.handCategory(q.vis.hole[0], q.vis.hole[1], q.vis.board)]) fail('madeHand 錯 ' + q.key);
+      // 錯的選項不能也成立：有同花聽牌就不能拿「同花聽牌」當錯的
+      const all = q.vis.hole.concat(q.vis.board), sc = [0, 0, 0, 0]; for (const x of all) sc[x & 3]++;
+      const fd = sc[q.vis.hole[0] & 3] === 4 || sc[q.vis.hole[1] & 3] === 4;
+      if (fd && ans !== '同花聽牌' && q.opts.some((o) => !o.ok && o.t === '同花聽牌')) fail('madeHand 兩個答案都對 ' + q.key);
+    }
+    if (gen === 'textureType') {
+      if (ans !== E.flopTexture(q.vis.board).type) fail('textureType 錯 ' + q.key);
+      // 照課文的定義再檢查一次：乾＝三種花色、任兩張差 3 點以上；濕＝兩張同花又有兩張差 2 點以內，或三張擠在 5 點以內
+      const rs = q.vis.board.map((c) => c >> 2).sort((a, b) => a - b), ns = new Set(q.vis.board.map((c) => c & 3)).size, gaps = [rs[1] - rs[0], rs[2] - rs[1]];
+      if (ans === '乾' && !(ns === 3 && gaps.every((x) => x >= 3) && !(rs[2] === 12 && rs[0] <= 1))) fail('乾的定義不對 ' + q.key);
+      if (ans === '濕' && !(ns < 3 && gaps.some((x) => x <= 2 && x > 0)) && !(rs[2] - rs[0] <= 4 && gaps.every((x) => x > 0))) fail('濕的定義不對 ' + q.key);
+    }
     if (gen === 'texture' && kp[0] === 'tx') { const ws = q.vis.fs.map((b) => E.flopTexture(b).wet); if (ans !== '第 ' + (ws.indexOf(Math.max(...ws)) + 1) + ' 個') fail('texture 錯'); }
     if (gen === 'cbet' && kp[0] === 'cb') { if (ans !== E.CBET_OPT[E.cbetRule(q.vis.board)]) fail('cbet 錯 ' + q.key); }
     if (gen === 'mdf') { const fr = E.BET_FR.find((x) => x[2] === kp[1]), f = fr[0] / fr[1]; if (ans !== Math.round(100 / (1 + f)) + '%') fail('mdf 錯 ' + q.key); }
@@ -56,7 +68,12 @@ for (const gen of Object.keys(E.QGEN)) {
       if (+ans !== n) fail('combosOnBoard 錯 ' + q.key + ' ' + n);
     }
     if (gen === 'faceBet' && kp[0] === 'fb' && ['棄牌', '跟注', '加注'].indexOf(ans) < 0) fail('faceBet 答案怪');
-    if (gen === 'gtoRiver' && kp[0] === 'gr') { const S = E.GTO_RIVER.find((x) => x.bs === kp[1]), r = S.rows.find((x) => x.h.join(',') === kp[2]); if (ans !== E.gtoRowWord(r)) fail('gtoRiver 錯 ' + q.key); }
+    if (gen === 'gtoRiver' && kp[0] === 'gr') {
+      const S = E.GTO_RIVER.find((x) => x.bs === kp[1]), r = S.rows.find((x) => x.h.join(',') === kp[2]);
+      if (ans !== E.gtoRowWord(r)) fail('gtoRiver 錯 ' + q.key);
+      const w = E.gtoRowWhy(r).split('——')[1];
+      if ((r.f <= 30 && /下注拿價值|拿來詐唬/.test(w)) || (r.f >= 70 && /過牌/.test(w))) fail('gtoRiver 解釋跟答案相反 ' + q.key);
+    }
     if (gen === 'gtoPolar' && kp[0] === 'gp') {
       const S = E.GTO_RIVER.find((x) => x.bs === kp[1]), hs = kp[2].split(',').map((t) => t.split('.').join(',')), rows = hs.map((h) => S.rows.find((x) => x.h.join(',') === h)), bluff = kp[3] === 'true';
       const i = +ans.match(/\d/)[0] - 1, r = rows[i];
@@ -152,7 +169,12 @@ for (const S of E.GTO_RIVER) {
   L3.gradW = { s: 27, n: 30, pass: true };
   if (E.gradCheck(L3)) fail('只有筆試就畢業了');
   L3.exam['8-5'] = { score: 0.84, pass: true, n: 25, good: 20, ok: 2, bad: 3 };
-  if (!E.gradCheck(L3) || !L3.grad || !L3.done['8-5']) fail('兩部分都過沒有畢業');
+  if (E.gradCheck(L3)) fail('課沒上完就畢業了');
+  for (let k = 1; k <= 7; k++) L3.skip[k] = true;
+  for (const id of ['8-1', '8-2', '8-3']) L3.done[id] = { s: 8, n: 8 };
+  if (E.gradCheck(L3) || E.gradMissing(L3).map((l) => l.id).join() !== '8-4') fail('8-4 沒完成應該不能畢業');
+  L3.done['8-4'] = { s: 80, n: 100, pct: true };
+  if (!E.gradCheck(L3) || !L3.grad || !L3.done['8-5']) fail('兩部分都過、課都上完沒有畢業');
   if (E.gradCheck(L3)) fail('畢業兩次');
   if (E.lessonDone(L3, '8-5') !== true) fail('畢業沒有標成完成');
   if (!E.NO_SKIP[8]) fail('第 8 階應該不能跳級');

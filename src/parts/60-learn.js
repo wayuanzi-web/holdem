@@ -3,7 +3,7 @@ const LN_KEY = 'dezhou-learn-1';
 let LP = null;                                                 // 進度（存在這台裝置）
 const LN = { mode: 'map', lesson: null, phase: 'read', qs: [], qi: 0, res: [], answered: false, timer: 0, t0: 0, sec: 0, rng: null, kind: '', stage: 0, dictG: -1, autoT: 0 };
 function lpLoad() { try { LP = Object.assign(learnBlank(), JSON.parse(localStorage.getItem(LN_KEY) || 'null') || {}); } catch (e) { LP = learnBlank(); } }
-function lpSave() { try { localStorage.setItem(LN_KEY, JSON.stringify(LP)); } catch (e) { /* 存不了也能上課 */ } }
+function lpSave() { if (LP && !LP.grad && typeof gradCheck === 'function') gradCheck(LP); try { localStorage.setItem(LN_KEY, JSON.stringify(LP)); } catch (e) { /* 存不了也能上課 */ } }
 const lnRng = () => makeRng((Date.now() ^ (Math.random() * 1e9)) >>> 0);
 const TIER_COL = ['', '#c9462e', '#d98a2b', '#c9b13a', '#3f9d6a', '#3b5a50'];
 /* 課程文字是程式裡寫好的（可信），可以有 <b> 等標記；只把 {c數字} 換成牌 */
@@ -13,7 +13,8 @@ const richH = (s) => String(s).replace(/\{c(\d+)\}/g, (m, c) => cardSpan(+c));
 function openLearn(mode, arg) {
   clearLnTimers();
   LN.mode = mode || 'map';
-  if (LN.mode === 'lesson') { LN.lesson = arg; LN.phase = 'read'; }
+  LN.phase = 'read'; LN.answered = false;                            // 離開題目畫面：鍵盤不會再答到看不見的題目
+  if (LN.mode === 'lesson') LN.lesson = arg;
   if (LN.mode === 'dict') LN.dictG = arg === undefined ? (LN.dictG >= 0 ? LN.dictG : 0) : arg;
   showView('learn');
   renderLearn();
@@ -90,6 +91,7 @@ function examLessonHTML(l, s) {
   const X = EXAMS[l.exam], R = (LP.exam || {})[l.exam];
   let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><span class="note">第 ' + s.id + ' 階　' + esc(s.name) + '</span><b>' + esc(l.id + '　' + l.title) + '</b></div></div>'
     + '<ol class="lnsteps"><li class="' + (R ? 'd' : 'on') + '">講解</li><li class="' + (R ? 'on' : '') + '">實戰考核</li></ol>';
+  h += examResumeHTML(l.exam);
   if (R) {
     h += '<div class="panel lnres"><p class="lnbig">' + (R.pass ? '🎉 考核過關' : '上一次還差一點') + '</p><p>' + R.n + ' 個決定：✓ ' + R.good + '、△ ' + R.ok + '、✗ ' + R.bad + '，平均 <b>' + Math.round(R.score * 100) + '%</b>（要 ' + Math.round(X.pass * 100) + '%）。</p>';
     const nx = learnNext(LP);
@@ -101,11 +103,20 @@ function examLessonHTML(l, s) {
   if (!R) h += '<div class="lngo2"><button class="btn main big" data-ln="exam" data-id="' + l.id + '">開始實戰考核（到牌桌）▶</button></div>';
   return h;
 }
+/* 考到一半離開了：回到牌桌接著考 */
+function examResumeHTML(id) {
+  const E = typeof G !== 'undefined' && G.exam;
+  if (!E || E.id !== id || E.done || !G.H) return '';
+  return '<div class="lngo2"><button class="btn main big" data-ln="resume">回到考核（已評 ' + E.grades.length + '／' + E.need + '）▶</button></div>';
+}
 /* 畢業考：筆試、實戰兩部分，都過就畢業 */
 function gradLessonHTML(l, s) {
   const W = LP.gradW, P = (LP.exam || {})['8-5'], X = EXAMS['8-5'];
   const st = (ok, has) => (ok ? '<span class="lnok">✓ 通過</span>' : has ? '<span class="lnno">還沒過</span>' : '<span class="note">還沒考</span>');
   let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><span class="note">第 ' + s.id + ' 階　' + esc(s.name) + '</span><b>' + esc(l.id + '　' + l.title) + '</b></div></div>';
+  const miss = gradMissing(LP);
+  if (!LP.grad && miss.length) h += '<p class="note lnmiss">畢業還要完成其他 ' + miss.length + ' 課（' + miss.slice(0, 4).map((x) => x.id).join('、') + (miss.length > 4 ? '…' : '') + '）；兩部分的成績會先記著，課上完就自動畢業。</p>';
+  h += examResumeHTML('8-5');
   if (LP.grad) h += '<div class="panel lnres"><p class="lnbig">🎓 畢業了！</p><p>筆試 ' + LP.grad.w + '／' + LP.grad.wn + '、實戰 ' + LP.grad.p + '%。</p><div class="lngo2"><button class="btn main big" data-ln="cert">看結業證書 ▶</button></div></div>';
   h += '<div class="lngrad">'
     + '<div class="panel"><h4 class="lnh4">第一部分　筆試 ' + st(W && W.pass, W) + '</h4><p class="note">30 題（第 1–8 階）、每題 ' + GRAD_W.sec + ' 秒，答對 ' + GRAD_W.pass + ' 題通過。' + (W ? '<br>' + (W.pass ? '通過的成績' : '最好成績') + '：' + W.s + '／' + W.n + (W.last !== undefined && W.last !== W.s ? '（上一次 ' + W.last + '）' : '') : '') + '</p><button class="btn' + (W && W.pass ? '' : ' main') + '" data-ln="gradw">' + (W ? '再考筆試' : '開始筆試') + ' ▶</button></div>'
@@ -136,9 +147,10 @@ function drawCert() {
   x.fillStyle = '#3b4a44'; x.font = '400 30px ' + serif; x.fillText('茲證明', W / 2, 320);
   const nm = (LP.name || '').trim();
   x.fillStyle = '#0e1d19'; x.font = '700 64px ' + serif; x.fillText(nm || '＿＿＿＿＿＿', W / 2, 405);
-  x.strokeStyle = '#d0a84e'; x.lineWidth = 2; x.beginPath(); x.moveTo(W / 2 - 260, 425); x.lineTo(W / 2 + 260, 425); x.stroke();
+  const uw = Math.max(200, Math.min(900, x.measureText(nm || '＿＿＿＿＿＿').width + 80)) / 2;
+  x.strokeStyle = '#d0a84e'; x.lineWidth = 2; x.beginPath(); x.moveTo(W / 2 - uw, 425); x.lineTo(W / 2 + uw, 425); x.stroke();
   x.fillStyle = '#3b4a44'; x.font = '400 30px ' + serif;
-  x.fillText('完成大師之路八階 ' + allLessons().length + ' 課，通過畢業考', W / 2, 490);
+  x.fillText('完成大師之路八階課程，通過畢業考', W / 2, 490);
   x.fillText('筆試 ' + G2.w + '／' + G2.wn + '　・　實戰 ' + G2.p + '%', W / 2, 540);
   x.fillText('特頒此證。', W / 2, 590);
   x.fillStyle = '#6b7a74'; x.font = '400 21px ' + sans;
@@ -226,7 +238,7 @@ function finishQs() {
     const P = placementStart(LN.res);
     LN.placeRes = P; LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0); return;
   }
-  if (LN.mode === 'skip') { LN.pass = ok >= 7; if (LN.pass) { LP.skip[LN.stage] = true; lpSave(); } LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0); }
+  if (LN.mode === 'skip') { LN.pass = ok >= 7; if (LN.pass) { LP.skip[LN.stage] = true; (LP.tskip = LP.tskip || {})[LN.stage] = true; lpSave(); } LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0); }
   if (LN.mode === 'drill') {
     const timed = LN.res.filter((r) => r.ms > 0), avg = timed.length ? timed.reduce((a, r) => a + r.ms, 0) / timed.length : 0;
     const b = LP.best[LN.drill.id];
@@ -476,7 +488,7 @@ function renderLearnHome() {
 function initLearn() {
   lpLoad();
   if (/[?&]lntest/.test(location.search)) { window.__LN = LN; window.__G = G; window.__GT = GT; }          // 自動測試用
-  $('nLearn').addEventListener('click', () => openLearn('map'));
+  $('nLearn').addEventListener('click', () => { const l = LN.ret; LN.ret = null; if (l && $('vLearn').hidden) openLearn('lesson', l); else openLearn('map'); });   // 從某一課打開工作室或考核：按「大師之路」回到那一課
   $('bLearn').addEventListener('click', () => openLearn('map'));
   $('lnModalClose').addEventListener('click', () => { $('lnModal').hidden = true; });
   $('lnModal').addEventListener('click', (e) => {
@@ -484,7 +496,8 @@ function initLearn() {
     const b = e.target.closest('[data-ln="hand"]');
     if (b) { $('lnModalBody').innerHTML = handDetailHTML(+b.dataset.g); $('lnModal').querySelector('.mbox').scrollTop = 0; }
   });
-  $('lnRoot').addEventListener('input', (e) => { if (e.target.id === 'lnCertName') { LP.name = e.target.value.slice(0, 16); lpSave(); drawCert(); } });
+  let certT = 0;
+  $('lnRoot').addEventListener('input', (e) => { if (e.target.id === 'lnCertName') { LP.name = e.target.value.slice(0, 16); clearTimeout(certT); certT = setTimeout(() => { lpSave(); drawCert(); }, 350); } });
   $('lnRoot').addEventListener('click', (e) => {
     const b = e.target.closest('[data-ln]');
     if (!b) {                                                   // 答完題目：點空白也能下一題
@@ -495,10 +508,11 @@ function initLearn() {
     if (a === 'map') openLearn('map');
     else if (a === 'go' || a === 'lesson') { const l = lessonById(b.dataset.id); if (l && l.ready) openLearn('lesson', l); }
     else if (a === 'practice') startQs('practice');
-    else if (a === 'exam') { const l = lessonById(b.dataset.id); if (l && l.exam) newGame('exam', l.exam); }
+    else if (a === 'exam') { const l = lessonById(b.dataset.id); if (l && l.exam) { LN.ret = l; newGame('exam', l.exam); } }
     else if (a === 'gradw') startTest('grad');
+    else if (a === 'resume') { LN.ret = LN.lesson; showView('table'); G.lastRender = null; renderCur(); scheduleAuto(); }
     else if (a === 'cert') openLearn('cert');
-    else if (a === 'studio') studioLoad(presetSpot('river'), '大師之路 8-3：河牌範例（K♦5♣6♥9♥2♦，大盲跟注 vs 按鈕開牌的範圍）。算完點格子看每一種牌怎麼打；看完按上面的「大師之路」回課程。', true);
+    else if (a === 'studio') LN.ret = LN.lesson, studioLoad(presetSpot('river'), '大師之路 8-3：河牌範例（K♦5♣6♥9♥2♦，大盲跟注 vs 按鈕開牌的範圍）。算完點格子看每一種牌怎麼打；看完按上面的「大師之路」回課程。', true);
     else if (a === 'quiz') startQs('quiz');
     else if (a === 'reread') { clearLnTimers(); LN.phase = 'read'; renderLearn(); window.scrollTo(0, 0); }
     else if (a === 'ans') answerQ(+b.dataset.i);
@@ -509,7 +523,14 @@ function initLearn() {
     else if (a === 'drill') startTest('drill', b.dataset.d);
     else if (a === 'review') startTest('review');
     else if (a === 'tstart') testStart();
-    else if (a === 'pstart') { const s = +b.dataset.s; LP.place = { start: s, at: Date.now() }; for (let k = 1; k < s; k++) LP.skip[k] = true; lpSave(); openLearn('map'); }
+    else if (a === 'pstart') {                                    // 分級的起點：換掉上一次分級標的「已通過」，跳級測驗過的保留
+      const s = +b.dataset.s, ts = LP.tskip || {};
+      LP.place = { start: s, at: Date.now() };
+      for (const k of Object.keys(LP.pskip || {})) if (!ts[k]) delete LP.skip[k];
+      LP.pskip = {};
+      for (let k = 1; k < s; k++) { LP.skip[k] = true; LP.pskip[k] = true; }
+      lpSave(); openLearn('map');
+    }
     else if (a === 'hand') {
       const g = +b.dataset.g;
       if (LN.mode === 'dict') { LN.dictG = g; LN.dictScroll = true; renderLearn(); }
@@ -520,7 +541,8 @@ function initLearn() {
   document.addEventListener('keydown', (e) => {
     if ($('vLearn').hidden || e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input,textarea,select')) return;
     if (!$('lnModal').hidden) { if (e.key === 'Escape') $('lnModal').hidden = true; return; }
-    const inQ = (LN.mode === 'lesson' && (LN.phase === 'practice' || LN.phase === 'quiz')) || (LN.mode !== 'lesson' && LN.mode !== 'map' && LN.mode !== 'dict' && LN.phase === 'q');
+    if (document.querySelector('.modal:not([hidden])')) return;          // 其他視窗開著（牌型、統計）：不要答到後面的題目
+    const inQ = (LN.mode === 'lesson' && (LN.phase === 'practice' || LN.phase === 'quiz')) || (['place', 'skip', 'drill', 'review', 'grad'].indexOf(LN.mode) >= 0 && LN.phase === 'q');
     if (!inQ) return;
     if (!LN.answered && /^[1-6]$/.test(e.key)) { const i = +e.key - 1; if (LN.qs[LN.qi] && i < LN.qs[LN.qi].opts.length) { e.preventDefault(); answerQ(i); } }
     else if (LN.answered && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight')) { e.preventDefault(); nextQ(); }

@@ -12,7 +12,7 @@ function gtoInit() {
   GW().on('g-progress', (m) => {
     const g = G.gto;
     if (!g || g.key !== m.key) return;
-    if (m.error) { g.lost = true; return; }
+    if (m.error) { g.lost = true; if (G.waitingHero && G.steps[G.view]) renderCtrl(G.steps[G.view]); return; }   // 算不了：動作鈕不能一直鎖著
     g.t = m.t; g.pct = m.pct; g.done = m.done; g.ready = true;
     // 輪到你：還沒有可用的建議、或剛算完，才重新問（不要一直重畫動作鈕）
     if (G.waitingHero && atHead() && !G.replay && g.seats.indexOf(0) >= 0 && (!gtoAdvUsable() || m.done)) gtoHeroTurn(true);
@@ -71,9 +71,12 @@ function gtoHeroTurn(refresh) {
   if (refresh && G.gtoAdv && G.gtoAdv.pathLen === pathLen && G.gtoAdv.done) return;
   if (g.asking) return;
   g.asking = true;
+  const tq = setTimeout(() => { g.asking = false; }, 8000);           // 背景執行緒沒回答：下次再問
   gtoAsk({ key: g.key, path: g.path.slice(), p: g.seats.indexOf(0), combo, ev: true }, (m) => {
+    clearTimeout(tq);
     g.asking = false;
-    if (G.gto !== g || !G.waitingHero || g.path.length !== pathLen || m.none) return;
+    if (G.gto !== g || !G.waitingHero || g.path.length !== pathLen) return;
+    if (m.none) { if (m.why !== 'notready') { g.heroFail = true; if (G.steps[G.view]) renderCtrl(G.steps[G.view]); } return; }
     G.gtoAdv = { pathLen, acts: m.acts, freq: m.freq, ev: m.ev, pct: m.pct, t: m.t, done: m.done, eq: m.eq, street: g.street };
     if (G.view === view || atHead()) { renderCtrl(G.steps[G.view]); if (G.steps[G.view].kind === 'hero') renderCoach(G.steps[G.view]); }
   });
@@ -121,7 +124,7 @@ function gtoGrade(ev) {
 /* 教練框裡的 GTO 區塊 */
 function gtoBoxHTML() {
   const g = G.gto;
-  if (!g || g.lost || g.seats.indexOf(0) < 0 || !GS.gtoCoach) return '';
+  if (!g || g.lost || g.seats.indexOf(0) < 0 || !GS.gtoCoach || G.exam) return '';
   if (!G.gtoAdv) return '<div class="gtob"><b>GTO 求解</b>：計算中…（單挑的' + STREET_NAME[g.street] + '，在另一個背景執行緒算）</div>';
   const a = G.gtoAdv, cols = actColors(a.acts);
   let h = '<div class="gtob"><b>GTO 求解</b>（' + glossify('可剝削度') + ' ' + (a.pct < 900 ? fmt(a.pct, 1) + '%' : '—') + (a.done ? '' : '，還在算') + (g.carried ? '；範圍接著上一條街的解' : '') + '）<table>';
@@ -146,7 +149,7 @@ function gtoBotWait(seat) {
   const fallback = () => { setRule(); afterBot(); };                 // 非同步（回答、計時）才用：叫牌局接著往下
   if (!g.ready) {
     if (Date.now() - W8.since > cap) { setRule(); return false; }    // 同步：直接讓外面這一次 produce 出這個動作（不要再叫一次 forward，會連出兩個動作）
-    setTimeout(() => { if (G.waitAI === W8) afterBot(); }, 300);
+    botPoll();
     return true;
   }
   W8.asking = true;
@@ -158,7 +161,7 @@ function gtoBotWait(seat) {
     if (G.waitAI !== W8) return;
     if (G.gto !== g || g.path.length !== pathLen) { G.waitAI = null; afterBot(); return; }   // 解換了：重新問現在的解（不要卡住）
     const good = !m.none && (m.done || m.pct <= 5 || m.t >= 60);
-    if (!good && Date.now() - W8.since < cap && !m.none) { setTimeout(() => { if (G.waitAI === W8) afterBot(); }, 350); return; }
+    if (!good && Date.now() - W8.since < cap && !m.none) { botPoll(); return; }
     if (m.none) { fallback(); return; }
     // 照解抽一個動作
     let r = G.rng(), i = 0;
@@ -174,6 +177,8 @@ function gtoBotWait(seat) {
   });
   return true;
 }
+/* GTO 電腦等解：只有一個計時器（不會越疊越多），到時候還沒在問就再叫一次 */
+function botPoll() { clearTimeout(G.botT); G.botT = setTimeout(() => { if (G.waitAI && !G.waitAI.asking) afterBot(); }, 300); }
 /* 解回來了（或等太久）：自動模式就接著往下 */
 function afterBot() {
   if ($('vTable').hidden || !G.H) return;

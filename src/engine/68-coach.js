@@ -105,14 +105,14 @@ function coachAdvice(H, rng) {
   const L = legalActions(H);
   const sh = shortSpot(H, L.seat);
   if (sh) {                                            // 短碼：推或棄
-    const pc = PRE_PCT[adv.info.g], go = sh.kind === 'push' ? pc < sh.pct : sh.kind === 'reshove' ? sh.ev > 0 : sh.eq >= sh.need, p = H.players[L.seat];
+    const pc = PUSH_PCT[adv.info.g], go = sh.kind === 'push' ? pc < sh.pct : sh.kind === 'reshove' ? sh.ev > 0 : sh.eq >= sh.need, p = H.players[L.seat];
     const head = adv.reasons[0];
     adv.more.unshift('（照勝率估的看法：建議「' + adv.label + '」。' + (sh.kind === 'call' ? '面對全下以底池賠率為準。' : '短碼時以推或棄為準。') + '）');
     adv.reasons.length = 0;
     adv.reasons.push(head);
     if (sh.kind === 'push') {
       adv.reasons.push('你和對手的有效籌碼只有 ' + fmt1(sh.eff) + ' 個大盲：籌碼這麼短，翻牌後沒有空間慢慢打，標準打法是「推或棄」：要嘛全下，要嘛棄牌。');
-      adv.reasons.push('在這個位置、這個籌碼，大約前 ' + PCT0(sh.pct) + ' 的牌可以全下；你的牌是前 ' + PCT0(pc) + '，' + (go ? '在裡面，全下。對手棄牌你就贏下盲注。' : '不在裡面，棄牌等更好的機會。'));
+      adv.reasons.push('在這個位置、這個籌碼，大約前 ' + PCT0(sh.pct) + ' 的牌可以全下；你的牌在推或棄的排名是前 ' + PCT0(pc) + '（對子、帶 A 的牌比較前面），' + (go ? '在裡面，全下。對手棄牌你就贏下盲注。' : '不在裡面，棄牌等更好的機會。'));
     } else if (sh.kind === 'reshove') {
       adv.reasons.push('你只剩 ' + fmt1(sh.eff) + ' 個大盲，面對加注：標準打法是「推或棄」，跟注之後翻牌幾乎沒空間打。');
       adv.reasons.push('他開牌大約是前 ' + PCT0(sh.v) + ' 的牌，你全下時他大概只用最好的前 ' + PCT0(sh.vc) + ' 跟（約 ' + PCT0(sh.c) + ' 的時候）。你的牌對那些牌勝率約 ' + PCT0(sh.eq) + '；連他棄牌的時候一起算，全下平均' + (sh.ev > 0 ? '多賺 ' + fmt1(sh.ev) + '，全下。' : '少 ' + fmt1(-sh.ev) + '，棄牌。') + '（這裡大約前 ' + PCT0(sh.pct) + ' 的牌可以推）');
@@ -210,7 +210,7 @@ function coachAdviceRule(H, rng) {
     const fac = [];
     if (!allin) {
       fac.push(ip ? { x: 0.92, s: '有位置只打 ×0.92（沒位置要 ×0.80）', t: '有位置（翻牌後你比他晚說話，能先看他怎麼做）：打的折比較少；沒位置要 ×0.80' } : { x: 0.8, s: '沒位置 ×0.80（有位置只要 ×0.92）', t: '沒位置（翻牌後你要先說話，看不到他怎麼做）：比較難把勝率打出來；有位置只要 ×0.92' });
-      if (play < 1) { const w = isPair ? '口袋對子' : suited ? '同花不相連' : '不同花' + (play < 0.85 ? '又不相連' : ''); fac.push({ x: play, s: w + ' ×' + play.toFixed(2), t: w + '：' + (isPair ? '沒中三條時翻牌後不好打' : '中牌的方式少，常常只中一對') }); }
+      if (play < 1) { const w = isPair ? '口袋對子' : suited ? '同花但不相連' : play < 0.85 ? '不同花、有一張小牌' : '不同花的大牌'; fac.push({ x: play, s: w + ' ×' + play.toFixed(2), t: w + '：' + (isPair ? '沒中三條時翻牌後不好打' : '中牌的方式少，常常只中一對') }); }
       if (I.nOpp > 1) fac.push({ x: 0.95, s: '多人底池 ×0.95', t: '已經有 ' + I.nOpp + ' 個人在底池裡：多人底池更難贏' });
       if (nBehind) fac.push({ x: 0.95, s: '後面 ' + nBehind + ' 人沒說話 ×0.95', t: '後面還有 ' + nBehind + ' 個人沒說話：他們可能再加注，你就得棄牌' });
     }

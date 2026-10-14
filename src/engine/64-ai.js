@@ -29,7 +29,7 @@ function aiDecide(H, rng, level) {
     const sh = shortSpot(H, L.seat);
     if (sh) {
       let go;
-      if (sh.kind === 'push') go = PRE_PCT[g] + gauss(rng) * lv.noise * 0.3 < Math.min(0.95, sh.pct * Math.sqrt(st.loose));
+      if (sh.kind === 'push') go = PUSH_PCT[g] + gauss(rng) * lv.noise * 0.3 < Math.min(0.95, sh.pct * Math.sqrt(st.loose));
       else if (sh.kind === 'reshove') go = sh.ev / Math.max(1, sh.pot) + gauss(rng) * lv.noise * 0.6 + (st.loose - 1) * 0.15 > 0;
       else go = sh.eq + gauss(rng) * lv.noise * 0.06 + (st.loose - 1) * 0.04 + (st.sticky || 0) >= sh.need;
       if (go) return sh.kind === 'push' || (L.canRaise && L.maxTo > H.curBet && p.stack + p.bet > H.curBet) ? { t: 'r', to: L.maxTo } : { t: 'c' };
