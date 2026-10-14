@@ -1,6 +1,6 @@
 /* ===== 50-game：牌局（首頁、牌桌、教練框、上一步／下一步、動作列、一手結束的檢討與重看） ===== */
 const SAVE_KEY = 'dezhou-game-1';
-const GS = { n: 6, mode: 'teach', level: 2, peek: false, auto: false, seen: [], hands: 0, net: 0, won: 0 };
+const GS = { n: 6, mode: 'teach', level: 2, peek: false, auto: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false };
 function gsLoad() { try { Object.assign(GS, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) { /* 沒有存檔 */ } }
 function gsSave() {
   if (G.ctx) GS.seen = [...G.ctx.seen];
@@ -210,12 +210,10 @@ function renderTable(st) {
     const sty = hero ? POS_ZH[p.pos] : styleZh(p.style) + '・' + POS_ZH[p.pos];
     h += '<div class="' + cls + '" style="left:' + xy.x.toFixed(1) + '%;top:' + xy.y.toFixed(1) + '%">'
       + '<div class="hc">' + cards + '</div>'
-      + '<div class="plate"><b>' + esc(p.name) + '</b><span class="sty">' + esc(sty) + '</span><br><span class="stk num">' + p.stack + '</span></div>'
+      + '<div class="plate">' + (k === S.button ? '<span class="dbtn" title="按鈕（莊家位）：翻牌後最後說話">D</span>' : '') + '<b>' + esc(p.name) + '</b><span class="sty">' + esc(sty) + '</span><br><span class="stk num">' + p.stack + '</span></div>'
       + bubble + '</div>';
     if (p.bet > 0) { const b = seatXY(n, k, hero ? 0.4 : 0.58); h += '<div class="betchip num" style="left:' + b.x.toFixed(1) + '%;top:' + b.y.toFixed(1) + '%"><i></i>' + p.bet + '</div>'; }
   }
-  const off = seatXY(n, S.button + 0.3, 0.72);
-  h += '<div class="dealer" style="left:' + off.x.toFixed(1) + '%;top:' + off.y.toFixed(1) + '%" title="按鈕">D</div>';
   $('seats').innerHTML = h;
   // 公牌
   const prevBoard = prev && prev.view < G.view ? prev.board : S.board.length;
@@ -253,8 +251,9 @@ function renderCoach(st) {
       const mk = { good: '✓', ok: '△', bad: '✗' }[st.grade.mark];
       h += '<div class="grade ' + st.grade.mark + '"><span class="mk">' + mk + '</span><div>' + esc(st.grade.text) + (st.grade.mark !== 'good' ? '<br><span class="note">教練的建議是：' + esc(st.adv.label) + '</span>' : '') + '</div></div>';
     }
-    for (const l of st.lines) h += '<p>' + rich(l) + '</p>';
-    if (st.tip) h += '<div class="tip"><b>第一次遇到，說明一下</b>' + rich(st.tip) + '</div>';
+    const used = new Set();
+    for (const l of st.lines) h += '<p>' + glossify(rich(l), used) + '</p>';
+    if (st.tip) h += '<div class="tip"><b>第一次遇到，說明一下</b>' + glossify(rich(st.tip), used) + '</div>';
   }
   if (!atHead() && !G.replay) h += '<p class="note">你在看前面的步驟；按「下一步」回到現在。</p>';
   $('cBody').innerHTML = h;
@@ -272,8 +271,10 @@ function heroHTML(st, S) {
   const adv = st.adv, L = legalSnapshot(S);
   let h = '<h3>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '：可以過牌') + '</h3>';
   if (atHead() && !G.replay) h += '<p class="note">' + (GS.mode === 'teach' ? '先看看教練的建議和原因，再選一個動作；有黃框的那顆是建議。' : '選一個動作；有黃框的那顆是建議。') + '</p>';
-  h += '<div class="adv"><div class="rec">建議：' + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + rich(r) + '</li>').join('') + '</ol>';
-  if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + rich(r) + '</p>').join('') + '</details>';
+  const used = new Set();
+  h += '<div class="adv"><div class="rec">建議：' + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
+  if (EXPLAIN.on && atHead() && !G.replay && !GS.seenTermHint) h += '<p class="note">底下有虛線的詞可以點，會跳出解釋；不需要的話，右上角「深入說明」可以關掉。</p>';
   h += '</div>';
   return h;
 }
@@ -345,7 +346,7 @@ function renderOdds() {
   if (hero.folded) { box.innerHTML = '<p class="note">你已經棄牌了。</p>'; return; }
   const live = S.players.filter((p) => !p.folded).length - 1;
   if (live < 1) { box.innerHTML = '<p class="note">只剩你了。</p>'; return; }
-  box.innerHTML = '<p class="note">計算中…</p>';
+  if (!box.querySelector('table')) box.innerHTML = '<p class="note">計算中…</p>';
   G.oddsTok = W.nextCalc();
   G.oddsLive = live;
   W.send({ cmd: 'calc', hero: hero.cards, board: S.board, maxOpp: 8, mcIters: 120000 });
@@ -353,26 +354,30 @@ function renderOdds() {
 function oddsHTML(m, mc) {
   const live = G.oddsLive;
   const eqN = (N) => m.pre ? m.pre.eq[N - 1] : N === 1 && m.exact ? m.exact.eq : mc ? (mc.win[N] + mc.tie[N]) / mc.n : null;
-  let h = '<p style="margin:4px 0">對隨機手牌的勝率（還在的對手：' + live + ' 個）</p><table>';
-  for (let N = 1; N <= Math.max(3, Math.min(8, live + 1)); N++) {
-    const x = eqN(N);
-    h += '<tr class="' + (N === live ? 'hl' : '') + '"><td>對 ' + N + ' 家</td><td style="width:50%"><div class="bar"><i style="width:' + ((x || 0) * 100).toFixed(1) + '%"></i></div></td><td class="r">' + (x === null ? '…' : pct(x) + '%') + '</td></tr>';
-  }
-  h += '</table>';
+  const method = (N) => m.pre ? '事先算好' : N === 1 ? '精確計算' : mc ? '模擬' + (mc.done ? '' : '中') : '模擬中';
+  let h = '<p style="margin:4px 0">對隨機手牌的勝率（還在的對手：' + live + ' 個，標黃的那一行）</p>';
+  h += eqTableHTML(eqN, Math.max(3, Math.min(8, live + 1)), live, method);
   const cat = m.pre ? m.pre.cat : m.cat;
   if (cat) {
     h += '<p style="margin:8px 0 4px">到河牌時的牌型機率</p><table>';
     for (let i = 8; i >= 0; i--) if (cat[i] > 0.0005) h += '<tr class="' + (m.cur && m.cur.cat === i ? 'hl' : '') + '"><td>' + CAT_NAMES[i] + '</td><td style="width:50%"><div class="bar"><i style="width:' + (cat[i] * 100).toFixed(1) + '%"></i></div></td><td class="r">' + pct(cat[i]) + '%</td></tr>';
     h += '</table>';
   }
-  if (m.outs && m.outs.total) h += '<p style="margin:8px 0 0">出牌 ' + m.outs.total + ' 張：' + m.outs.groups.filter((g) => g.strong).map((g) => g.name + ' ' + g.cards.map(cardSpan).join('')).join('；') + '</p>';
+  if (m.outs && m.outs.total) h += '<p style="margin:8px 0 0">' + glossify('出牌') + ' ' + m.outs.total + ' 張：' + m.outs.groups.filter((g) => g.strong).map((g) => g.name + ' ' + g.cards.map(cardSpan).join('')).join('；') + '</p>';
   const st = G.steps[G.view];
   if (st.adv) h += '<p class="note" style="margin-top:6px">教練是照對手的動作估他們可能的牌：勝率約 ' + pct(st.adv.eq, 0) + '%（比對隨機手牌更準）。</p>';
+  if (EXPLAIN.on) h += eqHowHTML({ pre: !!m.pre, e1: eqN(1), e2: eqN(2), board: m.pre ? 0 : (m.board || []).length, mcN: mc ? mc.n : 0, est: st.adv ? st.adv.eq : null });
   return h;
 }
 let ODDS_RES = null;
-W.on('calc', (m) => { if (m.token !== G.oddsTok) return; ODDS_RES = m; $('oddsBox').innerHTML = oddsHTML(m, null); });
-W.on('calcmc', (m) => { if (m.token !== G.oddsTok || !ODDS_RES) return; $('oddsBox').innerHTML = oddsHTML(ODDS_RES, m); });
+function setOdds(html) {   // 模擬一直在更新、換步驟也會重算：保持「怎麼算的」打開的狀態
+  const box = $('oddsBox'), top = box.scrollTop;
+  box.innerHTML = html;
+  if (G.howOpen) { const d = box.querySelector('details.how'); if (d) d.open = true; }
+  box.scrollTop = top;
+}
+W.on('calc', (m) => { if (m.token !== G.oddsTok) return; ODDS_RES = m; setOdds(oddsHTML(m, null)); });
+W.on('calcmc', (m) => { if (m.token !== G.oddsTok || !ODDS_RES) return; setOdds(oddsHTML(ODDS_RES, m)); });
 
 function renderCur() {
   const st = G.steps[G.view];
@@ -400,6 +405,14 @@ function initGame() {
   $('autoChk').addEventListener('change', (e) => { GS.auto = e.target.checked; gsSave(); scheduleAuto(); });
   $('peekChk').addEventListener('change', (e) => { GS.peek = e.target.checked; gsSave(); renderCur(); });
   $('cOdds').addEventListener('toggle', () => { if ($('cOdds').open) renderOdds(); });
+  $('oddsBox').addEventListener('toggle', (e) => { if (e.target.matches('details.how')) G.howOpen = e.target.open; }, true);
+  $('coach').addEventListener('click', (e) => { if (e.target.closest('button.term') && !GS.seenTermHint) { GS.seenTermHint = true; gsSave(); } });
+  document.querySelectorAll('.explainChk').forEach((x) => x.addEventListener('change', (e) => {
+    setExplain(e.target.checked);
+    if (G.H && G.steps[G.view]) renderCur();
+    if (CALC.res) renderCalc();
+  }));
+  setExplain(EXPLAIN.on);
   $('actBtns').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-a]'); if (!b) return;
     const L = legalActions(G.H), a = b.dataset.a;
@@ -435,6 +448,6 @@ function initGame() {
     else if (e.key === 'ArrowLeft') back();
   });
   let rt = 0;
-  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (!$('vTable').hidden && G.H) { G.lastRender = null; renderCur(); } }, 150); });
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (!$('vTable').hidden && G.H && G.steps[G.view]) { G.lastRender = { view: G.view, board: G.steps[G.view].snap.board.length }; renderTable(G.steps[G.view]); } /* 只重畫桌面：教練框裡打開的解釋、下注框都保留 */ }, 150); });
   showView('home');
 }

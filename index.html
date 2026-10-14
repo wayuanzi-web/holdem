@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1d19"><meta name="description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="德州軍師"><meta property="og:type" content="website"><meta property="og:title" content="德州軍師"><meta property="og:description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><meta property="og:image" content="https://wayuanzi-web.github.io/holdem/og.png"><meta property="og:url" content="https://wayuanzi-web.github.io/holdem/"><meta name="twitter:card" content="summary_large_image"><title>德州軍師</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%9F%E4%BA%82%E4%BA%86%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A5%E4%BB%BB%E4%BC%AF%E4%BC%B0%E4%BD%86%E4%BD%8D%E4%BD%8E%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%B3%E5%83%8F%E5%83%B9%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AC%E5%85%B1%E5%85%B6%E5%85%B7%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%92%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%BE%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%A1%E5%8E%9F%E5%8E%BB%E5%8F%8B%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%AB%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%9F%E5%96%AE%E5%99%A8%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%8B%E5%A3%93%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%B8%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%B6%E5%AE%B9%E5%AF%A6%E5%AF%AC%E5%AF%B8%E5%B0%8D%E5%B0%8F%E5%B0%91%E5%B0%B1%E5%B0%BA%E5%B1%80%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%95%E5%B9%B3%E5%B9%BE%E5%BA%95%E5%BA%A6%E5%BB%BA%E5%BC%84%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%97%E5%BF%A0%E5%BF%AB%E6%80%8E%E6%80%95%E6%83%B3%E6%86%B6%E6%87%89%E6%88%90%E6%88%96%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%BE%E6%8A%8A%E6%8A%95%E6%8A%98%E6%8B%BF%E6%8C%89%E6%8C%91%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A8%E6%8F%90%E6%8F%9B%E6%90%B6%E6%92%9E%E6%92%AD%E6%92%B2%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%B4%E6%95%B8%E6%96%87%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%97%81%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%9B%B4%E6%9C%80%E6%9C%83%E6%9C%89%E6%9C%8B%E6%9C%9F%E6%9C%AC%E6%9D%9F%E6%9D%B1%E6%9E%9C%E6%9F%A5%E6%A0%B8%E6%A0%BC%E6%A1%86%E6%A1%8C%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%B5%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AC%8A%E6%AC%A1%E6%AD%A2%E6%AD%A3%E6%AD%A5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B3%95%E6%B3%A8%E6%B5%81%E6%B6%88%E6%B8%85%E6%B8%AC%E6%BA%96%E7%80%8F%E7%82%BA%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%88%BE%E7%89%8C%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%B3%E7%A2%BA%E7%A2%BC%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A9%8D%E7%A9%BA%E7%AB%99%E7%AC%AC%E7%AD%89%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B1%8C%E7%B2%BE%E7%B4%84%E7%B4%9A%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B6%93%E7%B6%B2%E7%B7%8A%E7%B7%9A%E7%B7%B4%E7%B8%BD%E7%B9%BC%E7%BA%8C%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%BB%E8%80%81%E8%80%8C%E8%81%BD%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%90%AC%E8%91%AB%E8%92%99%E8%98%86%E8%99%A7%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%BD%E8%A7%92%E8%A7%A3%E8%A8%88%E8%A8%98%E8%A8%AD%E8%A9%90%E8%A9%95%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%AA%A4%E8%AA%AA%E8%AB%8B%E8%AD%B0%E8%AE%8A%E8%AE%93%E8%B2%BB%E8%B2%BC%E8%B3%A0%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B7%91%E8%B7%9B%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%81%87%E9%81%8E%E9%81%93%E9%81%A9%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8D%E9%87%8F%E9%87%9D%E9%88%95%E9%8C%A2%E9%8C%AF%E9%90%98%E9%95%B7%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%BF%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9D%9E%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%90%E9%A0%98%E9%A0%AD%E9%A1%86%E9%A1%AF%E9%A6%96%E9%A9%9F%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%9F%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A5%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BD%86%E4%BD%8D%E4%BD%8E%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%B3%E5%83%8F%E5%83%B9%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AC%E5%85%B1%E5%85%B6%E5%85%B7%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%92%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%BE%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%AB%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%9F%E5%96%AE%E5%99%A8%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%8B%E5%9F%BA%E5%A3%93%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%B8%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%B6%E5%AE%B9%E5%AF%A6%E5%AF%AC%E5%AF%B8%E5%B0%8D%E5%B0%8F%E5%B0%91%E5%B0%B1%E5%B0%BA%E5%B1%80%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BB%BA%E5%BC%84%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%97%E5%BF%A0%E5%BF%AB%E6%80%8E%E6%80%95%E6%80%9D%E6%83%85%E6%83%B3%E6%84%8F%E6%86%B6%E6%87%89%E6%88%90%E6%88%96%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%BE%E6%8A%8A%E6%8A%95%E6%8A%98%E6%8B%BF%E6%8C%89%E6%8C%91%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A8%E6%8F%90%E6%8F%9B%E6%90%B6%E6%92%9E%E6%92%AD%E6%92%B2%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%B4%E6%95%B8%E6%96%87%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%97%81%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%9B%B4%E6%9C%80%E6%9C%83%E6%9C%89%E6%9C%8B%E6%9C%9F%E6%9C%AC%E6%9D%9F%E6%9D%B1%E6%9E%9C%E6%9F%A5%E6%A0%B8%E6%A0%BC%E6%A1%86%E6%A1%8C%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%B5%E6%A6%82%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A2%E6%AD%A3%E6%AD%A5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%88%BE%E7%89%8C%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%99%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%B3%E7%A2%BA%E7%A2%BC%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A9%8D%E7%A9%BA%E7%AB%99%E7%AC%AC%E7%AD%89%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%84%E7%B4%9A%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B6%93%E7%B6%B2%E7%B7%8A%E7%B7%9A%E7%B7%B4%E7%B8%BD%E7%B9%BC%E7%BA%8C%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%BB%E8%80%81%E8%80%8C%E8%81%BD%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8E%8A%E8%90%AC%E8%91%97%E8%91%AB%E8%92%99%E8%98%86%E8%99%9B%E8%99%A7%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%BD%E8%A7%92%E8%A7%A3%E8%A8%88%E8%A8%8A%E8%A8%98%E8%A8%AD%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%AA%A4%E8%AA%AA%E8%AB%8B%E8%AD%B0%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%BA%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B7%91%E8%B7%9B%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8E%E9%81%93%E9%81%A9%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%9D%E9%88%95%E9%8C%A2%E9%8C%AF%E9%90%98%E9%95%B7%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%BF%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%90%E9%A0%98%E9%A0%AD%E9%A1%86%E9%A1%AF%E9%A6%96%E9%A9%9F%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
 <style>
 :root {
   --ink: #0e1d19;        /* 牌桌陰影裡的深綠 */
@@ -100,6 +100,18 @@ h3 { font-size: 14px; margin: 0 0 6px; color: var(--mute); font-weight: 500; }
 .bar i { display: block; height: 100%; background: var(--brass); border-radius: 5px; }
 .bars tr:not(.hl) .bar i { background: #6f9c88; }
 .bars tr.zero td { opacity: .35; }
+.bars td.r { width: 4.2em; text-align: right; }
+.nw { white-space: nowrap; }
+.bars td.xp { width: 8.8em; text-align: left; font-size: 12px; color: var(--mute); padding-left: 10px; line-height: 1.25; }
+.bars td.xp b { color: var(--text); }
+.bars td.xp small { display: block; font-size: 11px; }
+.bars td.xp .mth { display: none; }
+.calc .how { background: rgba(255,255,255,.04); border-color: var(--line); color: var(--text); }
+.calc .how summary { color: var(--brass); }
+.calc .gdef { background: #2a3a33; border-color: #4a6a5c; color: var(--text); }
+.calc .gdef b { color: var(--brass); }
+.calc button.term:hover { background: rgba(208,168,78,.2); }
+.calc .tog2 { font-size: 13px; margin-left: auto; color: var(--mute); white-space: nowrap; }
 .outs .grp { margin: 6px 0; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: 14px; }
 .outs .grp b { margin-right: 6px; }
 .outs .weak { opacity: .6; }
@@ -198,7 +210,9 @@ body.intable .brand p { display: none; }
 .seat.hero { width: 150px; }
 .seat.hero .hc { min-height: 66px; }
 .seat.hero .plate { border-color: var(--brass); }
-.dealer { position: absolute; width: 24px; height: 24px; border-radius: 50%; background: #fff; color: #111; font-weight: 900; display: grid; place-items: center; font-size: 13px; transform: translate(-50%, -50%); box-shadow: 0 1px 3px rgba(0,0,0,.6); z-index: 3; font-family: var(--serif); }
+/* 按鈕（D）：貼在名牌左邊，像一顆籌碼，不會跟手牌混在一起 */
+.seat .plate { position: relative; }
+.dbtn { position: absolute; left: -13px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; border-radius: 50%; background: #f4efe1; color: #8a1f17; border: 2px dashed #c8372d; font-weight: 900; font-size: 12px; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px #f4efe1, 0 1px 4px rgba(0,0,0,.7); font-family: var(--serif); z-index: 3; cursor: help; }
 .betchip { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; z-index: 2; background: rgba(0,0,0,.28); padding: 1px 7px 1px 3px; border-radius: 999px; }
 .betchip i { width: 15px; height: 15px; border-radius: 50%; background: radial-gradient(circle, #d93b2e 38%, #fff 40%, #fff 52%, #d93b2e 54%); border: 1px solid #7a1e17; }
 .center { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1; }
@@ -240,6 +254,28 @@ body.intable .brand p { display: none; }
 .cname { font-family: var(--serif); font-weight: 900; font-size: 19px; }
 .coach .note { color: #7a6c48; }
 .coach .tog { margin-left: auto; }
+.ctogs { margin-left: auto; display: flex; gap: 12px; font-size: 13.5px; }
+.ctogs label { white-space: nowrap; cursor: pointer; }
+.ctogs label[hidden] { display: none; }
+/* 深入說明：可以點的名詞、白話欄、怎麼算的 */
+button.term { all: unset; cursor: pointer; border-bottom: 1.5px dashed currentColor; text-underline-offset: 3px; }
+button.term:hover, button.term:focus-visible { background: rgba(208,168,78,.25); border-radius: 3px; outline: none; }
+.gdef { display: block; list-style: none; background: #fff4d6; border: 1px solid #e5cf8f; border-radius: 8px; padding: 6px 9px; margin: 4px 0 8px; font-size: 13.5px; line-height: 1.5; color: #3d2f0a; }
+.gdef b { color: #7a5a14; }
+body.noexplain .xp, body.noexplain .how { display: none; }
+.eqx { width: 100%; border-collapse: collapse; }
+.eqx th { font-size: 11px; font-weight: 600; color: #8a7a52; text-align: left; padding: 0 4px 2px 0; }
+.eqx th.r, .eqx td.r { text-align: right; }
+.eqx td { padding: 3px 4px 3px 0; vertical-align: middle; white-space: nowrap; }
+.eqx td.bc { width: 26%; }
+.eqx td.xp { font-size: 12px; color: #6d5f3c; padding-left: 8px; line-height: 1.25; white-space: normal; }
+.eqx td.xp small { display: block; font-size: 11px; color: #8a7a52; }
+.eqx .mth { display: inline-block; font-size: 10px; border: 1px solid #d9c99c; border-radius: 4px; padding: 0 4px; margin-top: 1px; color: #7a6c48; }
+.eqx tr.hl td { font-weight: 700; }
+.eqx tr.hl td.xp { color: #3d2f0a; }
+.how { margin: 8px 0 2px; background: #fbf4e0; border: 1px solid #e3d7b7; border-radius: 8px; padding: 4px 10px; font-size: 13.5px; line-height: 1.55; }
+.how summary { cursor: pointer; color: #7a5a14; font-weight: 700; padding: 2px 0; }
+.how p { margin: 6px 0; } .how ul { margin: 2px 0 6px; padding-left: 1.2em; }
 .cbody { overflow-y: auto; padding: 10px 2px 6px; flex: 1 1 auto; min-height: 140px; font-size: 15px; }
 .cbody h3 { color: #2b2410; font-size: 18px; margin: 0 0 8px; font-weight: 800; }
 .cbody p { margin: 0 0 8px; }
@@ -265,6 +301,7 @@ body.intable .brand p { display: none; }
 .coach .btn:disabled { opacity: .4; }
 .codds { border-top: 1px solid #e3d7b7; padding: 4px 0; font-size: 14px; }
 .codds summary { cursor: pointer; font-weight: 700; padding: 4px 0; color: #6b4a06; }
+#oddsBox { max-height: 46vh; overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
 .codds table { width: 100%; border-collapse: collapse; }
 .codds td { padding: 2px 0; }
 .codds td.r { text-align: right; font-variant-numeric: tabular-nums; }
@@ -288,6 +325,7 @@ body.intable .brand p { display: none; }
 @media (max-width: 1000px) {
   .tv { grid-template-columns: 1fr; padding: 8px 12px 20px; }
   .coach { position: static; max-height: none; }
+  #oddsBox { max-height: none; }
   .cbody { max-height: none; }
   .modes { grid-template-columns: 1fr; }
 }
@@ -336,6 +374,7 @@ body.intable .brand p { display: none; }
   .actbar { margin-top: 4px; }
   .acts2 button { padding: 6px; font-size: 14px; border-radius: 9px; }
   .coach { position: sticky; top: 4px; max-height: calc(100vh - 8px); padding: 8px 10px; }
+  #oddsBox { max-height: 48vh; }
   .cbody { font-size: 13.5px; min-height: 60px; }
   .cbody h3 { font-size: 15px; }
   .cnav .btn { padding: 5px 10px; font-size: 14px; }
@@ -426,7 +465,8 @@ body.intable .brand p { display: none; }
     <aside class="coach" id="coach" aria-live="polite">
       <div class="chead">
         <span class="cname">教練</span><span class="note num" id="handNo"></span>
-        <label class="tog" id="peekWrap"><input type="checkbox" id="peekChk">偷看對手的牌</label>
+        <span class="ctogs"><label id="peekWrap"><input type="checkbox" id="peekChk">偷看對手的牌</label>
+        <label title="打開：虛線的詞可以點開看解釋，勝率表多一欄白話和「怎麼算的」"><input type="checkbox" class="explainChk" checked>深入說明</label></span>
       </div>
       <div class="cbody" id="cBody"></div>
       <details class="codds" id="cOdds"><summary>看勝率表</summary><div id="oddsBox"></div></details>
@@ -476,9 +516,9 @@ body.intable .brand p { display: none; }
             <div class="bignum num" id="bigEq">—</div>
             <div class="headtxt"><div class="hand" id="handTxt"></div><div class="sub" id="handSub"></div></div>
           </div>
-          <div class="opps" id="opps"><span class="note">對手人數</span></div>
+          <div class="opps" id="opps"><span class="note">對手人數</span><label class="tog2" title="打開：勝率表多一欄白話和「怎麼算的」，名詞可以點開看解釋"><input type="checkbox" class="explainChk" checked>深入說明</label></div>
           <div class="cols">
-            <div><h3>勝率（對 N 家隨機手牌）</h3><table class="bars num" id="eqTab"></table><p class="note" id="eqNote"></p></div>
+            <div><h3>勝率（對 N 家隨機手牌）</h3><table class="bars num" id="eqTab"></table><p class="note" id="eqNote"></p><div id="eqHow"></div></div>
             <div><h3 id="catTitle">到河牌時的牌型機率</h3><table class="bars num" id="catTab"></table></div>
           </div>
           <div id="outsBox" style="margin-top:14px"></div>
@@ -2686,7 +2726,7 @@ function calcChanged() {
 function calcMsg(t) {
   $('bigEq').textContent = '—';
   $('handTxt').textContent = t; $('handSub').textContent = '';
-  $('eqTab').innerHTML = ''; $('catTab').innerHTML = ''; $('outsBox').innerHTML = ''; $('eqNote').textContent = '';
+  $('eqTab').innerHTML = ''; $('catTab').innerHTML = ''; $('outsBox').innerHTML = ''; $('eqNote').textContent = ''; $('eqHow').innerHTML = '';
 }
 
 W.on('calc', (m) => { if (m.token !== CALC.sent) return; CALC.res = m; CALC.mc = null; renderCalc(); });
@@ -2712,8 +2752,14 @@ function renderCalc() {
   $('bigEq').innerHTML = e === null ? '…' : pct(e) + '<small>%</small>';
   const hand = cardSpan(hero[0]) + cardSpan(hero[1]);
   let rows = '';
-  for (let k = 1; k <= 8; k++) { const x = eqFor(k); rows += barRow('對 ' + k + ' 家', x || 0, k === N, x === null ? '…' : pct(x) + '%'); }
+  for (let k = 1; k <= 8; k++) {
+    const x = eqFor(k);
+    rows += '<tr class="' + (k === N ? 'hl' : '') + '"><td>對 ' + k + ' 家</td><td><div class="bar"><i style="width:' + ((x || 0) * 100).toFixed(1) + '%"></i></div></td><td class="r">' + (x === null ? '…' : pct(x) + '%') + '</td><td class="xp">' + eqPlain(x, k, '') + '</td></tr>';
+  }
   $('eqTab').innerHTML = rows;
+  const howEl = $('eqHow');
+  howEl.innerHTML = EXPLAIN.on ? eqHowHTML({ pre: !!r.pre, e1: eqFor(1), e2: eqFor(2), board: r.board.length, mcN: CALC.mc ? CALC.mc.n : 0, est: null }) : '';
+  if (CALC.howOpen && howEl.querySelector('details')) howEl.querySelector('details').open = true;
   if (r.pre) {
     const g = r.cls;
     $('handTxt').innerHTML = hand + '（' + esc(classTxt(g)) + '）';
@@ -2745,7 +2791,7 @@ function renderCalc() {
       let h = '<h3>出牌數（下一張讓你升級的牌）</h3>';
       if (!o.groups.length) h += '<p class="note" style="margin:0">沒有能讓你明顯升級的牌。</p>';
       for (const g of o.groups) h += '<div class="grp' + (g.strong ? '' : ' weak') + '"><b>' + (g.strong ? '' : '弱：') + esc(g.name) + ' ' + g.cards.length + ' 張</b>' + g.cards.map(cardSpan).join(' ') + '</div>';
-      if (o.total) h += '<p class="note" style="margin:6px 0 0">共 ' + o.total + ' 張出牌：下一張就中 ' + pct(o.pNext) + '%' + (r.board.length === 3 ? '，到河牌至少中一張 ' + pct(o.pRiver) + '%（2–4 法則：' + o.total + ' × 4 ≈ ' + Math.min(100, o.total * 4) + '%）' : '（法則：' + o.total + ' × 2 ≈ ' + o.total * 2 + '%）') + '。</p>';
+      if (o.total) h += '<p class="note" style="margin:6px 0 0">' + glossify('共 ' + o.total + ' 張出牌：下一張就中 ' + pct(o.pNext) + '%' + (r.board.length === 3 ? '，到河牌至少中一張 ' + pct(o.pRiver) + '%（2–4 法則：' + o.total + ' × 4 ≈ ' + Math.min(100, o.total * 4) + '%）' : '（法則：' + o.total + ' × 2 ≈ ' + o.total * 2 + '%）') + '。') + '</p>';
       if (o.weak) h += '<p class="note" style="margin:2px 0 0">「弱」是配成中對、底對，不算進出牌數。</p>';
       $('outsBox').innerHTML = h;
     } else $('outsBox').innerHTML = '';
@@ -2788,7 +2834,7 @@ function heatClick(g) {
 function initCalc() {
   let ob = '';
   for (let k = 1; k <= 8; k++) ob += '<button type="button" data-n="' + k + '" aria-pressed="' + (k === CALC.nOpp) + '">' + k + '</button>';
-  $('opps').insertAdjacentHTML('beforeend', ob);
+  $('opps').querySelector('label').insertAdjacentHTML('beforebegin', ob);
   $('opps').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-n]'); if (!b) return;
     CALC.nOpp = +b.dataset.n;
@@ -2799,6 +2845,7 @@ function initCalc() {
   $('slots').addEventListener('keydown', (e) => { const t = e.target.closest('[data-slot]'); if (t && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); slotClick(+t.dataset.slot); } });
   $('deck').addEventListener('click', (e) => { const b = e.target.closest('button[data-c]'); if (b) deckClick(+b.dataset.c); });
   $('heat').addEventListener('click', (e) => { const b = e.target.closest('button[data-g]'); if (b) heatClick(+b.dataset.g); });
+  $('eqHow').addEventListener('toggle', (e) => { if (e.target.matches('details.how')) CALC.howOpen = e.target.open; }, true);
   $('bDeal').addEventListener('click', () => {
     const s = CALC.slots;
     let i = 2;
@@ -3034,9 +3081,121 @@ function initBench() {
   });
 }
 
+/* ===== 45-explain：深入說明（勝率怎麼算、名詞解釋）。頁面右上「深入說明」可以關掉 ===== */
+const EXPLAIN = { on: true };
+try { const v = localStorage.getItem('dezhou-explain'); if (v !== null) EXPLAIN.on = v === '1'; } catch (e) { /* 沒有儲存空間 */ }
+function setExplain(on) {
+  EXPLAIN.on = !!on;
+  try { localStorage.setItem('dezhou-explain', on ? '1' : '0'); } catch (e) { /* 忽略 */ }
+  document.body.classList.toggle('noexplain', !EXPLAIN.on);
+  document.querySelectorAll('.explainChk').forEach((x) => { x.checked = EXPLAIN.on; });
+}
+
+/* 名詞解釋：教練的文字裡出現這些詞，就可以點開看 */
+const GLOSS = {
+  '底池賠率': '要跟的錢 ÷ 跟完之後的底池。例如跟 4、跟完底池是 15：4÷15＝27%。你的勝率高過 27%，長期跟注會賺；低於就會虧。',
+  '勝率要': '這就是「底池賠率」：要跟的錢 ÷ 跟完之後的底池。你的勝率比它高，長期跟注會賺；比它低，長期會虧。',
+  '對隨機手牌': '假設對手拿的是任意兩張牌，不管他之前怎麼打。這是最基本的算法，但通常會高估你的勝率：還留在牌局裡的人，牌一般比隨機的好。',
+  '照他們的動作估': '對手加注、跟注、下注，都會透露他的牌大概在哪裡。教練把他比較可能拿的牌加重、不太可能的減輕，再算你的勝率，通常比「對隨機手牌」準。',
+  '照他的動作估': '對手加注、跟注、下注，都會透露他的牌大概在哪裡。教練把他比較可能拿的牌加重、不太可能的減輕，再算你的勝率，通常比「對隨機手牌」準。',
+  '範圍': '一個人在這個情況下「可能拿著的所有手牌」。例如「前 20%」就是 169 種起手牌裡最好的那 20%。',
+  '有位置': '翻牌後比對手晚說話。你看得到他怎麼做再決定，資訊比較多，所以比較有利。',
+  '沒位置': '翻牌後比對手先說話。你得先做決定，對手看了再反應，所以比較吃虧。',
+  '打折': '勝率是「一路打到攤牌」的數字。沒位置、或牌不好打（不同花、不相連）的時候，常常還沒攤牌就被逼著棄牌，實際拿得到的會比較少，所以要打個折。',
+  '隱含賠率': '現在跟注的價錢有點貴，但如果中了大牌，對手之後還會再付錢給你。把這些之後會贏的錢算進去，跟注可能就划算。',
+  '半詐唬': '還沒成牌、但有聽牌時下注：對手棄牌你直接贏；對手跟了，你還有機會補到牌。',
+  '價值下注': '你的牌很可能比對手好的時候下注，讓比你差的牌付錢跟你。',
+  '沉沒成本': '已經放進底池的錢，不管接下來怎麼做都拿不回來，所以不應該影響接下來的判斷。',
+  '出牌': '下一張公牌如果是這些牌，你的牌會明顯變強。',
+  '2–4 法則': '出牌數 × 4 ≈ 翻牌時「到河牌至少中一次」的機率；出牌數 × 2 ≈「下一張就中」的機率。不用算，心算就好。',
+  '跛入': '翻牌前只跟大盲、不加注。',
+  '3-bet': '翻牌前有人加注之後再加注。（第一次加注算 2-bet。）',
+  '踢腳': '兩個人牌型一樣大時，比剩下最大的牌，那張牌叫踢腳。',
+  '起手牌': '一開始發給你的兩張牌。169 種是把花色不重要的組合合併後的數量（例如 A♠K♠、A♥K♥ 都算「AK 同花」）。',
+  '聽牌': '差一張就成牌，例如同花差一張（同花聽牌）、順子差一張（順子聽牌）。',
+  '詐唬': '牌不好卻下注或加注，想讓比你好的牌棄牌。',
+  '位置': '翻牌後說話的先後順序。按鈕位最後說話最有利，小盲、大盲最先說話最吃虧。',
+  '緊凶': '電腦對手的打法之一：牌好才玩，玩就積極下注。它下注、加注通常是真的有牌。',
+  '鬆凶': '電腦對手的打法之一：玩很多手牌，常常主動下注、加注，裡面有不少詐唬。',
+  '岩石': '電腦對手的打法之一：很少玩，一下大注通常是大牌。',
+  '跟注站': '電腦對手的打法之一：什麼都跟、很少棄牌，也很少加注。對它少詐唬、多價值下注。',
+  '瘋子': '電腦對手的打法之一：一直加注，常常是詐唬。牌不錯就可以跟它打到底。',
+};
+const GLOSS_KEYS = Object.keys(GLOSS).sort((a, b) => b.length - a.length);
+const GLOSS_RE = new RegExp(GLOSS_KEYS.map((k) => k.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')).join('|'), 'g');
+/* 把一段 HTML 裡的名詞換成可以點的按鈕（只換標籤外的文字；同一塊畫面每個詞只換第一次；長的詞優先，所以「半詐唬」不會被拆成「詐唬」） */
+function glossify(html, used) {
+  if (!EXPLAIN.on) return html;
+  used = used || new Set();
+  let inBtn = false;
+  return html.split(/(<[^>]+>)/).map((part) => {
+    if (part.startsWith('<')) { if (/^<button/.test(part)) inBtn = true; else if (/^<\/button/.test(part)) inBtn = false; return part; }
+    if (inBtn) return part;
+    return part.replace(GLOSS_RE, (k) => {
+      if (used.has(k)) return k;
+      used.add(k);
+      return '<button type="button" class="term" data-term="' + k + '">' + k + '</button>';
+    });
+  }).join('');
+}
+/* 點名詞：在那一段後面打開／收起解釋 */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('button.term'); if (!b) return;
+  const host = b.closest('li, p, td, div');
+  const next = host && host.nextElementSibling;
+  if (next && next.classList.contains('gdef') && next.dataset.term === b.dataset.term) { next.remove(); return; }
+  const d = document.createElement(host && host.tagName === 'LI' ? 'li' : 'div');
+  d.className = 'gdef'; d.dataset.term = b.dataset.term;
+  d.innerHTML = '<b>' + esc(b.dataset.term) + '</b>：' + esc(GLOSS[b.dataset.term]);
+  host.after(d);
+});
+
+const r100 = (x) => Math.round(+(x * 100).toFixed(1));   // 跟表上顯示的小數一致（59.49 顯示 59.5，就說 60）
+/* 勝率的白話：「100 次贏約 34 次」＋（N≥2）「要同時贏過 N 人」＋算法 */
+function eqPlain(x, N, method) {
+  if (x === null || x === undefined) return '…';
+  return '<span class="nw">100 次贏約 <b>' + r100(x) + '</b> 次</span>' + (N > 1 ? '<small>要同時贏過 ' + N + ' 人</small>' : '<small>&nbsp;</small>') + (method ? '<span class="mth">' + method + '</span>' : '');
+}
+/* 勝率表：對 1–N 家，多一欄「白話」（深入說明關掉時藏起來） */
+function eqTableHTML(eqAt, maxN, hlN, method) {
+  let h = '<table class="eqx"><thead><tr><th>對手</th><th></th><th class="r">勝率</th><th class="xp">白話</th></tr></thead><tbody>';
+  for (let N = 1; N <= maxN; N++) {
+    const x = eqAt(N);
+    h += '<tr class="' + (N === hlN ? 'hl' : '') + '"><td>對 ' + N + ' 家</td><td class="bc"><div class="bar"><i style="width:' + ((x || 0) * 100).toFixed(1) + '%"></i></div></td><td class="r num">'
+      + (x === null ? '…' : pct(x) + '%') + '</td><td class="xp">' + eqPlain(x, N, method ? method(N) : '') + '</td></tr>';
+  }
+  return h + '</tbody></table>';
+}
+/* 「這些機率怎麼算的？」：用現在這一手的數字講 */
+function eqHowHTML(o) {
+  // o = { pre: 翻牌前？, e1, e2, board: 張數, mcN, est }
+  const p = r100;
+  const has = (x) => x !== null && x !== undefined;
+  let h = '<details class="how"><summary>這些機率怎麼算的？</summary>';
+  h += '<p><b>勝率</b>：把還沒發的公牌、對手可能拿的牌都發完，數你贏的比例；平手時算你分到的那一份。' + (has(o.e1) ? '對 1 家 ' + p(o.e1) + '% 的意思是：同樣的情況打 100 次，你大約贏 ' + p(o.e1) + ' 次。' : '') + '</p>';
+  if (has(o.e1) && has(o.e2)) {
+    const ind = o.e1 * o.e1;
+    h += '<p><b>為什麼對 2 家會變低</b>：你要「同時」贏過每一個人才算贏。對 1 家時 100 次贏 ' + p(o.e1) + ' 次；多一個對手，這 ' + p(o.e1) + ' 次裡有一部分會輸給第二個人，剩下約 ' + p(o.e2) + ' 次，所以是 ' + p(o.e2) + '%。'
+      + '粗略心算：兩個人都要贏 ≈ ' + p(o.e1) + '% × ' + p(o.e1) + '% ≈ ' + p(ind) + '%；實際算出來是 ' + p(o.e2) + '%，'
+      + (Math.abs(o.e2 - ind) < 0.015 ? '很接近。' : o.e2 > ind ? '比心算高，因為兩個對手共用同一組公牌：公牌幫你成大牌的那幾次，常常是兩個人一起贏。' : '比心算低一點，因為平手時要好幾個人分。')
+      + '人越多，「至少有一個人拿到比你大的牌」的機會就越高。</p>';
+  }
+  h += '<p><b>怎麼算出來的</b>：</p><ul>';
+  if (o.pre) h += '<li>翻牌前：事先算好。169 種起手牌，每一種都模擬發牌 100 萬次（隨機發對手的牌和 5 張公牌，數你贏了幾次），誤差大約 ±0.1%。</li>';
+  else {
+    const runs = o.board === 3 ? '1,081 種（還有 2 張要發）' : o.board === 4 ? '46 種（還有 1 張要發）' : '1 種（公牌已經發完）';
+    h += '<li>對 1 家：精確計算。剩下的公牌有 ' + runs + '發法，對手的兩張牌大約有 1,000 種，每一種組合都比過一次再算比例，沒有誤差。</li>';
+    h += '<li>對 2 家以上：組合太多，用模擬' + (o.mcN ? ' ' + o.mcN.toLocaleString() + ' 次' : '') + '：每次隨機發每個對手兩張牌、再把公牌發完，數你贏了幾次。模擬越多次越準' + (o.mcN && o.e2 ? '，現在誤差大約 ±' + (196 * Math.sqrt(o.e2 * (1 - o.e2) / o.mcN)).toFixed(1) + '%' : '') + '。</li>';
+  }
+  h += '</ul>';
+  h += '<p><b>到河牌的牌型機率</b>：只看你自己的牌，把剩下的公牌每一種發法都算過，看你最後湊成什麼牌型；跟對手的牌無關。</p>';
+  if (o.est !== undefined && o.est !== null) h += '<p><b>為什麼教練的數字不一樣</b>：上面的表假設對手拿任意兩張牌。還留在牌局裡的人通常牌比較好（不好的早就棄了），所以教練另外照每個人的動作估他可能的牌，算出你的勝率約 ' + p(o.est) + '%，用這個數字給建議。</p>';
+  return h + '</details>';
+}
+
 /* ===== 50-game：牌局（首頁、牌桌、教練框、上一步／下一步、動作列、一手結束的檢討與重看） ===== */
 const SAVE_KEY = 'dezhou-game-1';
-const GS = { n: 6, mode: 'teach', level: 2, peek: false, auto: false, seen: [], hands: 0, net: 0, won: 0 };
+const GS = { n: 6, mode: 'teach', level: 2, peek: false, auto: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false };
 function gsLoad() { try { Object.assign(GS, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) { /* 沒有存檔 */ } }
 function gsSave() {
   if (G.ctx) GS.seen = [...G.ctx.seen];
@@ -3246,12 +3405,10 @@ function renderTable(st) {
     const sty = hero ? POS_ZH[p.pos] : styleZh(p.style) + '・' + POS_ZH[p.pos];
     h += '<div class="' + cls + '" style="left:' + xy.x.toFixed(1) + '%;top:' + xy.y.toFixed(1) + '%">'
       + '<div class="hc">' + cards + '</div>'
-      + '<div class="plate"><b>' + esc(p.name) + '</b><span class="sty">' + esc(sty) + '</span><br><span class="stk num">' + p.stack + '</span></div>'
+      + '<div class="plate">' + (k === S.button ? '<span class="dbtn" title="按鈕（莊家位）：翻牌後最後說話">D</span>' : '') + '<b>' + esc(p.name) + '</b><span class="sty">' + esc(sty) + '</span><br><span class="stk num">' + p.stack + '</span></div>'
       + bubble + '</div>';
     if (p.bet > 0) { const b = seatXY(n, k, hero ? 0.4 : 0.58); h += '<div class="betchip num" style="left:' + b.x.toFixed(1) + '%;top:' + b.y.toFixed(1) + '%"><i></i>' + p.bet + '</div>'; }
   }
-  const off = seatXY(n, S.button + 0.3, 0.72);
-  h += '<div class="dealer" style="left:' + off.x.toFixed(1) + '%;top:' + off.y.toFixed(1) + '%" title="按鈕">D</div>';
   $('seats').innerHTML = h;
   // 公牌
   const prevBoard = prev && prev.view < G.view ? prev.board : S.board.length;
@@ -3289,8 +3446,9 @@ function renderCoach(st) {
       const mk = { good: '✓', ok: '△', bad: '✗' }[st.grade.mark];
       h += '<div class="grade ' + st.grade.mark + '"><span class="mk">' + mk + '</span><div>' + esc(st.grade.text) + (st.grade.mark !== 'good' ? '<br><span class="note">教練的建議是：' + esc(st.adv.label) + '</span>' : '') + '</div></div>';
     }
-    for (const l of st.lines) h += '<p>' + rich(l) + '</p>';
-    if (st.tip) h += '<div class="tip"><b>第一次遇到，說明一下</b>' + rich(st.tip) + '</div>';
+    const used = new Set();
+    for (const l of st.lines) h += '<p>' + glossify(rich(l), used) + '</p>';
+    if (st.tip) h += '<div class="tip"><b>第一次遇到，說明一下</b>' + glossify(rich(st.tip), used) + '</div>';
   }
   if (!atHead() && !G.replay) h += '<p class="note">你在看前面的步驟；按「下一步」回到現在。</p>';
   $('cBody').innerHTML = h;
@@ -3308,8 +3466,10 @@ function heroHTML(st, S) {
   const adv = st.adv, L = legalSnapshot(S);
   let h = '<h3>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '：可以過牌') + '</h3>';
   if (atHead() && !G.replay) h += '<p class="note">' + (GS.mode === 'teach' ? '先看看教練的建議和原因，再選一個動作；有黃框的那顆是建議。' : '選一個動作；有黃框的那顆是建議。') + '</p>';
-  h += '<div class="adv"><div class="rec">建議：' + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + rich(r) + '</li>').join('') + '</ol>';
-  if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + rich(r) + '</p>').join('') + '</details>';
+  const used = new Set();
+  h += '<div class="adv"><div class="rec">建議：' + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
+  if (EXPLAIN.on && atHead() && !G.replay && !GS.seenTermHint) h += '<p class="note">底下有虛線的詞可以點，會跳出解釋；不需要的話，右上角「深入說明」可以關掉。</p>';
   h += '</div>';
   return h;
 }
@@ -3381,7 +3541,7 @@ function renderOdds() {
   if (hero.folded) { box.innerHTML = '<p class="note">你已經棄牌了。</p>'; return; }
   const live = S.players.filter((p) => !p.folded).length - 1;
   if (live < 1) { box.innerHTML = '<p class="note">只剩你了。</p>'; return; }
-  box.innerHTML = '<p class="note">計算中…</p>';
+  if (!box.querySelector('table')) box.innerHTML = '<p class="note">計算中…</p>';
   G.oddsTok = W.nextCalc();
   G.oddsLive = live;
   W.send({ cmd: 'calc', hero: hero.cards, board: S.board, maxOpp: 8, mcIters: 120000 });
@@ -3389,26 +3549,30 @@ function renderOdds() {
 function oddsHTML(m, mc) {
   const live = G.oddsLive;
   const eqN = (N) => m.pre ? m.pre.eq[N - 1] : N === 1 && m.exact ? m.exact.eq : mc ? (mc.win[N] + mc.tie[N]) / mc.n : null;
-  let h = '<p style="margin:4px 0">對隨機手牌的勝率（還在的對手：' + live + ' 個）</p><table>';
-  for (let N = 1; N <= Math.max(3, Math.min(8, live + 1)); N++) {
-    const x = eqN(N);
-    h += '<tr class="' + (N === live ? 'hl' : '') + '"><td>對 ' + N + ' 家</td><td style="width:50%"><div class="bar"><i style="width:' + ((x || 0) * 100).toFixed(1) + '%"></i></div></td><td class="r">' + (x === null ? '…' : pct(x) + '%') + '</td></tr>';
-  }
-  h += '</table>';
+  const method = (N) => m.pre ? '事先算好' : N === 1 ? '精確計算' : mc ? '模擬' + (mc.done ? '' : '中') : '模擬中';
+  let h = '<p style="margin:4px 0">對隨機手牌的勝率（還在的對手：' + live + ' 個，標黃的那一行）</p>';
+  h += eqTableHTML(eqN, Math.max(3, Math.min(8, live + 1)), live, method);
   const cat = m.pre ? m.pre.cat : m.cat;
   if (cat) {
     h += '<p style="margin:8px 0 4px">到河牌時的牌型機率</p><table>';
     for (let i = 8; i >= 0; i--) if (cat[i] > 0.0005) h += '<tr class="' + (m.cur && m.cur.cat === i ? 'hl' : '') + '"><td>' + CAT_NAMES[i] + '</td><td style="width:50%"><div class="bar"><i style="width:' + (cat[i] * 100).toFixed(1) + '%"></i></div></td><td class="r">' + pct(cat[i]) + '%</td></tr>';
     h += '</table>';
   }
-  if (m.outs && m.outs.total) h += '<p style="margin:8px 0 0">出牌 ' + m.outs.total + ' 張：' + m.outs.groups.filter((g) => g.strong).map((g) => g.name + ' ' + g.cards.map(cardSpan).join('')).join('；') + '</p>';
+  if (m.outs && m.outs.total) h += '<p style="margin:8px 0 0">' + glossify('出牌') + ' ' + m.outs.total + ' 張：' + m.outs.groups.filter((g) => g.strong).map((g) => g.name + ' ' + g.cards.map(cardSpan).join('')).join('；') + '</p>';
   const st = G.steps[G.view];
   if (st.adv) h += '<p class="note" style="margin-top:6px">教練是照對手的動作估他們可能的牌：勝率約 ' + pct(st.adv.eq, 0) + '%（比對隨機手牌更準）。</p>';
+  if (EXPLAIN.on) h += eqHowHTML({ pre: !!m.pre, e1: eqN(1), e2: eqN(2), board: m.pre ? 0 : (m.board || []).length, mcN: mc ? mc.n : 0, est: st.adv ? st.adv.eq : null });
   return h;
 }
 let ODDS_RES = null;
-W.on('calc', (m) => { if (m.token !== G.oddsTok) return; ODDS_RES = m; $('oddsBox').innerHTML = oddsHTML(m, null); });
-W.on('calcmc', (m) => { if (m.token !== G.oddsTok || !ODDS_RES) return; $('oddsBox').innerHTML = oddsHTML(ODDS_RES, m); });
+function setOdds(html) {   // 模擬一直在更新、換步驟也會重算：保持「怎麼算的」打開的狀態
+  const box = $('oddsBox'), top = box.scrollTop;
+  box.innerHTML = html;
+  if (G.howOpen) { const d = box.querySelector('details.how'); if (d) d.open = true; }
+  box.scrollTop = top;
+}
+W.on('calc', (m) => { if (m.token !== G.oddsTok) return; ODDS_RES = m; setOdds(oddsHTML(m, null)); });
+W.on('calcmc', (m) => { if (m.token !== G.oddsTok || !ODDS_RES) return; setOdds(oddsHTML(ODDS_RES, m)); });
 
 function renderCur() {
   const st = G.steps[G.view];
@@ -3436,6 +3600,14 @@ function initGame() {
   $('autoChk').addEventListener('change', (e) => { GS.auto = e.target.checked; gsSave(); scheduleAuto(); });
   $('peekChk').addEventListener('change', (e) => { GS.peek = e.target.checked; gsSave(); renderCur(); });
   $('cOdds').addEventListener('toggle', () => { if ($('cOdds').open) renderOdds(); });
+  $('oddsBox').addEventListener('toggle', (e) => { if (e.target.matches('details.how')) G.howOpen = e.target.open; }, true);
+  $('coach').addEventListener('click', (e) => { if (e.target.closest('button.term') && !GS.seenTermHint) { GS.seenTermHint = true; gsSave(); } });
+  document.querySelectorAll('.explainChk').forEach((x) => x.addEventListener('change', (e) => {
+    setExplain(e.target.checked);
+    if (G.H && G.steps[G.view]) renderCur();
+    if (CALC.res) renderCalc();
+  }));
+  setExplain(EXPLAIN.on);
   $('actBtns').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-a]'); if (!b) return;
     const L = legalActions(G.H), a = b.dataset.a;
@@ -3471,7 +3643,7 @@ function initGame() {
     else if (e.key === 'ArrowLeft') back();
   });
   let rt = 0;
-  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (!$('vTable').hidden && G.H) { G.lastRender = null; renderCur(); } }, 150); });
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (!$('vTable').hidden && G.H && G.steps[G.view]) { G.lastRender = { view: G.view, board: G.steps[G.view].snap.board.length }; renderTable(G.steps[G.view]); } /* 只重畫桌面：教練框裡打開的解釋、下注框都保留 */ }, 150); });
   showView('home');
 }
 

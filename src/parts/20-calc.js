@@ -56,7 +56,7 @@ function calcChanged() {
 function calcMsg(t) {
   $('bigEq').textContent = '—';
   $('handTxt').textContent = t; $('handSub').textContent = '';
-  $('eqTab').innerHTML = ''; $('catTab').innerHTML = ''; $('outsBox').innerHTML = ''; $('eqNote').textContent = '';
+  $('eqTab').innerHTML = ''; $('catTab').innerHTML = ''; $('outsBox').innerHTML = ''; $('eqNote').textContent = ''; $('eqHow').innerHTML = '';
 }
 
 W.on('calc', (m) => { if (m.token !== CALC.sent) return; CALC.res = m; CALC.mc = null; renderCalc(); });
@@ -82,8 +82,14 @@ function renderCalc() {
   $('bigEq').innerHTML = e === null ? '…' : pct(e) + '<small>%</small>';
   const hand = cardSpan(hero[0]) + cardSpan(hero[1]);
   let rows = '';
-  for (let k = 1; k <= 8; k++) { const x = eqFor(k); rows += barRow('對 ' + k + ' 家', x || 0, k === N, x === null ? '…' : pct(x) + '%'); }
+  for (let k = 1; k <= 8; k++) {
+    const x = eqFor(k);
+    rows += '<tr class="' + (k === N ? 'hl' : '') + '"><td>對 ' + k + ' 家</td><td><div class="bar"><i style="width:' + ((x || 0) * 100).toFixed(1) + '%"></i></div></td><td class="r">' + (x === null ? '…' : pct(x) + '%') + '</td><td class="xp">' + eqPlain(x, k, '') + '</td></tr>';
+  }
   $('eqTab').innerHTML = rows;
+  const howEl = $('eqHow');
+  howEl.innerHTML = EXPLAIN.on ? eqHowHTML({ pre: !!r.pre, e1: eqFor(1), e2: eqFor(2), board: r.board.length, mcN: CALC.mc ? CALC.mc.n : 0, est: null }) : '';
+  if (CALC.howOpen && howEl.querySelector('details')) howEl.querySelector('details').open = true;
   if (r.pre) {
     const g = r.cls;
     $('handTxt').innerHTML = hand + '（' + esc(classTxt(g)) + '）';
@@ -115,7 +121,7 @@ function renderCalc() {
       let h = '<h3>出牌數（下一張讓你升級的牌）</h3>';
       if (!o.groups.length) h += '<p class="note" style="margin:0">沒有能讓你明顯升級的牌。</p>';
       for (const g of o.groups) h += '<div class="grp' + (g.strong ? '' : ' weak') + '"><b>' + (g.strong ? '' : '弱：') + esc(g.name) + ' ' + g.cards.length + ' 張</b>' + g.cards.map(cardSpan).join(' ') + '</div>';
-      if (o.total) h += '<p class="note" style="margin:6px 0 0">共 ' + o.total + ' 張出牌：下一張就中 ' + pct(o.pNext) + '%' + (r.board.length === 3 ? '，到河牌至少中一張 ' + pct(o.pRiver) + '%（2–4 法則：' + o.total + ' × 4 ≈ ' + Math.min(100, o.total * 4) + '%）' : '（法則：' + o.total + ' × 2 ≈ ' + o.total * 2 + '%）') + '。</p>';
+      if (o.total) h += '<p class="note" style="margin:6px 0 0">' + glossify('共 ' + o.total + ' 張出牌：下一張就中 ' + pct(o.pNext) + '%' + (r.board.length === 3 ? '，到河牌至少中一張 ' + pct(o.pRiver) + '%（2–4 法則：' + o.total + ' × 4 ≈ ' + Math.min(100, o.total * 4) + '%）' : '（法則：' + o.total + ' × 2 ≈ ' + o.total * 2 + '%）') + '。') + '</p>';
       if (o.weak) h += '<p class="note" style="margin:2px 0 0">「弱」是配成中對、底對，不算進出牌數。</p>';
       $('outsBox').innerHTML = h;
     } else $('outsBox').innerHTML = '';
@@ -158,7 +164,7 @@ function heatClick(g) {
 function initCalc() {
   let ob = '';
   for (let k = 1; k <= 8; k++) ob += '<button type="button" data-n="' + k + '" aria-pressed="' + (k === CALC.nOpp) + '">' + k + '</button>';
-  $('opps').insertAdjacentHTML('beforeend', ob);
+  $('opps').querySelector('label').insertAdjacentHTML('beforebegin', ob);
   $('opps').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-n]'); if (!b) return;
     CALC.nOpp = +b.dataset.n;
@@ -169,6 +175,7 @@ function initCalc() {
   $('slots').addEventListener('keydown', (e) => { const t = e.target.closest('[data-slot]'); if (t && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); slotClick(+t.dataset.slot); } });
   $('deck').addEventListener('click', (e) => { const b = e.target.closest('button[data-c]'); if (b) deckClick(+b.dataset.c); });
   $('heat').addEventListener('click', (e) => { const b = e.target.closest('button[data-g]'); if (b) heatClick(+b.dataset.g); });
+  $('eqHow').addEventListener('toggle', (e) => { if (e.target.matches('details.how')) CALC.howOpen = e.target.open; }, true);
   $('bDeal').addEventListener('click', () => {
     const s = CALC.slots;
     let i = 2;
