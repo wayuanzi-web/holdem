@@ -1,0 +1,278 @@
+<title>德州軍師</title>
+<!--FONTS-->
+<style>
+:root {
+  --ink: #0e1d19;        /* 牌桌陰影裡的深綠 */
+  --felt: #17392f;       /* 檯面 */
+  --felt2: #1f4a3d;
+  --line: #2c5547;
+  --text: #e6eee9;
+  --mute: #93aaa1;
+  --brass: #d0a84e;      /* 黃銅：選取、焦點 */
+  --seal: #c8372d;       /* 朱印 */
+  --face: #fbf8f1;       /* 牌面 */
+  --s0: #1c2333; --s1: #c8372d; --s2: #2463c7; --s3: #2c8548;   /* ♠♥♦♣ 四色牌 */
+  --a-chk: #3f9d6a; --a-fold: #4c7bc4;
+  --serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --sans: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--ink); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.55; -webkit-text-size-adjust: 100%; }
+body { min-height: 100vh; background: radial-gradient(120% 80% at 50% -10%, #1d4538 0%, var(--ink) 60%) fixed; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ===== 頁首：朱印、名稱、分頁 ===== */
+.top { display: flex; align-items: center; gap: 14px; padding: 14px 20px 0; max-width: 1240px; margin: 0 auto; flex-wrap: wrap; }
+.seal { width: 52px; height: 52px; flex: none; background: var(--seal); border-radius: 6px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+  padding: 5px; color: #fff3e8; font-family: var(--serif); font-weight: 900; font-size: 18px; line-height: 1; box-shadow: inset 0 0 0 2px rgba(255,240,225,.55), inset 0 0 0 4px var(--seal);
+  transform: rotate(-3deg); }
+.seal b { display: grid; place-items: center; }
+.brand { flex: 1 1 220px; min-width: 0; }
+.brand h1 { margin: 0; font-family: var(--serif); font-weight: 900; font-size: 26px; letter-spacing: .06em; line-height: 1.1; }
+.brand p { margin: 2px 0 0; color: var(--mute); font-size: 13px; }
+.webbar { margin-left: auto; display: flex; gap: 8px; }
+.chip { border: 1px solid var(--line); background: rgba(255,255,255,.03); border-radius: 999px; padding: 5px 14px; cursor: pointer; font-size: 14px; }
+.chip:hover { border-color: var(--brass); }
+.tabs { display: flex; gap: 4px; max-width: 1240px; margin: 14px auto 0; padding: 0 20px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tabs button { background: none; border: 0; padding: 10px 16px 11px; font-size: 16px; color: var(--mute); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--brass); font-weight: 600; }
+main { max-width: 1240px; margin: 0 auto; padding: 18px 20px 60px; }
+[hidden] { display: none !important; }
+h2 { font-size: 17px; margin: 0 0 10px; font-weight: 600; }
+h3 { font-size: 14px; margin: 0 0 6px; color: var(--mute); font-weight: 500; }
+.panel { background: rgba(23,57,47,.55); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.note { color: var(--mute); font-size: 13px; }
+.btn { border: 1px solid var(--line); background: var(--felt2); border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 15px; }
+.btn:hover { border-color: var(--brass); }
+.btn.main { background: var(--brass); color: #1b1608; border-color: var(--brass); font-weight: 700; }
+.btn.main:hover { background: #e2bc63; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.sm { padding: 5px 11px; font-size: 14px; }
+
+/* ===== 牌 ===== */
+.cd { --w: 46px; width: var(--w); height: calc(var(--w) * 1.4); border-radius: calc(var(--w) * .12); background: var(--face); color: var(--s0);
+  display: inline-flex; flex-direction: column; align-items: flex-start; padding: calc(var(--w) * .07) calc(var(--w) * .1); font-family: var(--serif); font-weight: 900;
+  line-height: 1; box-shadow: 0 2px 0 rgba(0,0,0,.35); position: relative; flex: none; user-select: none; }
+.cd .r { font-size: calc(var(--w) * .46); letter-spacing: -.04em; }
+.cd .s { font-size: calc(var(--w) * .42); margin-top: calc(var(--w) * .04); font-family: var(--sans); }
+.cd .big { position: absolute; right: calc(var(--w) * .08); bottom: calc(var(--w) * .04); font-size: calc(var(--w) * .62); font-family: var(--sans); opacity: .9; }
+.cd.c0 { color: var(--s0); } .cd.c1 { color: var(--s1); } .cd.c2 { color: var(--s2); } .cd.c3 { color: var(--s3); }
+.cd.empty { background: transparent; border: 2px dashed var(--line); box-shadow: none; }
+.cd.on { box-shadow: 0 0 0 3px var(--brass); }
+.cd.empty.on { border-color: var(--brass); box-shadow: none; }
+.ct { font-weight: 700; white-space: nowrap; }
+.ct.c0 { color: #dfe6f3; } .ct.c1 { color: #ff7b6e; } .ct.c2 { color: #79a8ff; } .ct.c3 { color: #69cf8c; }
+
+/* ===== 勝率計算機 ===== */
+.calc { display: grid; grid-template-columns: minmax(300px, 430px) 1fr; gap: 18px; align-items: start; }
+.slots { display: flex; gap: 22px; flex-wrap: wrap; }
+.slots .row { display: flex; gap: 6px; }
+.slots .cd { cursor: pointer; }
+.slots .cd:not(.empty) { border: 0; }
+.cd.empty { border-color: #3d7060; }
+.slots .gap { width: 6px; }
+.deck { display: grid; grid-template-columns: repeat(13, 1fr); gap: 4px; margin-top: 14px; }
+.deck button { border: 0; padding: 0; background: var(--face); border-radius: 5px; aspect-ratio: 5 / 7; cursor: pointer; font-family: var(--serif); font-weight: 900;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; font-size: 15px; }
+.deck button span { font-family: var(--sans); font-size: 13px; margin-top: 1px; }
+.deck button.c0 { color: var(--s0); } .deck button.c1 { color: var(--s1); } .deck button.c2 { color: var(--s2); } .deck button.c3 { color: var(--s3); }
+.deck button.used { opacity: .18; }
+.deck button:hover:not(.used) { box-shadow: 0 0 0 2px var(--brass); }
+.tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.head { display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+.bignum { font-family: var(--serif); font-weight: 900; font-size: 56px; line-height: 1; letter-spacing: -.02em; }
+.bignum small { font-size: 22px; margin-left: 2px; }
+.headtxt .hand { font-size: 18px; font-weight: 600; }
+.headtxt .sub { color: var(--mute); font-size: 14px; }
+.opps { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 6px; align-items: center; }
+.opps button { min-width: 38px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: none; cursor: pointer; }
+.opps button[aria-pressed="true"] { background: var(--brass); border-color: var(--brass); color: #1b1608; font-weight: 700; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 14px; }
+.bars { width: 100%; border-collapse: collapse; }
+.bars td { padding: 3px 0; font-size: 14px; vertical-align: middle; }
+.bars td:first-child { width: 4.6em; color: var(--mute); white-space: nowrap; }
+.bars td:last-child { width: 4.2em; text-align: right; }
+.bars tr.hl td { color: var(--text); font-weight: 700; }
+.bar { height: 10px; background: rgba(255,255,255,.07); border-radius: 5px; overflow: hidden; margin: 0 8px; }
+.bar i { display: block; height: 100%; background: var(--brass); border-radius: 5px; }
+.bars tr:not(.hl) .bar i { background: #6f9c88; }
+.bars tr.zero td { opacity: .35; }
+.outs .grp { margin: 6px 0; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; font-size: 14px; }
+.outs .grp b { margin-right: 6px; }
+.outs .weak { opacity: .6; }
+.heat { display: grid; grid-template-columns: repeat(13, 1fr); gap: 2px; margin-top: 8px; }
+.heat button { border: 0; border-radius: 3px; padding: 0; aspect-ratio: 1; font-size: 10px; cursor: pointer; line-height: 1; font-weight: 600; }
+.heat button.me { box-shadow: 0 0 0 2px var(--seal), 0 0 0 3px #fff; position: relative; z-index: 1; }
+.msg { padding: 14px; border: 1px dashed var(--line); border-radius: 10px; color: var(--mute); }
+
+/* ===== 求解器 ===== */
+.sbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.seg button { background: none; border: 0; padding: 7px 14px; cursor: pointer; font-size: 14px; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--felt2); color: var(--brass); font-weight: 700; }
+.spec { margin-top: 10px; font-size: 14px; color: var(--mute); }
+.prog { margin-top: 12px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; font-size: 14px; }
+.prog .track { flex: 1 1 200px; height: 8px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; min-width: 160px; }
+.prog .track i { display: block; height: 100%; width: 0; background: var(--brass); transition: width .3s; }
+.sview { display: grid; grid-template-columns: minmax(320px, 560px) 1fr; gap: 18px; margin-top: 16px; align-items: start; }
+.crumbs { font-size: 14px; color: var(--mute); display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; margin-bottom: 8px; }
+.crumbs button { background: none; border: 0; color: var(--text); padding: 0; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.boardrow { display: flex; gap: 5px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
+.acts { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 12px; }
+.acts button { border: 1px solid var(--line); background: var(--felt2); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 14px; display: flex; gap: 8px; align-items: center; }
+.acts button:hover { border-color: var(--brass); }
+.acts .sw { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.grid13 { display: grid; grid-template-columns: repeat(13, 1fr); gap: 2px; }
+.grid13 .cell { position: relative; aspect-ratio: 1; background: #20403a; border-radius: 3px; overflow: hidden; cursor: pointer; border: 0; padding: 0; }
+.grid13 .cell .fill { position: absolute; left: 0; right: 0; bottom: 0; display: flex; }
+.grid13 .cell .fill i { display: block; height: 100%; }
+.grid13 .cell span { position: absolute; left: 2px; top: 1px; font-size: 10px; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.8); line-height: 1.1; }
+.grid13 .cell.sel { box-shadow: inset 0 0 0 2px var(--brass); }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; margin-top: 8px; color: var(--mute); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.combos { width: 100%; border-collapse: collapse; font-size: 14px; }
+.combos th { text-align: left; color: var(--mute); font-weight: 500; padding: 4px 6px; border-bottom: 1px solid var(--line); }
+.combos td { padding: 4px 6px; border-bottom: 1px solid rgba(44,85,71,.5); }
+.combos td.r { text-align: right; }
+.sbarh { display: flex; height: 10px; border-radius: 3px; overflow: hidden; min-width: 90px; background: rgba(255,255,255,.06); }
+.sbarh i { display: block; height: 100%; }
+.cardpick { display: grid; grid-template-columns: repeat(13, 1fr); gap: 4px; max-width: 560px; }
+
+/* ===== 效能測試 ===== */
+.bench { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+.bench th { text-align: left; color: var(--mute); font-weight: 500; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.bench td { padding: 8px; border-bottom: 1px solid rgba(44,85,71,.5); vertical-align: top; }
+.bench td.v { font-family: var(--serif); font-weight: 900; font-size: 18px; white-space: nowrap; }
+.bench .sub { color: var(--mute); font-size: 13px; }
+.dev { margin-top: 12px; font-size: 13px; color: var(--mute); word-break: break-all; }
+
+@media (max-width: 900px) {
+  .calc, .sview { grid-template-columns: 1fr; }
+  .calc { display: flex; flex-direction: column; gap: 16px; }
+  .lcol { display: contents; }
+  .rcol { order: 2; }
+  #heatPanel { order: 3; margin-top: 0 !important; }
+  .cols { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  html, body { font-size: 14px; }
+  .top { padding: 10px 14px 0; gap: 10px; }
+  .seal { width: 42px; height: 42px; font-size: 14px; padding: 4px; }
+  .brand { flex: 1 1 220px; min-width: 0; }
+.brand h1 { font-size: 21px; }
+  .tabs { padding: 0 8px; }
+  .tabs button { padding: 9px 11px 10px; font-size: 15px; }
+  main { padding: 14px 12px 50px; }
+  .panel { padding: 12px; }
+  .cd { --w: 38px; }
+  .slots { gap: 14px; }
+  .deck { gap: 3px; }
+  .deck button { font-size: 12px; border-radius: 4px; }
+  .deck button span { font-size: 11px; }
+  .bignum { font-size: 46px; }
+  .opps button { min-width: 32px; padding: 3px 8px; }
+  .heat button { font-size: 8px; }
+  .grid13 .cell span { font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<div id="app">
+<header class="top">
+  <div class="seal" aria-hidden="true"><b>德</b><b>州</b><b>軍</b><b>師</b></div>
+  <div class="brand"><h1>德州軍師</h1><p>引擎實驗室（第一步）：勝率、牌型機率、GTO 求解器</p></div>
+  <div class="webbar" id="webbar"></div>
+</header>
+<nav class="tabs" role="tablist" aria-label="功能">
+  <button role="tab" id="tCalc" aria-controls="pCalc" aria-selected="true">勝率計算機</button>
+  <button role="tab" id="tSolve" aria-controls="pSolve" aria-selected="false">求解器</button>
+  <button role="tab" id="tBench" aria-controls="pBench" aria-selected="false">效能測試</button>
+</nav>
+<main>
+  <section id="pCalc" role="tabpanel" aria-labelledby="tCalc">
+    <div class="calc">
+      <div class="lcol">
+      <div class="panel">
+        <div class="slots" id="slots"></div>
+        <div class="deck" id="deck" aria-label="選牌"></div>
+        <div class="tools">
+          <button class="btn sm" id="bDeal">發下一張公牌</button>
+          <button class="btn sm" id="bNewHand">隨機手牌</button>
+          <button class="btn sm" id="bClearBoard">清掉公牌</button>
+        </div>
+        <p class="note" style="margin:12px 0 0">點上面的空格，再點下面的牌放進去；點已經放的牌就拿掉。公牌要 3 張（翻牌）以上才算翻牌後。</p>
+      </div>
+      <div class="panel" id="heatPanel" style="margin-top:16px">
+        <h2 id="heatTitle">起手牌強度：對 1 家</h2>
+        <p class="note" style="margin:0">169 種起手牌，越亮越強；右上同花、左下不同花、對角線是對子。點一格換成那一手。</p>
+        <div class="heat" id="heat"></div>
+      </div>
+      </div>
+      <div class="rcol">
+        <div class="panel" id="calcOut">
+          <div class="head">
+            <div class="bignum num" id="bigEq">—</div>
+            <div class="headtxt"><div class="hand" id="handTxt"></div><div class="sub" id="handSub"></div></div>
+          </div>
+          <div class="opps" id="opps"><span class="note">對手人數</span></div>
+          <div class="cols">
+            <div><h3>勝率（對 N 家隨機手牌）</h3><table class="bars num" id="eqTab"></table><p class="note" id="eqNote"></p></div>
+            <div><h3 id="catTitle">到河牌時的牌型機率</h3><table class="bars num" id="catTab"></table></div>
+          </div>
+          <div id="outsBox" style="margin-top:14px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pSolve" role="tabpanel" aria-labelledby="tSolve" hidden>
+    <div class="panel">
+      <div class="sbar">
+        <div class="seg" id="presetSeg"></div>
+        <button class="btn main" id="bSolve">開始求解</button>
+        <button class="btn" id="bStop" hidden>停止</button>
+      </div>
+      <div class="spec" id="spec"></div>
+      <div class="prog" id="prog" hidden>
+        <span class="num" id="progTxt"></span>
+        <div class="track" aria-hidden="true"><i id="progBar"></i></div>
+        <span class="num" id="progTime"></span>
+      </div>
+    </div>
+    <div class="sview" id="sview" hidden>
+      <div class="panel">
+        <div class="crumbs" id="crumbs"></div>
+        <div class="boardrow" id="sBoard"></div>
+        <div id="nodeHead"></div>
+        <div class="acts" id="acts"></div>
+        <div id="gridWrap"><div class="grid13" id="grid13"></div><div class="legend" id="legend"></div></div>
+        <div id="chancePick" hidden><p class="note">選下一張牌：</p><div class="cardpick deck" id="cardPick"></div></div>
+      </div>
+      <div class="panel" id="sideBox">
+        <h2>整體</h2>
+        <table class="bars num" id="freqTab"></table>
+        <p class="note" id="nodeNums"></p>
+        <h2 style="margin-top:16px" id="cellTitle">點左邊的格子看每個組合</h2>
+        <div id="cellBox"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pBench" role="tabpanel" aria-labelledby="tBench" hidden>
+    <div class="panel">
+      <h2>量這台裝置跑多快</h2>
+      <p class="note" style="margin:0 0 12px">請在你的手機和電腦各跑一次，按「複製結果」貼回對話。第四步要做多大的翻牌求解，就看這些數字。測試會跑三十秒到幾分鐘，跑的時候畫面可以照常用。</p>
+      <div class="tools" style="margin-top:0">
+        <button class="btn main" id="bBench">開始測試</button>
+        <label class="note" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="bigChk">加測轉牌大樹（較久，電腦再勾）</label>
+        <button class="btn" id="bCopy" disabled>複製結果</button>
+      </div>
+      <table class="bench" id="benchTab"><thead><tr><th>項目</th><th>結果</th><th>說明</th></tr></thead><tbody></tbody></table>
+      <p class="note" id="benchMsg"></p>
+      <div class="dev" id="devInfo"></div>
+    </div>
+  </section>
+</main>
+</div>
