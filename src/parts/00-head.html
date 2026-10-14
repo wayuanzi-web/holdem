@@ -423,6 +423,17 @@ body.intable .brand p { display: none; }
 .lncats .lngrp td { color: var(--brass); font-size: 13px; padding-top: 12px; border-bottom-color: var(--brass); }
 .lnradv .cs { white-space: nowrap; }
 #tInfo.exam b { color: var(--brass); }
+.lnok { color: #6fd08f; font-size: 14px; font-weight: 600; } .lnno { color: #f08a7a; font-size: 14px; font-weight: 600; }
+.lngrad { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.lngrad .panel { margin: 0; } .lngrad .lnh4 { margin-top: 0; }
+@media (max-width: 640px) { .lngrad { grid-template-columns: 1fr; } }
+.lncert img { display: block; width: 100%; max-width: 900px; margin: 12px auto; border-radius: 6px; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+.lnname2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 15px; }
+.lnname2 input { flex: 1; min-width: 10em; font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--ink); color: var(--text); }
+.lnpolar td, .lnpolar th { text-align: right; padding: 5px 6px; }
+.lnpolar th.cs { font-size: 12px; line-height: 1.3; white-space: nowrap; }
+.lnpolar td:first-child, .lnpolar th:first-child { text-align: left; white-space: nowrap; }
+.lncertb { width: 100%; }
 .lnleg { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--mute); margin: 8px 0; }
 .lnleg i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
 .lngrid .cell { cursor: pointer; }

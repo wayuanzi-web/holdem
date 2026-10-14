@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1d19"><meta name="description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="德州軍師"><meta property="og:type" content="website"><meta property="og:title" content="德州軍師"><meta property="og:description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><meta property="og:image" content="https://wayuanzi-web.github.io/holdem/og.png"><meta property="og:url" content="https://wayuanzi-web.github.io/holdem/"><meta name="twitter:card" content="summary_large_image"><title>德州軍師</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%9F%E4%B8%A6%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%9D%E4%B9%9F%E4%B9%BE%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%8D%E4%BB%94%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A4%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BC%BC%E4%BD%86%E4%BD%88%E4%BD%8D%E4%BD%8E%E4%BD%8F%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%82%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%99%E5%82%B3%E5%83%8F%E5%83%B9%E5%84%AA%E5%84%B2%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AB%E5%85%AC%E5%85%AD%E5%85%B1%E5%85%B6%E5%85%B7%E5%85%B8%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%9F%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%A2%E5%8B%BE%E5%8C%85%E5%8C%96%E5%8C%AF%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%83%E5%8F%88%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%A6%E5%90%AB%E5%91%8A%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%8F%E5%95%9F%E5%96%AE%E5%97%8E%E5%98%9B%E5%99%A8%E5%9A%87%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9B%BA%E5%9C%88%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9C%BE%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%83%E5%9E%8B%E5%9F%B7%E5%9F%BA%E5%A0%85%E5%A0%B1%E5%A0%B4%E5%A1%97%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AB%8C%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AD%B8%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%88%E5%B0%8D%E5%B0%8E%E5%B0%8F%E5%B0%91%E5%B0%AC%E5%B0%B1%E5%B0%B7%E5%B0%BA%E5%B0%BE%E5%B1%80%E5%B1%95%E5%B1%A4%E5%B1%AC%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B7%B4%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%85%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%A7%E5%BA%AB%E5%BB%BA%E5%BC%84%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%A9%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8B%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%97%E5%BF%A0%E5%BF%AB%E6%80%8E%E6%80%95%E6%80%9D%E6%80%A7%E6%83%85%E6%83%B3%E6%84%8F%E6%84%9B%E6%85%8B%E6%85%A2%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%88%90%E6%88%91%E6%88%96%E6%88%B0%E6%88%B2%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%A3%E6%89%B9%E6%89%BE%E6%8A%8A%E6%8A%93%E6%8A%95%E6%8A%98%E6%8A%BD%E6%8B%96%E6%8B%AC%E6%8B%BF%E6%8C%81%E6%8C%87%E6%8C%89%E6%8C%91%E6%8C%96%E6%8D%A8%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A7%E6%8E%A8%E6%8F%9B%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%87%E6%93%8B%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BB%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%A3%E6%95%B4%E6%95%B8%E6%96%87%E6%96%99%E6%96%9C%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%96%BD%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%99%AF%E6%9A%97%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9C%80%E6%9C%83%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%91%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9E%B6%E6%9F%90%E6%9F%A5%E6%A0%B8%E6%A0%B9%E6%A0%BC%E6%A1%86%E6%A1%88%E6%A1%8C%E6%A2%85%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%9A%E6%A5%AD%E6%A5%B5%E6%A6%82%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A3%E6%AD%A5%E6%AE%B5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B0%A3%E6%B0%B8%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B4%97%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B7%BA%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E6%BB%BF%E6%BF%95%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%86%9F%E7%87%A5%E7%88%9B%E7%88%BE%E7%89%88%E7%89%8C%E7%89%B9%E7%8C%9C%E7%8D%8E%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%90%86%E7%94%9A%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%8C%E7%95%99%E7%95%A2%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%A4%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%81%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%AD%E7%9F%B3%E7%A0%94%E7%A1%AC%E7%A2%BA%E7%A2%BC%E7%A4%8E%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A8%B1%E7%A9%8D%E7%A9%A9%E7%A9%B6%E7%A9%BA%E7%A9%BF%E7%AA%81%E7%AA%84%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%94%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%80%E7%B4%84%E7%B4%85%E7%B4%94%E7%B4%9A%E7%B4%AF%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B5%B1%E7%B6%93%E7%B6%A0%E7%B6%AD%E7%B6%B2%E7%B7%8A%E7%B7%92%E7%B7%9A%E7%B7%A3%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B8%BE%E7%B9%9E%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%92%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%8C%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%87%E8%88%8A%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8E%8A%E8%90%AC%E8%91%97%E8%91%AB%E8%92%99%E8%98%86%E8%99%95%E8%99%9B%E8%99%A7%E8%99%B9%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A1%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%8B%E8%A6%8F%E8%A6%BD%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%93%E8%A8%98%E8%A8%A3%E8%A8%AD%E8%A8%B4%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%A9%B3%E8%AA%8D%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AA%B2%E8%AA%BF%E8%AB%8B%E8%AB%96%E8%AC%9B%E8%AD%B0%E8%AD%B7%E8%AE%80%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%AA%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B7%91%E8%B7%9B%E8%B7%9D%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8B%E9%81%8E%E9%81%93%E9%81%94%E9%81%A0%E9%81%A9%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%91%E9%87%9D%E9%88%95%E9%8C%84%E9%8C%A2%E9%8C%A6%E9%8C%AF%E9%8E%96%E9%90%98%E9%95%B7%E9%96%80%E9%96%89%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%B2%E9%98%BB%E9%98%BF%E9%99%84%E9%99%90%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%8E%E9%9A%94%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A2%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A0%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%90%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8C%E9%A1%8D%E9%A1%8F%E9%A1%98%E9%A1%9E%E9%A1%AF%E9%A2%A8%E9%A6%96%E9%A6%AC%E9%A9%97%E9%A9%9F%E9%AB%92%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%9F%E4%B8%A6%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%98%E4%B9%9D%E4%B9%9F%E4%B9%BE%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%8D%E4%BB%94%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A4%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BC%BC%E4%BD%86%E4%BD%88%E4%BD%8D%E4%BD%8E%E4%BD%8F%E4%BD%94%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%82%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%99%E5%82%B3%E5%82%BE%E5%83%8F%E5%83%B9%E5%84%AA%E5%84%B2%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AB%E5%85%AC%E5%85%AD%E5%85%B1%E5%85%B6%E5%85%B7%E5%85%B8%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%9F%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%A2%E5%8B%BE%E5%8C%85%E5%8C%96%E5%8C%AF%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%9A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%83%E5%8F%88%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%A6%E5%90%AB%E5%91%8A%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%8F%E5%95%9F%E5%96%9C%E5%96%AE%E5%97%8E%E5%98%9B%E5%99%A8%E5%9A%87%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9B%BA%E5%9C%88%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9C%BE%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%83%E5%9E%8B%E5%9F%B7%E5%9F%BA%E5%A0%85%E5%A0%B1%E5%A0%B4%E5%A1%97%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AB%8C%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AD%B8%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%9F%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%88%E5%B0%8A%E5%B0%8D%E5%B0%8E%E5%B0%8F%E5%B0%91%E5%B0%AC%E5%B0%B1%E5%B0%B7%E5%B0%BA%E5%B0%BE%E5%B1%80%E5%B1%95%E5%B1%A4%E5%B1%AC%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B7%B4%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%85%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%B4%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%A7%E5%BA%AB%E5%BB%BA%E5%BC%84%E5%BC%88%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%A9%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8B%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%85%E5%BF%97%E5%BF%A0%E5%BF%AB%E5%BF%B5%E6%80%8E%E6%80%95%E6%80%9D%E6%80%A7%E6%83%85%E6%83%B3%E6%84%8F%E6%84%9B%E6%85%8B%E6%85%A2%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%88%90%E6%88%91%E6%88%96%E6%88%B0%E6%88%B2%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%A3%E6%89%B9%E6%89%BE%E6%8A%8A%E6%8A%93%E6%8A%95%E6%8A%98%E6%8A%BD%E6%8B%96%E6%8B%AC%E6%8B%BF%E6%8C%81%E6%8C%87%E6%8C%89%E6%8C%91%E6%8C%96%E6%8D%A8%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A7%E6%8E%A8%E6%8F%9B%E6%90%8D%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%87%E6%93%8A%E6%93%8B%E6%93%9A%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BB%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%A3%E6%95%B4%E6%95%B8%E6%96%87%E6%96%99%E6%96%9C%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%96%BD%E6%97%A5%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%99%AF%E6%9A%97%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9B%B8%E6%9C%80%E6%9C%83%E6%9C%88%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%91%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9E%B6%E6%9F%90%E6%9F%A5%E6%A0%B8%E6%A0%B9%E6%A0%BC%E6%A1%86%E6%A1%88%E6%A1%8C%E6%A2%85%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%9A%E6%A5%AD%E6%A5%B5%E6%A6%82%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A1%E6%AD%A3%E6%AD%A4%E6%AD%A5%E6%AE%B5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B0%A3%E6%B0%B8%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B2%BF%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B4%97%E6%B4%9E%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B7%BA%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E6%BB%BF%E6%BC%8F%E6%BF%95%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%86%9F%E7%87%A5%E7%88%9B%E7%88%BE%E7%89%87%E7%89%88%E7%89%8C%E7%89%B9%E7%8A%AF%E7%8C%9C%E7%8D%8E%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%90%86%E7%94%9A%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%8C%E7%95%99%E7%95%A2%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%A4%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%81%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%AD%E7%9F%B3%E7%A0%94%E7%A1%AC%E7%A2%BA%E7%A2%BC%E7%A4%8E%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A8%B1%E7%A9%8D%E7%A9%A9%E7%A9%B6%E7%A9%BA%E7%A9%BF%E7%AA%81%E7%AA%84%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%94%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B0%BF%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%80%E7%B4%84%E7%B4%85%E7%B4%94%E7%B4%9A%E7%B4%AF%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B5%B1%E7%B6%93%E7%B6%A0%E7%B6%AD%E7%B6%B2%E7%B7%8A%E7%B7%92%E7%B7%9A%E7%B7%A3%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B8%BE%E7%B9%9E%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%92%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%8C%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%87%E8%88%8A%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8C%B2%E8%8E%8A%E8%90%AC%E8%90%BD%E8%91%97%E8%91%AB%E8%92%99%E8%96%84%E8%98%86%E8%99%95%E8%99%9B%E8%99%A7%E8%99%B9%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A1%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%8B%E8%A6%8F%E8%A6%BD%E8%A7%80%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%93%E8%A8%98%E8%A8%A3%E8%A8%AD%E8%A8%B4%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A2%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%A9%B3%E8%AA%8D%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AA%B2%E8%AA%BF%E8%AB%8B%E8%AB%96%E8%AC%9B%E8%AD%89%E8%AD%B0%E8%AD%B7%E8%AE%80%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%AA%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B6%95%E8%B6%A3%E8%B7%91%E8%B7%9B%E8%B7%9D%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8A%E9%81%8B%E9%81%8E%E9%81%93%E9%81%94%E9%81%A0%E9%81%A9%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%91%E9%87%9D%E9%88%95%E9%8C%84%E9%8C%A2%E9%8C%A6%E9%8C%AF%E9%8C%B6%E9%8D%B5%E9%8E%96%E9%90%98%E9%95%B7%E9%96%80%E9%96%89%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%B2%E9%98%BB%E9%98%BF%E9%99%84%E9%99%8D%E9%99%90%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%8E%E9%9A%94%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A2%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A0%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%88%E9%A0%90%E9%A0%92%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8C%E9%A1%8D%E9%A1%8F%E9%A1%98%E9%A1%9E%E9%A1%AF%E9%A2%A8%E9%A6%96%E9%A6%AC%E9%A9%97%E9%A9%9F%E9%AA%A8%E9%AA%B0%E9%AB%92%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
 <style>
 :root {
   --ink: #0e1d19;        /* 牌桌陰影裡的深綠 */
@@ -424,6 +424,17 @@ body.intable .brand p { display: none; }
 .lncats .lngrp td { color: var(--brass); font-size: 13px; padding-top: 12px; border-bottom-color: var(--brass); }
 .lnradv .cs { white-space: nowrap; }
 #tInfo.exam b { color: var(--brass); }
+.lnok { color: #6fd08f; font-size: 14px; font-weight: 600; } .lnno { color: #f08a7a; font-size: 14px; font-weight: 600; }
+.lngrad { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.lngrad .panel { margin: 0; } .lngrad .lnh4 { margin-top: 0; }
+@media (max-width: 640px) { .lngrad { grid-template-columns: 1fr; } }
+.lncert img { display: block; width: 100%; max-width: 900px; margin: 12px auto; border-radius: 6px; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+.lnname2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 15px; }
+.lnname2 input { flex: 1; min-width: 10em; font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--ink); color: var(--text); }
+.lnpolar td, .lnpolar th { text-align: right; padding: 5px 6px; }
+.lnpolar th.cs { font-size: 12px; line-height: 1.3; white-space: nowrap; }
+.lnpolar td:first-child, .lnpolar th:first-child { text-align: left; white-space: nowrap; }
+.lncertb { width: 100%; }
 .lnleg { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--mute); margin: 8px 0; }
 .lnleg i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
 .lngrid .cell { cursor: pointer; }
@@ -5443,11 +5454,14 @@ function examCounts(grades) { const c = { good: 0, ok: 0, bad: 0 }; for (const g
 /* 開始一次考核：題庫洗牌；對手的風格每兩手換一次 */
 function examNew(id, rng) {
   const X = EXAMS[id];
-  const spots = shuffleArr(EXAM_SPOTS[X.spots].map(([h, b]) => ({ hole: parseCards(h), board: parseCards(b) })), rng);
-  return { id, stage: X.stage, need: X.need, passAt: X.pass, villains: X.villains.slice(), spots, i: 0, hands: 0, grades: [], done: false, score: 0, pass: false };
+  const spots = X.spots ? shuffleArr(EXAM_SPOTS[X.spots].map(([h, b]) => ({ hole: parseCards(h), board: parseCards(b) })), rng) : null;   // 沒有題庫＝隨機發牌
+  return { id, stage: X.stage, need: X.need, passAt: X.pass, villains: X.villains ? X.villains.slice() : null, spots, i: 0, hands: 0, grades: [], done: false, score: 0, pass: false,
+    n: X.n || 2, level: X.level || 2, gto: !!X.gto, autoEarly: !!X.autoEarly, skipTrivial: !!X.skipTrivial, final: !!X.final };
 }
 function examNextSpot(E, rng) { if (E.i >= E.spots.length) { shuffleArr(E.spots, rng); E.i = 0; } return E.spots[E.i++]; }
-function examVillain(E) { return E.villains[Math.floor(E.hands / 2) % E.villains.length]; }
+function examVillain(E) { return E.villains ? E.villains[Math.floor(E.hands / 2) % E.villains.length] : null; }
+/* 一手裡哪些決定要算分：GTO 訓練場只算 GTO 評分的；畢業考不算明顯該棄的爛牌 */
+function examMarks(E, review) { return review.filter((x) => (!E.gto || x.grade.src === 'GTO') && !(E.skipTrivial && x.trivial)).map((x) => x.grade.mark); }
 /* 一手結束：把這一手的評分加進去；夠了就算分數 */
 function examAdd(E, marks) {
   if (E.done) return false;
@@ -5537,6 +5551,195 @@ STAGE_GENS[6] = ['madeHand', 'textureType', 'texture', 'cbet', 'mdf', 'faceBet',
 STAGE_GENS[7] = ['rangeHit', 'rangeAdv', 'combosOnBoard', 'blockCombos', 's7a', 's7d'];
 PLACEMENT[9] = [6, 'madeHand']; PLACEMENT[10] = [7, 'combosOnBoard'];
 DRILLS.push({ id: 'post', name: '翻牌後：中了什麼、質地', gens: ['madeHand', 'textureType'], sec: 5 });
+
+/* ===== 73-learn-d：大師之路第四段（第 8 階 GTO 大師、GTO 訓練場、畢業考與結業證書） ===== */
+
+/* ===== 河牌的 GTO 解：離線用工作室的求解器算好 =====
+   大盲跟注 vs 按鈕開牌的範圍（翻牌、轉牌都過牌）、底池 5.5、籌碼 97.5、下注 33%／75%／全下、加注 2.5 倍；可剝削度 ≤ 0.2%。
+   看的是「大盲過牌之後，按鈕怎麼打」。每一列：手牌 4 字＋下注頻率％（36 進位 2 字）＋對大盲過牌範圍的勝率％（36 進位 2 字）。
+   bk：照勝率分 10 組（0–10%…90–100%），那一組的牌平均下注多少％（-1＝沒有這種牌） */
+const GTO_RIVER_BK = [[100, 74, -1, 0, 1, 0, 0, 14, 63, 100], [98, 11, 0, 0, 0, 0, 0, 30, 100, 100], [100, 100, 57, 0, 0, 0, 3, 0, 78, 100], [100, 3, 0, 0, 3, 0, 0, 53, 100, 100]];
+const GTO_RIVER = [
+  ['Kd5c6h9h2d', 52, 39, '7sTs2s008sJs2s03TdJs2s057hQh2s0bThQh2s0dJsQc110h3hAs000v4hAs000v3sAh000w7hAd00138sAd04168cAc0116TcAs0019JdAs001dQdAh001f2sAd001j3h3d001o5sQs001v5d8d001w6sTs0d286s7s1g286cAd00296c8c1n297s7d2s2eQsQc2s2e9cAc002e9sJs1t2e9dTh1o2e9dJd1r2e9cTh1p2e9cQs1t2eJsJh2s2f3cKc2s2h8sKs2s2jTsKs2s2jJsKs2s2jQsKh2s2jKsAh2s2j5d6d2s2k6sKs2s2l9cKc2s2l7c8c2s2r'],
+  ['As8d3c7h2s', 52, 33, '4s6s2s006dTd2s009dTd2s029sJc2s06TsJs2k09TcJh2k094sQs1q0e4cQc1o0e5cQc1r0e6sQs000f9dQh000fThQd000jJsQc000o4hKh000x9sKh000zTsKs0013TcKd0013JdKc0017QdKh00194s4h001h6s6h001m7c9c001t6c8c00225c8c1622KsKd00258cKc0e269h9d1s26QsQh1a26QhQc1a26TdTc1s274dAd2s2c5dAc2s2c6cAh2s2c9cAc2s2cJsAh2s2gKsAd2s2gQsAc2s2h2hAd2s2m3hAc2s2n2h2d2s2p3s3d2s2q4c5c2s2s'],
+  ['QsJd4c9h2c', 54, 36, '5s6s2s025h8h2s0a6dTd2s0f3hKh2s0h8hKh2s0k3cAs0f0q3dAh0e0r5dAd000u6hAc000y7hAs00118sAd00178cAc0017TcAs001dKhAh001e2hAs001h3d3c021l4hAh031r5h5c0b1v7d7c001x8s9s00289cAc00296cJc2s2a9sTs162a9sTc162a9sKd1a2a9dTh162a9dKh192a9cTs162a9cTc152a9cKc1g2aJsKs2s2bTsJc2s2cAhAd2s2c8dQd2s2fQcAc2s2fTsQc2s2hQdKh2s2h4hQh2s2jJhQh2s2l9s9c2s2oTsKh2s2rTcKc2s2r'],
+  ['8c7c3d2hKs', 54, 42, '4s5s2s006h9h2s009dTs2s029hJs2s05TsJd2s084sQs010d9sQd000fTcQs000jTdQd000kJdQc000p4dAd00125hAs00176hAd021b9sAc001eTsAh001kTcAc001kJcAh001pQdAc001q2cAh001u3cAc00216s6c0g257sAs15257sAh15257sAc15257hAs15257hAd15257hAc15257dAh15257dAc15256h7h2n267sJs2s278hAc2f278dTd2s28QsQd2s295dKd2s2g9cKh2s2iJsKh2s2mJhKc2s2nQcKc2s2n7d8d2s2o8hKc2s2qKdKc2s2s']
+].map(([b, ip, oop, s], i) => {
+  const rows = [];
+  for (let k = 0; k < s.length; k += 8) rows.push({ h: parseCards(s.slice(k, k + 4)), f: parseInt(s.slice(k + 4, k + 6), 36), e: parseInt(s.slice(k + 6, k + 8), 36) });
+  return { bs: b, board: parseCards(b), ip, oop, rows, bk: GTO_RIVER_BK[i] };
+});
+const GTO_RIVER_PROMPT = '河牌單挑：底池 5.5、雙方還有 97.5（翻牌、轉牌都過牌）。大盲過牌給你（按鈕）。';
+function gtoRowWord(r) { return r.f >= 70 ? '大多下注' : r.f <= 30 ? '大多過牌' : '混合（一半一半）'; }
+function gtoRowWhy(r) {
+  const k = r.e >= 75 ? '很強的牌：下注拿價值' : r.e <= 20 ? (r.f >= 70 ? '攤牌幾乎一定輸：拿來詐唬（不下注就一定輸）' : '攤牌幾乎一定輸') : '中等的牌：過牌攤牌（下注的話，比你差的會棄、比你好的會跟）';
+  return 'GTO 下注 ' + r.f + '%；這手牌對大盲過牌範圍的勝率 ' + r.e + '%——' + k + '。';
+}
+/* 這手牌 GTO 怎麼打（只出明確的：≥ 70%、≤ 30%、或 40–60% 混合） */
+QGEN.gtoRiver = (rng) => {
+  for (let i = 0; i < 100; i++) {
+    const S = pickOne(GTO_RIVER, rng), r = pickOne(S.rows, rng);
+    if ((r.f > 30 && r.f < 40) || (r.f > 60 && r.f < 70)) continue;
+    const ans = gtoRowWord(r);
+    return { gen: 'gtoRiver', prompt: GTO_RIVER_PROMPT + '照 GTO 的解，這手牌通常怎麼打？', vis: { k: 'hand', hole: r.h, board: S.board },
+      opts: ['大多下注', '大多過牌', '混合（一半一半）'].map((t) => ({ t, ok: t === ans })),
+      explain: gtoRowWhy(r) + '這就是<b>兩極化</b>：按鈕下注的是最強的牌和最弱的牌，中間的牌過牌（整個範圍下注約 ' + S.ip + '%）。', key: 'gr|' + S.bs + '|' + r.h.join(',') };
+  }
+  return QGEN.bluffRatio(rng);
+};
+/* 三手牌裡，哪一手 GTO 幾乎都過牌／哪一手是拿來詐唬的 */
+QGEN.gtoPolar = (rng) => {
+  for (let i = 0; i < 200; i++) {
+    const S = pickOne(GTO_RIVER, rng);
+    const val = S.rows.filter((r) => r.e >= 75 && r.f >= 75), mid = S.rows.filter((r) => r.e >= 25 && r.e <= 70 && r.f <= 15), air = S.rows.filter((r) => r.e <= 15 && r.f >= 75);
+    if (!val.length || !mid.length || !air.length) continue;
+    const three = shuffleArr([pickOne(val, rng), pickOne(mid, rng), pickOne(air, rng)], rng);
+    const askBluff = rng() < 0.5, ans = three.findIndex((r) => (askBluff ? r.e <= 15 : r.e >= 25 && r.e <= 70));
+    return { gen: 'gtoPolar', prompt: GTO_RIVER_PROMPT + '這三手牌裡，' + (askBluff ? '哪一手是 GTO 拿來<b>詐唬</b>的？' : '哪一手 GTO <b>幾乎都過牌</b>？'), vis: { k: 'hands3', hs: three.map((r) => r.h), board: S.board },
+      opts: three.map((r, k) => ({ t: '第 ' + (k + 1) + ' 手', ok: k === ans })),
+      explain: three.map((r, k) => '第 ' + (k + 1) + ' 手 ' + cardsTok(r.h) + '：' + gtoRowWhy(r)).join('<br>') + '<br>最強的牌拿價值、最弱的牌詐唬，中等的牌過牌——兩極化。', key: 'gp|' + S.bs + '|' + three.map((r) => r.h.join('.')).join(',') + '|' + askBluff };
+  }
+  return QGEN.gtoRiver(rng);
+};
+/* 河牌兩極下注：詐唬可以佔多少 */
+QGEN.bluffRatio = (rng) => {
+  const [a, c, t] = pickOne(BET_FR, rng), f = a / c, ans = Math.round(f / (1 + 2 * f) * 100);
+  return { gen: 'bluffRatio', prompt: '河牌，GTO 下注 ' + t + '，用的是兩極的範圍（很強的牌＋詐唬）。要讓你抓詐唬的牌跟或棄一樣好，他下注的牌裡詐唬大約佔多少？', vis: null,
+    opts: pctOpts(ans, [100 / (1 + f), f / (1 + f) * 100, ans + 10, ans - 8, 50], rng),
+    explain: '你跟注付 ' + fmtF(f) + '（以底池＝1 算），抓到詐唬贏 1 ＋ ' + fmtF(f) + '。詐唬比例 b 讓你剛好打平：b × (1 ＋ ' + fmtF(f) + ') ＝ (1 − b) × ' + fmtF(f) + ' → b ＝ 下注 ÷ (底池 ＋ 2 × 下注) ≈ ' + ans + '%。跟「跟注要的勝率」是同一個數字。下注越大，可以帶越多詐唬：1/3 底池 20%、半個底池 25%、一個底池 33%、兩倍底池 40%。', key: 'br|' + t };
+};
+/* 照頻率做：隨機數 */
+const RNG_ACTS = [['下注', '過牌'], ['跟注', '棄牌'], ['加注', '跟注', '棄牌'], ['下注 1/3 底池', '下注 3/4 底池', '過牌'], ['過牌', '下注']];
+QGEN.rngPick = (rng) => {
+  const acts = pickOne(RNG_ACTS, rng);
+  for (let i = 0; i < 50; i++) {
+    const fs = [];
+    let left = 100;
+    for (let k = 0; k < acts.length - 1; k++) { const x = 5 * (2 + ((rng() * (left / 5 - 2 * (acts.length - k))) | 0)); fs.push(x); left -= x; }
+    fs.push(left);
+    if (fs.some((x) => x < 10)) continue;
+    const n = (rng() * 100) | 0;
+    let lo = 0, ans = -1;
+    const bounds = fs.map((x) => { const b = [lo, lo + x - 1]; lo += x; return b; });
+    bounds.forEach((b, k) => { if (n >= b[0] && n <= b[1]) ans = k; });
+    if (bounds.some((b) => Math.abs(n - b[0]) <= 1 && b[0] > 0)) continue;     // 太靠近分界的不出
+    return { gen: 'rngPick', prompt: 'GTO 這手牌：' + acts.map((t, k) => t + ' ' + fs[k] + '%').join('、') + '。你的隨機數（0–99）是 <b>' + n + '</b>，照順序分，這一次該？', vis: null,
+      opts: acts.map((t, k) => ({ t, ok: k === ans })),
+      explain: '照寫的順序把 0–99 分下去：' + acts.map((t, k) => t + ' ' + bounds[k][0] + '–' + bounds[k][1]).join('、') + '。' + n + ' 落在「' + acts[ans] + '」。隨機數可以用手錶或手機的秒數（秒 × 100 ÷ 60）。', key: 'rp|' + acts.join('~') + '|' + fs.join(',') + '|' + n };
+  }
+  return QGEN.bluffRatio(rng);
+};
+addStatic('s8a', [
+  { prompt: 'GTO 策略最主要的特點是什麼？', opts: ['對手怎麼調整都沒辦法占你便宜', '每一手都贏最多錢', '專門針對對手的弱點', '從來不詐唬'], ans: 0,
+    explain: 'GTO 是「不會被剝削」的打法：對手怎麼改都不會比較好。它不一定贏最多，對很弱的對手時，針對他的弱點（剝削）通常賺更多。' },
+  { prompt: '工作室顯示「可剝削度 0.4%」是什麼意思？', opts: ['最會針對你的對手，每手平均只能多贏底池的 0.4%', '你有 0.4% 的機率輸', '還要再算 0.4% 的時間', 'GTO 會贏 0.4%'], ans: 0,
+    explain: '可剝削度＝完全知道這個打法的對手每手能多贏多少（底池的百分比）。越接近 0 越接近 GTO；0.5% 以下就很夠用了。' },
+  { prompt: 'GTO 對上一個很爛的對手（例如什麼都跟的人），結果會？', opts: ['還是會贏，但沒有針對他的打法贏得多', '一定打平', '會輸給他', '跟針對他贏得一樣多'], ans: 0,
+    explain: '對手犯錯，GTO 就賺錢；但 GTO 不會「主動」去抓他的錯。針對他的漏洞（剝削）通常贏更多，代價是自己的打法也露出可以被針對的地方。' },
+  { prompt: '照 GTO，河牌下注的範圍為什麼一定要有詐唬？', opts: ['沒有詐唬，對手只要用打得贏你價值牌的牌跟，其他全棄就好', '詐唬比較好玩', '規則規定要詐唬', '詐唬的 EV 永遠比較高'], ans: 0,
+    explain: '只用強牌下注，對手看到下注就棄（除非他更強），你的強牌收不到錢。帶適當比例的詐唬，對手就必須跟一些，你的價值牌才賺得到。' },
+  { prompt: '河牌對手下注一個底池。照 GTO，你至少要繼續（跟或加注）多少比例的範圍？', opts: ['50%', '33%', '67%', '100%'], ans: 0,
+    explain: '最少防守比例＝底池 ÷（底池＋下注）＝ 1 ÷ 2 ＝ 50%。棄得比這多，他用任何牌詐唬都會賺。' },
+]);
+addStatic('s8b', [
+  { prompt: '對手是「跟注站」（什麼都跟、很少棄）。你河牌拿空氣，想詐唬。該？', opts: ['不要詐唬，他會跟', '下大注嚇他', '全下', '照 GTO 的頻率詐唬'], ans: 0,
+    explain: '詐唬要對手會棄才賺；跟注站很少棄。針對他：少詐唬、中上的牌多下注拿價值。' },
+  { prompt: '對手是「跟注站」。你河牌拿頂對、踢腳普通，他過牌給你。該？', opts: ['下注拿價值，他會用更差的牌跟', '過牌，怕他有更好的', '全下', '棄牌'], ans: 0,
+    explain: '跟注站會用中對、弱對、甚至沒中的牌跟。對他「薄價值」下注（中上的牌也下注）比 GTO 賺更多。' },
+  { prompt: '對手是「岩石」（很少玩、很少詐唬），他突然在河牌加注你。你拿頂對。該？', opts: ['多半棄牌，他很少詐唬', '一定跟', '再加注', '全下'], ans: 0,
+    explain: '岩石的大注、加注幾乎都是大牌。針對他：他下大注就尊重；反過來，他的盲注要多偷。' },
+  { prompt: '你在按鈕，大盲是「岩石」，前面都棄牌。針對他該？', opts: ['比平常開更多牌偷盲', '只用大牌開', '跛入', '全下'], ans: 0,
+    explain: '岩石防守很少，偷他的盲注很容易成功。可以比圖表開更寬。' },
+  { prompt: '對手是「瘋子」（一直加注、常常詐唬）。你拿中上的牌（例如頂對），他一直下注。該？', opts: ['過牌跟注，讓他自己繼續詐唬', '一直加注把他趕走', '棄牌', '全下'], ans: 0,
+    explain: '瘋子的下注裡詐唬很多。你加注會把他的詐唬趕跑、只剩比你好的牌；跟注讓他繼續用空氣付錢。' },
+  { prompt: '對手是「緊凶」或打法接近 GTO。你該？', opts: ['照 GTO 打，不要亂偏離', '一直詐唬', '一直跟注', '只玩 AA、KK'], ans: 0,
+    explain: '對手沒有明顯漏洞時，偏離只會讓你自己被針對。GTO 是最安全的打法。' },
+  { prompt: '你只看對手打了 3 手，他有一次河牌詐唬被抓。該？', opts: ['還不能下結論，先照 GTO，多觀察', '認定他是瘋子，一直跟', '認定他很緊，一直棄', '馬上全力針對他'], ans: 0,
+    explain: '偏離要有證據：看過好幾次一樣的傾向才針對。樣本太少時，GTO 最安全。' },
+]);
+addStatic('s8c', [
+  { prompt: 'GTO 的解說某一手牌「下注 55%、過牌 45%」。這代表？', opts: ['這兩個動作的 EV 幾乎一樣，照頻率混著做', '下注比較好，過牌是錯的', '這手牌一定要下注', '解還沒算好'], ans: 0,
+    explain: '會混合的牌，兩個動作在均衡時 EV 一樣（不然 GTO 會全部選比較好的那個）。照頻率做讓範圍平衡；偶爾選錯邊，損失也很小。' },
+  { prompt: '為什麼 GTO 不讓一種牌永遠下注、另一種牌永遠過牌？', opts: ['太好猜：對手可以針對你過牌時一定沒有強牌', '因為電腦喜歡亂數', '為了讓遊戲比較有趣', '因為兩種一樣好'], ans: 0,
+    explain: '如果某種強牌永遠下注，你過牌時就一定沒有它，對手可以放心攻擊你的過牌。混合讓兩邊的範圍都有強牌。' },
+  { prompt: '真人實戰，GTO 說某手牌「下注 90%、過牌 10%」。最實際的做法？', opts: ['直接下注（當成一定這樣做）', '一定要用隨機數', '過牌', '每次都換'], ans: 0,
+    explain: '頻率很高的（約 80% 以上）當成純策略就好；偏離一點點損失很小。真正要用隨機數的是接近一半一半的混合。' },
+  { prompt: '真正讓你虧大錢的是哪一種錯？', opts: ['該下注的強牌過牌、該棄的牌跟到底這種大錯', '混合頻率差 10%', '下注尺寸差一點點', '隨機數用秒數而不是骰子'], ans: 0,
+    explain: '混合牌兩個動作 EV 差不多，頻率差一點損失很小。EV 差很多的大錯（GTO 幾乎不做的動作）才是虧錢的主因——這也是牌局 GTO 評分 ✗ 的意思。' },
+]);
+addStatic('s8d', [
+  { prompt: '工作室的格子裡，一格的顏色一半紅、一半綠，代表？', opts: ['這種牌混合兩個動作，各大約一半', '算錯了', '這種牌不在範圍裡', '這種牌一定加注'], ans: 0,
+    explain: '格子的顏色照每個動作的比例畫。混在一起＝混合策略；點那一格可以看每個組合的比例和 EV。' },
+  { prompt: '想知道「對手翻牌下注太少時，我該怎麼打」，工作室要用哪一個功能？', opts: ['節點鎖定：把對手那裡的打法固定成你看到的樣子，再重新求解', '換一張公牌', '把下注尺寸改大', '看下一張牌報告'], ans: 0,
+    explain: '節點鎖定讓你假設對手偏離 GTO（例如很少下注），求解器會算出針對他的最好打法——這就是用工作室研究剝削。' },
+  { prompt: '工作室算到「可剝削度 3%」就停了。這個解可以拿來學嗎？', opts: ['大方向可以參考，但細的頻率還不準；最好算到 0.5% 以下', '完全準確', '完全不能用', '3% 比 0.5% 更準'], ans: 0,
+    explain: '可剝削度越低越接近 GTO。牌局的 GTO 評分也是等解算到夠準（約 3% 以下）才用。' },
+  { prompt: '牌局結束時「GTO 分析」按鈕會做什麼？', opts: ['把這一手照每個人的動作估好範圍，帶進工作室求解，再對照你實際怎麼打', '重新發一次一樣的牌', '直接告訴你對手的牌', '把這一手刪掉'], ans: 0,
+    explain: '從牌局帶入：範圍照每個人在這一手的動作估，下注選項包含你們實際用的大小；算完可以一步一步對照你的打法。' },
+]);
+
+/* ===== 畢業考：筆試（第 1–8 階都有）＋實戰 ===== */
+const GRAD_W = { per: [3, 4, 4, 4, 4, 4, 4, 3], sec: 20, pass: 26 };
+function makeGradQuiz(rng) {
+  const out = [];
+  GRAD_W.per.forEach((k, i) => { const s = i + 1; for (const q of makeQuiz(STAGE_GENS[s], k, rng)) { q.stage = s; out.push(q); } });
+  return out;
+}
+/* 兩部分都過了就畢業：回傳是不是剛剛畢業 */
+function gradCheck(LP) {
+  const w = LP.gradW, p = LP.exam && LP.exam['8-5'];
+  if (LP.grad || !(w && w.pass && p && p.pass)) return false;
+  LP.grad = { at: Date.now(), w: w.s, wn: w.n, p: Math.round(p.score * 100) };
+  LP.done['8-5'] = { s: Math.round(p.score * 100), n: 100, pct: true, at: LP.grad.at };
+  return true;
+}
+const NO_SKIP = { 8: true };          // 第 8 階不能跳級（畢業考要真的考）
+
+EXAMS['8-4'] = { stage: 8, gto: true, n: 2, level: 4, villains: ['gto'], need: 10, pass: 0.7, autoEarly: true };
+EXAMS['8-5'] = { stage: 8, n: 6, level: 3, need: 25, pass: 0.8, skipTrivial: true, final: true };
+
+/* ===== 第 8 階的課 ===== */
+COURSE[7].lessons = [
+  { id: '8-1', title: 'GTO 是什麼、什麼時候偏離', sum: '不會被占便宜的打法；對手有明顯漏洞時才針對他。', read: [
+    '<b>GTO</b>（博弈論最佳策略）是一種<b>平衡</b>的打法：雙方都照它打的時候，任何一方自己改打法都不會比較好。所以它的重點是<b>不會被剝削</b>——對手怎麼調整都占不到你便宜——不是「每一手贏最多」。',
+    '工作室裡的<b>可剝削度</b>就是在量這件事：一個完全知道你打法的對手，每手平均能多贏多少（底池的百分之幾）。GTO 是 0%；算到 0.5% 以下就很接近了。',
+    { k: 'gtoTable' },
+    { k: 'tip', html: '河牌 GTO 的骨架就是這張表：<b>下注的人</b>照「詐唬可以佔」的比例配詐唬，抓詐唬的牌跟或棄都一樣；<b>防守的人</b>照「最少要繼續」的比例跟或加注，下注的人拿任何牌詐唬都不會多賺。' },
+    '<b>什麼時候偏離（剝削）</b>：對手有明顯、穩定的漏洞時，針對它打比 GTO 賺更多。',
+    { k: 'tip', html: '<b>跟注站</b>：少詐唬，中上的牌多下注拿價值（他會用更差的牌跟）。<br><b>岩石</b>：多偷他的盲注；他突然大注或加注，沒有很強就棄。<br><b>瘋子</b>：少主動詐唬，用中等以上的牌過牌跟注，讓他自己詐唬。<br><b>鬆凶</b>：用更寬的牌 3-bet、跟注抓詐唬。<br><b>緊凶、GTO</b>：照 GTO 打。' },
+    '偏離有代價：你偏離得越多，自己也越容易被反過來針對。<b>先打 GTO，有證據（看過好幾次）才偏離</b>。牌桌上對手名牌寫的風格，就是讓你練習針對的。',
+  ], practice: { gens: ['bluffRatio', 's8a', 's8b'], n: 6 }, quiz: { gens: ['bluffRatio', 's8a', 's8b', 'mdf'], n: 8, pass: 7 } },
+  { id: '8-2', title: '頻率與混合策略', sum: '同一手牌有時下注、有時過牌；牌桌上怎麼照頻率做。', read: [
+    'GTO 的解常常是「這手牌<b>下注 60%、過牌 40%</b>」——同一手牌兩種打法都用，叫<b>混合策略</b>。',
+    '為什麼要混：如果某一種牌<b>永遠</b>下注，你過牌的時候就一定沒有它，對手就可以放心攻擊你的過牌。混合讓兩邊的範圍都有強牌、也都有弱牌，對手抓不到規律。',
+    { k: 'tip', html: '<b>關鍵觀念：會混合的牌，兩種打法 EV 一樣</b>（不然 GTO 會全部選比較好的那個）。所以照頻率做就好；偶爾選錯邊，損失也很小。真正虧錢的是「該下注的強牌過牌、該棄的牌跟到底」這種 EV 差很多的大錯。' },
+    '<b>牌桌上怎麼照頻率做</b>：用一個隨機數。看手錶或手機的秒數（0–59，乘 100 除 60 換成 0–99）。把 0–99 照順序分給各個動作：下注 60%、過牌 40% → 0–59 下注、60–99 過牌。',
+    { k: 'tip', html: '<b>簡化原則</b>：頻率 80% 以上的，當成一定這樣做；接近一半一半的才用隨機數。工作室的格子裡，顏色混在一起的格子就是混合策略。' },
+  ], practice: { gens: ['rngPick', 's8c'], n: 6 }, quiz: { gens: ['rngPick', 's8c', 'rngPick', 'bluffRatio'], n: 8, pass: 7 } },
+  { id: '8-3', title: 'GTO 工作室導讀', sum: '五步用工作室；讀懂 GTO 的解：河牌兩極化。', read: [
+    '「工具 → GTO 工作室」可以算兩個人的翻牌後局面（翻牌、轉牌、河牌）。用法五步：',
+    { k: 'tip', html: '① <b>選局面</b>：範例，或牌局結束時按「GTO 分析」把那一手帶進來。<br>② <b>範圍</b>：雙方可能拿的牌（13×13 格子，可以改）。<br>③ <b>下注樹</b>：每條街可以下多大（尺寸越多越準、越慢）。<br>④ <b>求解</b>：看可剝削度，降到 0.5% 以下就夠用。<br>⑤ <b>看結果</b>：格子顏色＝每一種牌各動作的比例；點一格看每個組合的 EV、勝率；沿著動作往下走、看下一張牌報告；用<b>節點鎖定</b>假設對手偏離，看怎麼針對他。' },
+    { k: 'studio' },
+    '<b>河牌最重要的規律：兩極化</b>。下表是工作室算好的四個河牌（大盲跟注 vs 按鈕開牌的範圍，翻牌、轉牌都過牌，大盲過牌給按鈕）：把按鈕的牌照「對大盲過牌範圍的勝率」分十組，看每組平均下注多少。',
+    { k: 'polarTable' },
+    { k: 'tip', html: '<b>最強的牌下注拿價值、最弱的牌下注詐唬，中間的牌過牌攤牌</b>。為什麼：詐唬要用「攤牌一定輸」的牌——拿中等的牌詐唬，等於把本來會贏的攤牌丟掉；中等的牌下注，比它差的會棄、比它好的會跟（第 6-4 課）。' },
+  ], practice: { gens: ['gtoRiver', 'gtoPolar'], n: 6 }, quiz: { gens: ['gtoRiver', 'gtoPolar', 's8d'], n: 8, pass: 6 } },
+  { id: '8-4', title: 'GTO 訓練場', sum: '和 GTO 電腦單挑：轉牌、河牌你自己打，用 GTO 評 10 個決定、70% 過關。', exam: '8-4', read: [
+    '<b>GTO 訓練場</b>：到牌桌上和 <b>GTO 電腦</b>單挑（它的轉牌、河牌照求解器的解打）。<b>翻牌前和翻牌由教練代打</b>，你專心打轉牌、河牌。',
+    '輪到你的轉牌、河牌時，背景會先把這個局面<b>求解</b>（手機大約幾秒，算好動作鈕才會亮）。你按完就用 GTO 評分：GTO 常用的動作 ✓；很少用、但少賺不多 △；幾乎不用、而且少賺很多 ✗。',
+    { k: 'tip', html: '評滿 <b>10 個 GTO 評分的決定</b>，平均 <b>70%</b> 以上過關（✓ 1 分、△ 半分）。記住第 8-3 課：最強的牌和最弱的牌下注、中等的牌過牌；面對下注照價錢和最少防守比例。' },
+  ] },
+  { id: '8-5', title: '畢業考', sum: '筆試 30 題＋6 人桌實戰 25 個決定：兩個都過就拿結業證書。', exam: '8-5', grad: true, read: [
+    '<b>第一部分　筆試</b>：30 題，第 1 到第 8 階都有，每題 <b>' + GRAD_W.sec + ' 秒</b>；答對 <b>' + GRAD_W.pass + ' 題</b>通過。',
+    '<b>第二部分　實戰</b>：6 人桌，對手是「高手」等級的各種風格，牌是隨機發的；教練不給建議、不顯示勝率。評滿 <b>25 個決定</b>（明顯該棄的爛牌不算），平均 <b>80%</b> 以上通過。',
+    { k: 'tip', html: '兩部分都通過就<b>畢業</b>，拿到結業證書（可以寫上名字、存成圖片）。兩部分可以分開考、不限次數。' },
+  ] },
+].map((l) => lessonFinish(l, 8));
+for (const id of ['8-4', '8-5']) lessonById(id).ready = true;
+
+STAGE_GENS[8] = ['bluffRatio', 'rngPick', 'gtoRiver', 'gtoPolar', 's8a', 's8b', 's8c', 's8d'];
+PLACEMENT[11] = [8, 'gtoPolar'];
+DRILLS.push({ id: 'gto', name: 'GTO：兩極化與頻率', gens: ['gtoRiver', 'gtoPolar', 'rngPick'], sec: 8 });
 
 </script>
 <script type="text/plain" id="workersrc">
@@ -5797,7 +6000,7 @@ onmessage = (e) => {
     else if (m.cmd === 'rvr') doRvr(m);
     else if (m.cmd === 'batch') doBatch(m).catch((err) => postMessage({ cmd: 'batch-done', tag: m.tag, error: String((err && err.message) || err) }));
     else if (m.cmd === 'g-start') gStart(m).catch((err) => postMessage({ cmd: 'g-progress', key: m.key, error: String((err && err.message) || err) }));
-    else if (m.cmd === 'g-query') gQuery(m);
+    else if (m.cmd === 'g-query') { try { gQuery(m); } catch (err) { postMessage({ cmd: 'g-ans', req: m.req, key: m.key, none: true, why: 'error', error: String((err && err.message) || err) }); } }   // 出錯也一定要回答，牌局才不會卡住
     else if (m.cmd === 'g-stop') GSOL = null;
     else if (m.cmd === 'ports') setPorts(m.ports);
     else if (m.cmd === 'helper') beHelper(m.port);
@@ -7687,9 +7890,9 @@ function newGame(kind, examId) {
   const train = kind === true, tour = kind === 'tourney', exam = kind === 'exam';
   GS.train = train; gsSave();
   G.exam = exam ? examNew(examId, G.rng) : null;
-  const n = train || exam ? 2 : tour ? GS.tn || 6 : GS.n, level = train ? 4 : exam ? 2 : GS.level;
+  const n = exam ? G.exam.n : train ? 2 : tour ? GS.tn || 6 : GS.n, level = train ? 4 : exam ? G.exam.level : GS.level;
   const opp = makeOpponents(n, level, G.rng);
-  if (exam) opp[0].style = examVillain(G.exam);
+  if (exam && G.exam.villains) opp[0].style = examVillain(G.exam);
   G.T = newTable({ n, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level, button: (G.rng() * n) | 0, tourney: tour });
   G.tEnd = null;
   G.ctx = { hero: 0, seen: new Set(GS.seen), exam: exam };
@@ -7752,7 +7955,7 @@ function produce() {
     G.waitingHero = true; G.gtoAdv = null;
     pushStep({ kind: 'hero', adv: G.adv, title: '輪到你', lines: [] });
     gtoHeroTurn(false);
-    if (GS.train && GS.autoPre && H.street <= 1) G.autoHero = setTimeout(() => { if (G.waitingHero && atHead() && !G.replay) heroAct(G.adv.act, true); }, 350);
+    if (((GS.train && GS.autoPre) || examAutoNow()) && H.street <= 1) G.autoHero = setTimeout(() => { if (G.waitingHero && atHead() && !G.replay) heroAct(G.adv.act, true); }, 350);
     return;
   }
   if (gtoBotWait(H.toAct)) return;
@@ -7811,7 +8014,7 @@ function skipAhead() {
 }
 /* 你按了動作 */
 function heroAct(a, auto) {
-  if (!G.waitingHero || !atHead() || G.replay) return;
+  if (!G.waitingHero || !atHead() || G.replay || (!auto && examLockBtns())) return;
   clearTimeout(G.autoHero);
   const H = G.H, adv = G.adv;
   const ev = applyAction(H, a);
@@ -7820,7 +8023,7 @@ function heroAct(a, auto) {
   gtoOnAct(ev);
   G.gtoAdv = null;
   if (gg && GS.train) { trainAdd(gg); gsSave(); }
-  if (!auto) G.review.push({ street: ev.street, label: actWord(ev, H), grade: g, adv: gg ? gg.adv : adv.label });
+  if (!auto) G.review.push({ street: ev.street, label: actWord(ev, H), grade: g, adv: gg ? gg.adv : adv.label, trivial: ev.street === 0 && ev.t === 'f' && !!adv.chart && adv.chart.fold >= 0.95 });
   G.waitingHero = false;
   pushStep(eventStep(ev, auto ? {} : { grade: g, adv: gg ? { label: gg.adv } : adv }));
   G.view = G.steps.length - 1;
@@ -8032,7 +8235,9 @@ function renderCtrl(st) {
     const adv = st.adv, L = legalSnapshot(st.snap);
     const e = adv.eff === undefined ? adv.eq : adv.eff;
     const why = adv.need > 0 ? '你的勝率約 ' + PCT0(e) + (e < adv.eq - 0.005 ? '（打折後）' : '') + '，跟注要 ' + PCT0(adv.need) + ' 以上' : '你的勝率約 ' + PCT0(e);
-    if (examHiding()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">考核中：自己決定，按完評分（已評 ' + G.exam.grades.length + '／' + G.exam.need + '）</span>';
+    if (examHiding() && examAutoNow()) m = '<b>教練代打' + STREET_NAME[G.H.street] + '</b>　<span class="why">GTO 訓練場只評轉牌、河牌</span>';
+    else if (examHiding() && examWaitGto()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">GTO 計算中…算好才能按（' + (G.gto.ready && G.gto.pct < 900 ? '可剝削度 ' + fmt(G.gto.pct, 1) + '%，要 3% 以下' : '準備中') + '）</span>';
+    else if (examHiding()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">考核中：自己決定，按完評分（已評 ' + G.exam.grades.length + '／' + G.exam.need + '）</span>';
     else if (gtoAdvUsable()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<b class="rec">GTO</b> ' + gtoLine() + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
     else m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　建議 <b class="rec">' + esc(adv.label) + '</b><span class="why">（' + why + '）</span>'
       + (G.gto && !G.gto.lost && G.gto.seats.indexOf(0) >= 0 && GS.gtoCoach ? '<span class="why">　GTO 計算中…</span>' : '') + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
@@ -8070,6 +8275,7 @@ function renderActBtns(st) {
   let allinRec = recA && adv.act.to >= L.maxTo;
   G.recTo = recA ? adv.act.to : 0;
   if (examHiding()) { recF = recP = recA = allinRec = false; G.recTo = 0; }
+  const lock = examLockBtns();
   if (gtoAdvUsable()) {                                     // GTO 最常用的動作
     const ta = G.gtoAdv.acts[gtoBest()], b = gtoActBtn(ta, L);
     recF = b === 'f'; recP = b === 'x' || b === 'c'; recA = b === 'size' || b === 'allin'; allinRec = b === 'allin';
@@ -8091,6 +8297,7 @@ function renderActBtns(st) {
     else box.innerHTML = h;
     box.dataset.h = h;
   }
+  box.querySelectorAll('button').forEach((b) => { b.disabled = lock; });
   if (G.sizerStep === G.view) { const v = +$('sizeRange').value; openSizer(); if (v) { $('sizeRange').value = v; sizerLabel(); } }   // 重畫時保持打開
   else $('sizer').hidden = true;
 }
@@ -8106,6 +8313,7 @@ function ctrlCmd(c) {
   else if (c === 'newtourney') newGame('tourney');
   else if (c === 'exam' && G.exam) newGame('exam', G.exam.id);
   else if (c === 'learn' && G.exam) { const l = lessonById(G.exam.id); openLearn('lesson', l); }
+  else if (c === 'cert') openLearn('cert');
   else if (c === 'home') showView('home');
   else if (c === 'replay') { G.replay = true; G.view = 0; G.lastRender = null; clearTimeout(G.timer); renderCur(); }
   else if (c === 'endreplay') { G.replay = false; G.view = G.steps.length - 1; G.lastRender = null; renderCur(); }
@@ -8348,7 +8556,7 @@ function gtoActive() { return G.gto && !G.gto.lost && G.gto.ready; }
 function gtoReset() { if (G.gto) GW().send({ cmd: 'g-stop' }); G.gto = null; G.gtoAdv = null; G.waitAI = null; }
 function gtoAsk(msg, cb) { const req = ++GT.req; GT.cbs.set(req, cb); GW().send(Object.assign({ cmd: 'g-query', req }, msg)); }
 function gtoInit() {
-  GW().on('g-ans', (m) => { const f = GT.cbs.get(m.req); if (f) { GT.cbs.delete(m.req); f(m); } });
+  GW().on('g-ans', (m) => { if (m.error) console.error('GTO 查詢出錯', m.error); const f = GT.cbs.get(m.req); if (f) { GT.cbs.delete(m.req); f(m); } });
   GW().on('g-progress', (m) => {
     const g = G.gto;
     if (!g || g.key !== m.key) return;
@@ -8360,7 +8568,7 @@ function gtoInit() {
 }
 /* 需要 GTO 嗎：單挑、你在裡面（而且開著 GTO 教練）或有 GTO 電腦 */
 function gtoWanted(seats) {
-  if (seats.indexOf(0) >= 0 && GS.gtoCoach && !G.exam) return true;           // 考核時不幫你算
+  if (seats.indexOf(0) >= 0 && ((GS.gtoCoach && !G.exam) || (G.exam && G.exam.gto))) return true;   // 考核時不幫你算（GTO 訓練場要算來評分）
   return seats.some((k) => G.H.players[k].style === 'gto');
 }
 /* 發了轉牌或河牌 */
@@ -8379,8 +8587,10 @@ function gtoOnStreet(ev) {
   // 河牌：前一條街的解如果一路對得上，就把那裡的雙方範圍接過來
   if (prev && !prev.lost && prev.street === ev.street - 1 && prev.nd && prev.nd.kind === N_CHANCE && prev.ready) {
     const key = prev.key;
+    // 等範圍回來之前先放一個「準備中」：電腦照這個等（不會拿到上一條街的解），有人先動作就放棄這條街的 GTO
+    const wait = G.gto = { key: -1, street: ev.street, seats: prev.seats.slice(), path: [], nd: null, pct: 999, done: false, ready: false, lost: false, pending: true, pot: prev.pot };
     gtoAsk({ key, path: prev.path.concat([{ c: ev.cards[0] }]), reach: true }, (m) => {
-      if (G.H !== H || H.street !== ev.street) return;
+      if (G.H !== H || H.street !== ev.street || G.gto !== wait || wait.lost) return;
       start(m.none ? null : m.reach);
     });
     return;
@@ -8403,7 +8613,7 @@ function gtoOnAct(ev) {
 /* ===== 你 ===== */
 function gtoHeroTurn(refresh) {
   const g = G.gto, H = G.H;
-  if (!g || g.lost || !g.ready || g.seats.indexOf(0) < 0 || !GS.gtoCoach) return;
+  if (!g || g.lost || !g.ready || g.seats.indexOf(0) < 0 || (!GS.gtoCoach && !(G.exam && G.exam.gto))) return;
   const pathLen = g.path.length, view = G.view;
   const combo = comboOf(H.players[0].cards[0], H.players[0].cards[1]);
   if (refresh && G.gtoAdv && G.gtoAdv.pathLen === pathLen && G.gtoAdv.done) return;
@@ -8480,17 +8690,21 @@ function gtoBotWait(seat) {
   if (!G.waitAI || G.waitAI.seat !== seat) G.waitAI = { seat, since: Date.now() };
   const W8 = G.waitAI;
   if (W8.asking) return true;
-  const fallback = () => { G.pendingAI = { seat, a: aiDecide(H, G.rng, G.T.level), why: 'rule' }; G.waitAI = null; afterBot(); };
+  const setRule = () => { G.pendingAI = { seat, a: aiDecide(H, G.rng, G.T.level), why: 'rule' }; G.waitAI = null; };
+  const fallback = () => { setRule(); afterBot(); };                 // 非同步（回答、計時）才用：叫牌局接著往下
   if (!g.ready) {
-    if (Date.now() - W8.since > cap) { fallback(); return false; }
+    if (Date.now() - W8.since > cap) { setRule(); return false; }    // 同步：直接讓外面這一次 produce 出這個動作（不要再叫一次 forward，會連出兩個動作）
     setTimeout(() => { if (G.waitAI === W8) afterBot(); }, 300);
     return true;
   }
   W8.asking = true;
   const p = g.seats.indexOf(seat), combo = comboOf(pl.cards[0], pl.cards[1]), pathLen = g.path.length;
+  const tq = setTimeout(() => { if (G.waitAI === W8 && W8.asking) { W8.asking = false; fallback(); } }, 8000);   // 背景執行緒沒回答：照原本的打法
   gtoAsk({ key: g.key, path: g.path.slice(), p, combo }, (m) => {
+    clearTimeout(tq);
     W8.asking = false;
-    if (G.waitAI !== W8 || G.gto !== g || g.path.length !== pathLen) return;
+    if (G.waitAI !== W8) return;
+    if (G.gto !== g || g.path.length !== pathLen) { G.waitAI = null; afterBot(); return; }   // 解換了：重新問現在的解（不要卡住）
     const good = !m.none && (m.done || m.pct <= 5 || m.t >= 60);
     if (!good && Date.now() - W8.since < cap && !m.none) { setTimeout(() => { if (G.waitAI === W8) afterBot(); }, 350); return; }
     if (m.none) { fallback(); return; }
@@ -8677,19 +8891,21 @@ function renderLearn() {
   if (LN.mode === 'map') R.innerHTML = mapHTML();
   else if (LN.mode === 'lesson') R.innerHTML = lessonHTML();
   else if (LN.mode === 'dict') { R.innerHTML = dictHTML(); }
+  else if (LN.mode === 'cert') { R.innerHTML = certHTML(); drawCert(); }
   else R.innerHTML = testHTML();
   if (LN.mode === 'dict' && LN.dictScroll) { LN.dictScroll = false; const d = $('lnDictDetail'); if (d && window.innerWidth < 900) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 
 /* ===== 課程表 ===== */
 const SKIP_OK = {};
-function canSkipTest(sid) { if (!(sid in SKIP_OK)) SKIP_OK[sid] = !!STAGE_GENS[sid] && makeQuiz(STAGE_GENS[sid], 8, makeRng(1)).length >= 8; return SKIP_OK[sid]; }
+function canSkipTest(sid) { if (NO_SKIP[sid]) return false; if (!(sid in SKIP_OK)) SKIP_OK[sid] = !!STAGE_GENS[sid] && makeQuiz(STAGE_GENS[sid], 8, makeRng(1)).length >= 8; return SKIP_OK[sid]; }
 function mapHTML() {
   const c = learnCount(LP), nx = learnNext(LP);
   let h = '<div class="lnhead"><h2>大師之路</h2><p class="note">從規則到 GTO 分八階，每一課：短講解 → 練習 → 過關測驗。進度存在這台裝置，隨時接著上。</p>'
     + '<div class="lnprog"><div class="track"><i style="width:' + (c.done / c.total * 100).toFixed(1) + '%"></i></div><span class="num">' + c.done + '／' + c.total + ' 課</span></div>';
   if (nx) h += '<button class="btn main big lngo" data-ln="go" data-id="' + nx.id + '">' + (c.done ? '繼續' : '開始') + '：第 ' + nx.stage + ' 階・' + esc(nx.title) + ' ▶</button>' + (nx.ready ? '' : '<p class="note">這一課還在製作中（下一批更新），可以先做下面的練習、查起手牌字典，或用跳級測驗往後走。</p>');
   else h += '<p class="lndone">🏆 全部完成！</p>';
+  if (LP.grad) h += '<div class="strow"><button class="btn main lncertb" data-ln="cert">🎓 已畢業：看結業證書</button></div>';
   h += '<div class="strow"><button class="btn" data-ln="place">' + (LP.place ? '重新做分級測驗' : '分級測驗：找到你的起點（12 題）') + '</button><button class="btn" data-ln="dict">起手牌字典（169 手）</button></div>';
   if (LP.place) h += '<p class="note">分級測驗建議從第 ' + LP.place.start + ' 階開始。</p>';
   const nw = (LP.wrong || []).length;
@@ -8718,6 +8934,7 @@ function mapHTML() {
 /* ===== 上課：講解 → 練習 → 過關測驗 ===== */
 function lessonHTML() {
   const l = LN.lesson, s = COURSE.find((x) => x.id === l.stage);
+  if (l.grad) return gradLessonHTML(l, s);
   if (l.exam) return examLessonHTML(l, s);
   const steps = [['read', '講解'], ['practice', '練習'], ['quiz', '過關測驗']];
   const curI = LN.phase === 'result' ? 2 : steps.findIndex((x) => x[0] === LN.phase);
@@ -8749,6 +8966,61 @@ function examLessonHTML(l, s) {
   h += '<div class="panel lnread">' + l.read.map(blockHTML).join('') + '</div>';
   if (!R) h += '<div class="lngo2"><button class="btn main big" data-ln="exam" data-id="' + l.id + '">開始實戰考核（到牌桌）▶</button></div>';
   return h;
+}
+/* 畢業考：筆試、實戰兩部分，都過就畢業 */
+function gradLessonHTML(l, s) {
+  const W = LP.gradW, P = (LP.exam || {})['8-5'], X = EXAMS['8-5'];
+  const st = (ok, has) => (ok ? '<span class="lnok">✓ 通過</span>' : has ? '<span class="lnno">還沒過</span>' : '<span class="note">還沒考</span>');
+  let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><span class="note">第 ' + s.id + ' 階　' + esc(s.name) + '</span><b>' + esc(l.id + '　' + l.title) + '</b></div></div>';
+  if (LP.grad) h += '<div class="panel lnres"><p class="lnbig">🎓 畢業了！</p><p>筆試 ' + LP.grad.w + '／' + LP.grad.wn + '、實戰 ' + LP.grad.p + '%。</p><div class="lngo2"><button class="btn main big" data-ln="cert">看結業證書 ▶</button></div></div>';
+  h += '<div class="lngrad">'
+    + '<div class="panel"><h4 class="lnh4">第一部分　筆試 ' + st(W && W.pass, W) + '</h4><p class="note">30 題（第 1–8 階）、每題 ' + GRAD_W.sec + ' 秒，答對 ' + GRAD_W.pass + ' 題通過。' + (W ? '<br>' + (W.pass ? '通過的成績' : '最好成績') + '：' + W.s + '／' + W.n + (W.last !== undefined && W.last !== W.s ? '（上一次 ' + W.last + '）' : '') : '') + '</p><button class="btn' + (W && W.pass ? '' : ' main') + '" data-ln="gradw">' + (W ? '再考筆試' : '開始筆試') + ' ▶</button></div>'
+    + '<div class="panel"><h4 class="lnh4">第二部分　實戰 ' + st(P && P.pass, P) + '</h4><p class="note">6 人桌、高手等級，評 ' + X.need + ' 個決定、平均 ' + Math.round(X.pass * 100) + '%。' + (P ? '<br>' + (P.pass ? '通過的成績' : '上一次') + '：' + Math.round(P.score * 100) + '%（✓ ' + P.good + '、△ ' + P.ok + '、✗ ' + P.bad + '）' : '') + '</p><button class="btn' + (P && P.pass ? '' : ' main') + '" data-ln="exam" data-id="' + l.id + '">' + (P ? '再考實戰' : '開始實戰（到牌桌）') + ' ▶</button></div></div>';
+  h += '<div class="panel lnread">' + l.read.map(blockHTML).join('') + '</div>';
+  return h;
+}
+/* ===== 結業證書 ===== */
+function certHTML() {
+  const G2 = LP.grad;
+  let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><b>結業證書</b></div></div>';
+  if (!G2) return h + '<div class="panel lnres"><p>還沒畢業：通過第 8-5 課的筆試和實戰就會拿到證書。</p></div>';
+  h += '<div class="panel lncert"><label class="lnname2">證書上的名字 <input id="lnCertName" maxlength="16" placeholder="寫上你的名字" value="' + esc(LP.name || '') + '"></label>'
+    + '<canvas id="lnCertCv" width="1200" height="850" hidden></canvas><img id="lnCertImg" alt="結業證書">'
+    + '<div class="lngo2"><a class="btn main" id="lnCertDl" download="德州軍師-結業證書.png">存成圖片 ▼</a></div><p class="note">手機可以長按圖片存到相簿。名字只存在這台裝置。</p></div>';
+  return h;
+}
+function drawCert() {
+  const cv = $('lnCertCv'), G2 = LP.grad;
+  if (!cv || !G2) return;
+  const x = cv.getContext('2d'), W = cv.width, H = cv.height, serif = '"Noto Serif TC", "Songti TC", "PMingLiU", serif', sans = '"PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif';
+  x.fillStyle = '#fbf8f1'; x.fillRect(0, 0, W, H);
+  x.strokeStyle = '#17392f'; x.lineWidth = 14; x.strokeRect(22, 22, W - 44, H - 44);
+  x.strokeStyle = '#d0a84e'; x.lineWidth = 3; x.strokeRect(46, 46, W - 92, H - 92);
+  x.textAlign = 'center'; x.fillStyle = '#17392f';
+  x.font = '600 30px ' + sans; x.fillText('德州軍師・大師之路', W / 2, 130);
+  x.font = '700 84px ' + serif; x.fillText('結 業 證 書', W / 2, 235);
+  x.fillStyle = '#3b4a44'; x.font = '400 30px ' + serif; x.fillText('茲證明', W / 2, 320);
+  const nm = (LP.name || '').trim();
+  x.fillStyle = '#0e1d19'; x.font = '700 64px ' + serif; x.fillText(nm || '＿＿＿＿＿＿', W / 2, 405);
+  x.strokeStyle = '#d0a84e'; x.lineWidth = 2; x.beginPath(); x.moveTo(W / 2 - 260, 425); x.lineTo(W / 2 + 260, 425); x.stroke();
+  x.fillStyle = '#3b4a44'; x.font = '400 30px ' + serif;
+  x.fillText('完成大師之路八階 ' + allLessons().length + ' 課，通過畢業考', W / 2, 490);
+  x.fillText('筆試 ' + G2.w + '／' + G2.wn + '　・　實戰 ' + G2.p + '%', W / 2, 540);
+  x.fillText('特頒此證。', W / 2, 590);
+  x.fillStyle = '#6b7a74'; x.font = '400 21px ' + sans;
+  x.fillText(COURSE.map((c) => c.name).join('・'), W / 2, 660);
+  const d = new Date(G2.at);
+  x.textAlign = 'left'; x.fillStyle = '#3b4a44'; x.font = '400 26px ' + serif;
+  x.fillText(d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日', 110, 760);
+  // 朱印
+  x.save(); x.translate(W - 190, 738); x.rotate(-0.06);                 // 跟標題的印一樣：上排德州、下排軍師
+  x.fillStyle = '#c8372d'; x.fillRect(-60, -60, 120, 120);
+  x.strokeStyle = '#fbf8f1'; x.lineWidth = 3; x.strokeRect(-52, -52, 104, 104);
+  x.fillStyle = '#fbf8f1'; x.font = '700 40px ' + serif; x.textAlign = 'center';
+  x.fillText('德', -21, -6); x.fillText('州', 21, -6); x.fillText('軍', -21, 38); x.fillText('師', 21, 38);
+  x.restore();
+  const url = cv.toDataURL('image/png');
+  $('lnCertImg').src = url; $('lnCertDl').href = url;
 }
 function startQs(kind) {
   const l = LN.lesson;
@@ -8829,6 +9101,13 @@ function finishQs() {
     LN.avg = avg; LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0);
   }
   if (LN.mode === 'review') { LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0); }
+  if (LN.mode === 'grad') {
+    const n = LN.res.length, prev = LP.gradW, best = !prev || ok > prev.s ? ok : prev.s;   // 記最好的成績
+    LN.pass = ok >= GRAD_W.pass;
+    LP.gradW = { s: best, n, pass: best >= GRAD_W.pass, last: ok, at: Date.now() };
+    LN.justGrad = gradCheck(LP);
+    lpSave(); LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0);
+  }
 }
 function resultHTML() {
   const ok = LN.res.filter((r) => r.ok).length, l = LN.lesson;
@@ -8852,9 +9131,10 @@ function startTest(mode, stage) {
 }
 function testHTML() {
   const isP = LN.mode === 'place', s = COURSE.find((x) => x.id === LN.stage);
-  const title = isP ? '分級測驗' : LN.mode === 'drill' ? '⚡ 快答：' + LN.drill.name : LN.mode === 'review' ? '📕 錯題本' : '第 ' + s.id + ' 階跳級測驗：' + esc(s.name);
+  const title = isP ? '分級測驗' : LN.mode === 'drill' ? '⚡ 快答：' + LN.drill.name : LN.mode === 'review' ? '📕 錯題本' : LN.mode === 'grad' ? '🎓 畢業考・筆試' : '第 ' + s.id + ' 階跳級測驗：' + esc(s.name);
   let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><b>' + title + '</b></div></div>';
   if (LN.mode === 'drill' || LN.mode === 'review') return h + drillHTML();
+  if (LN.mode === 'grad') return h + gradTestHTML();
   if (LN.phase === 'intro') {
     h += '<div class="panel lnres">' + (isP ? '<p>12 題，大約 3 分鐘：從規則、起手牌、翻牌前、數學、翻牌後、範圍到 GTO，每一階 1–2 題。</p><p>不會的直接按「不知道」，不扣分——第一個答錯的地方，就是你該開始的地方。</p>'
       : '<p>8 題，答對 7 題這一階就直接算通過（課程表上標成「已跳過」，之後還是可以回來上）。</p>')
@@ -8874,6 +9154,19 @@ function testHTML() {
   }
   h += '<div class="panel lnres"><p class="lnbig">' + (LN.pass ? '🎉 第 ' + s.id + ' 階直接通過！' : '這一階先上課比較好') + '</p><p>答對 ' + ok + '／' + LN.res.length + '（要 7 題）。</p>'
     + '<div class="lngo2"><button class="btn main big" data-ln="map">回課程表</button>' + (LN.pass ? '' : '<button class="btn" data-ln="skip" data-s="' + s.id + '">再考一次</button>') + '</div></div>';
+  return h;
+}
+/* 畢業考的筆試 */
+function gradTestHTML() {
+  if (LN.phase === 'intro') return '<div class="panel lnres"><p>30 題：第 1 到第 8 階都有，照階段排；每題 <b>' + GRAD_W.sec + ' 秒</b>。答對 <b>' + GRAD_W.pass + ' 題</b>通過。</p><div class="lngo2"><button class="btn main big" data-ln="tstart">開始 ▶</button></div></div>';
+  if (LN.phase === 'q') return qHTML();
+  const ok = LN.res.filter((r) => r.ok).length;
+  let h = '<div class="panel lnres"><p class="lnbig">' + (LP.grad && LN.justGrad ? '🎓 畢業了！' : LN.pass ? '🎉 筆試通過' : '還差一點') + '</p><p>答對 <b>' + ok + '／' + LN.res.length + '</b>（要 ' + GRAD_W.pass + ' 題）。</p>';
+  const by = {}; LN.res.forEach((r, i) => { const st = LN.qs[i].stage; by[st] = by[st] || [0, 0]; by[st][1]++; if (r.ok) by[st][0]++; });
+  h += '<ol class="lnplace">' + COURSE.map((c) => { const b = by[c.id]; return b ? '<li class="' + (b[0] === b[1] ? 'ok' : 'no') + '">第 ' + c.id + ' 階 ' + esc(c.name) + '：' + b[0] + '／' + b[1] + '</li>' : ''; }).join('') + '</ol>';
+  const wrong = LN.res.map((r, i) => (r.ok ? null : LN.qs[i])).filter(Boolean);
+  if (wrong.length) h += '<details class="lnwrong"><summary>看答錯的 ' + wrong.length + ' 題</summary>' + wrong.map((q) => '<div class="lnw"><p>' + richH(q.prompt) + '</p><p class="note">答案：' + esc(q.opts.find((o) => o.ok).t) + '。' + richH(q.explain) + '</p></div>').join('') + '</details>';
+  h += '<div class="lngo2">' + (LP.grad && LN.justGrad ? '<button class="btn main big" data-ln="cert">看結業證書 ▶</button>' : '<button class="btn main big" data-ln="lesson" data-id="8-5">回畢業考 ▶</button>') + (LN.pass ? '' : '<button class="btn" data-ln="gradw">再考一次</button>') + '</div></div>';
   return h;
 }
 /* 快答訓練場、錯題本 */
@@ -8898,6 +9191,7 @@ function drillHTML() {
 function testStart() {
   if (LN.mode === 'drill') { LN.qs = makeQuiz(LN.drill.gens, 20, LN.rng); LN.sec = LN.drill.sec; }
   else if (LN.mode === 'review') { LN.qs = wrongSession(LP, LN.rng); LN.sec = 0; if (!LN.qs.length) { openLearn('map'); return; } }
+  else if (LN.mode === 'grad') { LN.qs = makeGradQuiz(LN.rng); LN.sec = GRAD_W.sec; }
   else if (LN.mode === 'place') {
     LN.qs = makePlacement(LN.rng);
     for (const q of LN.qs) q.opts.push({ t: '不知道', ok: false });
@@ -8918,6 +9212,7 @@ function visHTML(v) {
   if (v.k === 'cls') return '<div class="lnvis"><div class="lnrow">' + (v.pos ? '<span class="lbl">' + esc(v.pos) + '</span>' : '') + classCards(v.g).map((c) => cardHTML(c)).join('') + '<span class="lnname">' + esc(NAMEZH(v.g)) + '<small>' + esc(clsWords(v.g)) + '</small></span></div></div>';
   if (v.k === 'cls2') return '<div class="lnvis lnpair">' + [v.a, v.b].map((g) => '<div class="lnrow">' + classCards(g).map((c) => cardHTML(c, 'sm')).join('') + '<span class="lnname">' + esc(NAMEZH(g)) + '</span></div>').join('<span class="vs">vs</span>') + '</div>';
   if (v.k === 'seats') return seatsHTML(v.n, v.btn, v.hero, false);
+  if (v.k === 'hands3') return '<div class="lnvis">' + v.hs.map((h, i) => '<div class="lnrow"><span class="lbl">第 ' + (i + 1) + ' 手</span>' + h.map((c) => cardHTML(c, 'sm')).join('') + '</div>').join('') + '<div class="lnrow"><span class="lbl">公牌</span>' + v.board.map((c) => cardHTML(c, 'sm')).join('') + '</div></div>';
   if (v.k === 'flops') return '<div class="lnvis">' + v.fs.map((b, i) => '<div class="lnrow"><span class="lbl">第 ' + (i + 1) + ' 個</span>' + b.map((c) => cardHTML(c, 'sm')).join('') + '</div>').join('') + '</div>';
   return '';
 }
@@ -8952,6 +9247,9 @@ function blockHTML(b) {
   if (b.k === 'pushTable') return '<div class="tscroll"><table class="stt lnt"><tr><th>位置＼籌碼</th>' + PUSH_BB.map((x) => '<th class="r">' + x + ' 大盲</th>').join('') + '</tr>' + [5, 4, 3, 2, 1].map((B) => '<tr><td>' + PUSH_POS[B] + '</td>' + PUSH_BB.map((x) => '<td class="r num">' + Math.round(pushPct(x, B) * 100) + '%</td>').join('') + '</tr>').join('') + '</table></div><p class="note">數字是「前百分之幾的牌全下」（6 人桌，前面都棄牌）。</p>';
   if (b.k === 'cats2') return '<table class="lncats"><thead><tr><th>牌力</th><th>例子（手牌｜公牌）</th></tr></thead><tbody>' + CATG_GRP.map(([cs, gn]) => '<tr class="lngrp"><td colspan="2">' + esc(gn) + '</td></tr>' + cs.map((c) => '<tr><td><b>' + CATG[c] + '</b><small>' + esc(CATG_NOTE[c]) + '</small></td><td class="cs">' + parseCards(CATG_EX[c][0]).map((x) => cardSpan(x)).join('') + '｜' + parseCards(CATG_EX[c][1]).map((x) => cardSpan(x)).join('') + '</td></tr>').join('')).join('') + '</tbody></table>';
   if (b.k === 'radvTable') return '<div class="tscroll"><table class="stt lnt lnradv"><tr><th>翻牌</th><th class="r">按鈕勝率</th><th class="r">兩對以上<br><small>按鈕／大盲</small></th></tr>' + RANGE_ADV.slice().sort((x, y) => y[1] - x[1]).map(([f, e, nb, nbb]) => '<tr><td class="cs">' + parseCards(f).map((x) => cardSpan(x)).join('') + '</td><td class="r num"><span class="' + (e >= 0.535 ? 'rz' : e <= 0.505 ? 'cz' : '') + '">' + Math.round(e * 100) + '%</span></td><td class="r num">' + (nb > nbb ? '<b>' + pct(nb, 1) + '%</b>' : pct(nb, 1) + '%') + '／' + (nbb > nb ? '<b>' + pct(nbb, 1) + '%</b>' : pct(nbb, 1) + '%') + '</td></tr>').join('') + '</table></div><p class="note">照 6 人桌圖表的範圍（按鈕開牌、大盲跟注）一手一手算到攤牌。紅＝按鈕明顯有利，綠＝接近或大盲有利；粗體＝那一邊的大牌比較多。</p>';
+  if (b.k === 'gtoTable') return '<table class="stt lnt"><tr><th>對手下注</th><th class="r">跟注要的勝率<br><small>＝他的下注裡詐唬可以佔</small></th><th class="r">你最少要繼續</th></tr>' + BET_FR.map(([a, c, t]) => { const f = a / c; return '<tr><td>' + t + '</td><td class="r num"><b>' + Math.round(f / (1 + 2 * f) * 100) + '%</b></td><td class="r num">' + Math.round(100 / (1 + f)) + '%</td></tr>'; }).join('') + '</table>';
+  if (b.k === 'polarTable') return '<div class="tscroll"><table class="stt lnt lnpolar"><tr><th>勝率</th>' + GTO_RIVER.map((S) => '<th class="r cs">' + S.board.slice(0, 3).map((c) => cardSpan(c)).join('') + '<br>' + S.board.slice(3).map((c) => cardSpan(c)).join('') + '</th>').join('') + '</tr>' + [9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((i) => '<tr><td>' + i * 10 + '–' + (i + 1) * 10 + '%</td>' + GTO_RIVER.map((S) => { const x = S.bk[i]; return x < 0 ? '<td class="r note">—</td>' : '<td class="r num" style="background:rgba(201,70,46,' + (x / 100 * 0.75).toFixed(2) + ')">' + x + '%</td>'; }).join('') + '</tr>').join('') + '<tr><td><b>整體</b></td>' + GTO_RIVER.map((S) => '<td class="r num"><b>' + S.ip + '%</b></td>').join('') + '</tr></table></div><p class="note">每一格＝那一組牌平均下注多少（紅色越深下注越多）。最上面（最強）和最下面（最弱）都下注，中間幾乎都過牌。</p>';
+  if (b.k === 'studio') return '<div class="lngo2"><button class="btn" data-ln="studio">打開 GTO 工作室：河牌範例 ▶</button></div>';
   if (b.k === 'openDiff') return '<ol class="lndiff">' + openDiffs(b.t).map((d) => '<li><b>' + esc(POS_ZH[d.pos]) + '</b><span class="note">（開 ' + Math.round(d.pct * 100) + '%）</span>' + (d.pos === 'UTG' ? '：' : '：多開 ') + d.add.map((g) => '<button type="button" class="lnh t' + HAND_TIER[g] + '" data-ln="hand" data-g="' + g + '">' + NAMEZH(g) + '</button>').join('') + '</li>').join('') + '</ol>';
   return '';
 }
@@ -9037,13 +9335,13 @@ function openHandModal(g) {
 function renderLearnHome() {
   if (!LP) lpLoad();
   const c = learnCount(LP), nx = learnNext(LP);
-  $('hLearnTxt').textContent = c.done ? '已完成 ' + c.done + '／' + c.total + ' 課' + (nx ? '，下一課：' + nx.title : '') : '八階課程，從規則練到 GTO；可以先做分級測驗找起點。';
+  $('hLearnTxt').textContent = LP.grad ? '🎓 已畢業（筆試 ' + LP.grad.w + '／' + LP.grad.wn + '、實戰 ' + LP.grad.p + '%）：可以回去複習、做快答、看證書。' : c.done ? '已完成 ' + c.done + '／' + c.total + ' 課' + (nx ? '，下一課：' + nx.title : '') : '八階課程，從規則練到 GTO；可以先做分級測驗找起點。';
   $('bLearn').textContent = c.done ? '繼續上課 ▶' : '開始 ▶';
 }
 
 function initLearn() {
   lpLoad();
-  if (/[?&]lntest/.test(location.search)) { window.__LN = LN; window.__G = G; }          // 自動測試用
+  if (/[?&]lntest/.test(location.search)) { window.__LN = LN; window.__G = G; window.__GT = GT; }          // 自動測試用
   $('nLearn').addEventListener('click', () => openLearn('map'));
   $('bLearn').addEventListener('click', () => openLearn('map'));
   $('lnModalClose').addEventListener('click', () => { $('lnModal').hidden = true; });
@@ -9052,6 +9350,7 @@ function initLearn() {
     const b = e.target.closest('[data-ln="hand"]');
     if (b) { $('lnModalBody').innerHTML = handDetailHTML(+b.dataset.g); $('lnModal').querySelector('.mbox').scrollTop = 0; }
   });
+  $('lnRoot').addEventListener('input', (e) => { if (e.target.id === 'lnCertName') { LP.name = e.target.value.slice(0, 16); lpSave(); drawCert(); } });
   $('lnRoot').addEventListener('click', (e) => {
     const b = e.target.closest('[data-ln]');
     if (!b) {                                                   // 答完題目：點空白也能下一題
@@ -9063,6 +9362,9 @@ function initLearn() {
     else if (a === 'go' || a === 'lesson') { const l = lessonById(b.dataset.id); if (l && l.ready) openLearn('lesson', l); }
     else if (a === 'practice') startQs('practice');
     else if (a === 'exam') { const l = lessonById(b.dataset.id); if (l && l.exam) newGame('exam', l.exam); }
+    else if (a === 'gradw') startTest('grad');
+    else if (a === 'cert') openLearn('cert');
+    else if (a === 'studio') studioLoad(presetSpot('river'), '大師之路 8-3：河牌範例（K♦5♣6♥9♥2♦，大盲跟注 vs 按鈕開牌的範圍）。算完點格子看每一種牌怎麼打；看完按上面的「大師之路」回課程。', true);
     else if (a === 'quiz') startQs('quiz');
     else if (a === 'reread') { clearLnTimers(); LN.phase = 'read'; renderLearn(); window.scrollTo(0, 0); }
     else if (a === 'ans') answerQ(+b.dataset.i);
@@ -9097,27 +9399,37 @@ function initLearn() {
 function examPrep() {
   const E = G.exam;
   for (const s of G.T.seats) s.stack = GAME_STACK;
-  G.T.seats[1].style = examVillain(E);
+  if (E.villains) G.T.seats[1].style = examVillain(E);
 }
 /* newHand 之後、發牌之前：把指定的牌排進牌堆 */
 function examDeal(H) {
+  if (!G.exam.spots) return;                                       // 畢業考、GTO 訓練場：隨機發牌
   const sp = examNextSpot(G.exam, G.rng);
   stackDeck(H, 0, sp.hole, sp.board);
 }
 /* 現在是不是「考核中、輪到你、還沒按」：這時候不給任何建議 */
 function examHiding() { return !!(G.exam && !G.exam.done && G.waitingHero && atHead() && !G.replay); }
+/* GTO 訓練場：翻牌前、翻牌教練代打 */
+function examAutoNow() { return !!(G.exam && G.exam.autoEarly && !G.exam.done && G.H && G.H.street <= 1); }
+/* GTO 訓練場：轉牌、河牌要等解算好才能按（才能用 GTO 評分） */
+function examWaitGto() {
+  const E = G.exam, g = G.gto;
+  return !!(E && E.gto && !E.done && G.waitingHero && G.H && G.H.street >= 2 && g && !g.lost && g.seats.indexOf(0) >= 0 && !gtoAdvUsable());
+}
+function examLockBtns() { return examHiding() && (examAutoNow() || examWaitGto()); }
 /* 一手結束：記分；評滿就存成績 */
 function examHandEnd() {
   const E = G.exam;
   if (!E || E.done) return;
-  if (!examAdd(E, G.review.map((x) => x.grade.mark))) return;
+  if (!examAdd(E, examMarks(E, G.review))) return;
   if (!LP) lpLoad();
   const c = examCounts(E.grades);
   LP.exam = LP.exam || {};
   const prev = LP.exam[E.id];
   const rec = { score: E.score, n: E.grades.length, good: c.good, ok: c.ok, bad: c.bad, pass: E.pass, at: Date.now() };
   LP.exam[E.id] = !E.pass && prev && prev.pass ? Object.assign({}, prev, { last: E.score }) : rec;   // 之前過了、這次沒過：保留過關的成績
-  if (E.pass) {
+  if (E.final) E.graduated = gradCheck(LP);                        // 畢業考：筆試也過了才算畢業
+  else if (E.pass) {
     const s = Math.round(E.score * 100), d = LP.done[E.id];
     if (!d || d.s < s) LP.done[E.id] = { s, n: 100, pct: true, at: Date.now() };
   }
@@ -9126,8 +9438,8 @@ function examHandEnd() {
 /* 牌桌上方那一條：進度 */
 function examBarHTML() {
   const E = G.exam, n = E.grades.length, c = examCounts(E.grades);
-  if (E.done) return '<b>實戰考核結束</b>・平均 ' + Math.round(E.score * 100) + '%（要 ' + Math.round(E.passAt * 100) + '%）・' + (E.pass ? '過關' : '還差一點');
-  return '<b>實戰考核 ' + esc(E.id) + '</b>・已評 ' + n + '／' + E.need + '・✓ ' + c.good + '　△ ' + c.ok + '　✗ ' + c.bad + (n ? '・目前 ' + Math.round(examScore(E.grades) * 100) + '%' : '') + '・要 ' + Math.round(E.passAt * 100) + '%';
+  if (E.done) return '<b>' + (E.final ? '畢業考・實戰' : E.gto ? 'GTO 訓練場' : '實戰考核') + '結束</b>・平均 ' + Math.round(E.score * 100) + '%（要 ' + Math.round(E.passAt * 100) + '%）・' + (E.pass ? '過關' : '還差一點');
+  return '<b>' + (E.final ? '畢業考・實戰' : E.gto ? 'GTO 訓練場' : '實戰考核 ' + esc(E.id)) + '</b>・' + (E.gto ? 'GTO 已評 ' : '已評 ') + n + '／' + E.need + '・✓ ' + c.good + '　△ ' + c.ok + '　✗ ' + c.bad + (n ? '・目前 ' + Math.round(examScore(E.grades) * 100) + '%' : '') + '・要 ' + Math.round(E.passAt * 100) + '%';
 }
 /* 輪到你：教練框只放提醒 */
 function examHeroHTML(S) {
@@ -9139,7 +9451,8 @@ function examHeroHTML(S) {
 /* 一手結束時教練框的考核區塊 */
 function examSummaryHTML() {
   const E = G.exam, c = examCounts(E.grades);
-  if (!E.done) return '<p class="note" style="margin-top:10px">實戰考核：已評 ' + E.grades.length + '／' + E.need + ' 個決定（✓ ' + c.good + '、△ ' + c.ok + '、✗ ' + c.bad + '）。</p>';
+  if (!E.done) return '<p class="note" style="margin-top:10px">' + (E.gto ? 'GTO 訓練場：GTO 評分 ' : E.final ? '畢業考：已評 ' : '實戰考核：已評 ') + E.grades.length + '／' + E.need + ' 個決定（✓ ' + c.good + '、△ ' + c.ok + '、✗ ' + c.bad + '）' + (E.gto ? '；翻牌前、翻牌是教練代打，不算分' : E.skipTrivial ? '；明顯該棄的爛牌不算' : '') + '。</p>';
+  if (E.final && E.pass) return '<div class="studiooffer"><b>' + (E.graduated || (LP && LP.grad) ? '🎓 畢業了！' : '🎉 實戰通過！') + '</b><p>' + E.grades.length + ' 個決定：✓ ' + c.good + '、△ ' + c.ok + '、✗ ' + c.bad + '，平均 <b>' + Math.round(E.score * 100) + '%</b>（要 ' + Math.round(E.passAt * 100) + '%）。</p><p class="note">' + (LP && LP.grad ? '筆試和實戰都通過了：回大師之路拿結業證書。' : '還要通過筆試（30 題）才畢業。') + '</p></div>';
   return '<div class="studiooffer"><b>' + (E.pass ? '🎉 實戰考核過關！' : '實戰考核：還差一點') + '</b><p>' + E.grades.length + ' 個決定：✓ ' + c.good + '、△ ' + c.ok + '、✗ ' + c.bad + '，平均 <b>' + Math.round(E.score * 100) + '%</b>（要 ' + Math.round(E.passAt * 100) + '%）。</p>'
     + '<p class="note">' + (E.pass ? '回大師之路繼續下一課。' : '✗ 的決定在每一手的檢討裡都有教練的建議；把第 ' + E.stage + ' 階的課再看一次，再考一次（牌會重新洗）。') + '</p></div>';
 }
@@ -9148,8 +9461,9 @@ function examOverCtrl(net, marks) {
   const E = G.exam;
   const res = '<b>' + (net > 0 ? '你贏了 ' + net : net < 0 ? '你輸了 ' + (-net) : '沒輸沒贏') + '</b>' + (marks ? '　這手：' + marks : '');
   if (!E.done) return { m: res + '　<span class="why">考核：已評 ' + E.grades.length + '／' + E.need + '</span>', b: '<button class="btn main" data-c="nexthand" id="bNext">下一手 ▶</button><button class="btn" data-c="replay">重看這一手</button>' };
-  return { m: '<b>' + (E.pass ? '🎉 考核過關！' : '考核結束：還差一點') + '</b>　平均 ' + Math.round(E.score * 100) + '%（要 ' + Math.round(E.passAt * 100) + '%）<button type="button" class="linkbtn" data-c="why">看結果</button>',
-    b: '<button class="btn main" data-c="learn" id="bNext">回大師之路 ▶</button><button class="btn" data-c="exam">再考一次</button><button class="btn" data-c="replay">重看這一手</button>' };
+  const grad = E.final && LP && LP.grad;
+  return { m: '<b>' + (grad ? '🎓 畢業了！' : E.pass ? '🎉 ' + (E.final ? '實戰通過！' : '考核過關！') : '考核結束：還差一點') + '</b>　平均 ' + Math.round(E.score * 100) + '%（要 ' + Math.round(E.passAt * 100) + '%）<button type="button" class="linkbtn" data-c="why">看結果</button>',
+    b: '<button class="btn main" data-c="' + (grad ? 'cert' : 'learn') + '" id="bNext">' + (grad ? '看結業證書 ▶' : '回大師之路 ▶') + '</button><button class="btn" data-c="exam">再考一次</button><button class="btn" data-c="replay">重看這一手</button>' };
 }
 
 /* ===== 85-main：分頁、開始 ===== */

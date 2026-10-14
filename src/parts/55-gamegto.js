@@ -8,7 +8,7 @@ function gtoActive() { return G.gto && !G.gto.lost && G.gto.ready; }
 function gtoReset() { if (G.gto) GW().send({ cmd: 'g-stop' }); G.gto = null; G.gtoAdv = null; G.waitAI = null; }
 function gtoAsk(msg, cb) { const req = ++GT.req; GT.cbs.set(req, cb); GW().send(Object.assign({ cmd: 'g-query', req }, msg)); }
 function gtoInit() {
-  GW().on('g-ans', (m) => { const f = GT.cbs.get(m.req); if (f) { GT.cbs.delete(m.req); f(m); } });
+  GW().on('g-ans', (m) => { if (m.error) console.error('GTO 查詢出錯', m.error); const f = GT.cbs.get(m.req); if (f) { GT.cbs.delete(m.req); f(m); } });
   GW().on('g-progress', (m) => {
     const g = G.gto;
     if (!g || g.key !== m.key) return;
@@ -20,7 +20,7 @@ function gtoInit() {
 }
 /* 需要 GTO 嗎：單挑、你在裡面（而且開著 GTO 教練）或有 GTO 電腦 */
 function gtoWanted(seats) {
-  if (seats.indexOf(0) >= 0 && GS.gtoCoach && !G.exam) return true;           // 考核時不幫你算
+  if (seats.indexOf(0) >= 0 && ((GS.gtoCoach && !G.exam) || (G.exam && G.exam.gto))) return true;   // 考核時不幫你算（GTO 訓練場要算來評分）
   return seats.some((k) => G.H.players[k].style === 'gto');
 }
 /* 發了轉牌或河牌 */
@@ -39,8 +39,10 @@ function gtoOnStreet(ev) {
   // 河牌：前一條街的解如果一路對得上，就把那裡的雙方範圍接過來
   if (prev && !prev.lost && prev.street === ev.street - 1 && prev.nd && prev.nd.kind === N_CHANCE && prev.ready) {
     const key = prev.key;
+    // 等範圍回來之前先放一個「準備中」：電腦照這個等（不會拿到上一條街的解），有人先動作就放棄這條街的 GTO
+    const wait = G.gto = { key: -1, street: ev.street, seats: prev.seats.slice(), path: [], nd: null, pct: 999, done: false, ready: false, lost: false, pending: true, pot: prev.pot };
     gtoAsk({ key, path: prev.path.concat([{ c: ev.cards[0] }]), reach: true }, (m) => {
-      if (G.H !== H || H.street !== ev.street) return;
+      if (G.H !== H || H.street !== ev.street || G.gto !== wait || wait.lost) return;
       start(m.none ? null : m.reach);
     });
     return;
@@ -63,7 +65,7 @@ function gtoOnAct(ev) {
 /* ===== 你 ===== */
 function gtoHeroTurn(refresh) {
   const g = G.gto, H = G.H;
-  if (!g || g.lost || !g.ready || g.seats.indexOf(0) < 0 || !GS.gtoCoach) return;
+  if (!g || g.lost || !g.ready || g.seats.indexOf(0) < 0 || (!GS.gtoCoach && !(G.exam && G.exam.gto))) return;
   const pathLen = g.path.length, view = G.view;
   const combo = comboOf(H.players[0].cards[0], H.players[0].cards[1]);
   if (refresh && G.gtoAdv && G.gtoAdv.pathLen === pathLen && G.gtoAdv.done) return;
@@ -140,17 +142,21 @@ function gtoBotWait(seat) {
   if (!G.waitAI || G.waitAI.seat !== seat) G.waitAI = { seat, since: Date.now() };
   const W8 = G.waitAI;
   if (W8.asking) return true;
-  const fallback = () => { G.pendingAI = { seat, a: aiDecide(H, G.rng, G.T.level), why: 'rule' }; G.waitAI = null; afterBot(); };
+  const setRule = () => { G.pendingAI = { seat, a: aiDecide(H, G.rng, G.T.level), why: 'rule' }; G.waitAI = null; };
+  const fallback = () => { setRule(); afterBot(); };                 // 非同步（回答、計時）才用：叫牌局接著往下
   if (!g.ready) {
-    if (Date.now() - W8.since > cap) { fallback(); return false; }
+    if (Date.now() - W8.since > cap) { setRule(); return false; }    // 同步：直接讓外面這一次 produce 出這個動作（不要再叫一次 forward，會連出兩個動作）
     setTimeout(() => { if (G.waitAI === W8) afterBot(); }, 300);
     return true;
   }
   W8.asking = true;
   const p = g.seats.indexOf(seat), combo = comboOf(pl.cards[0], pl.cards[1]), pathLen = g.path.length;
+  const tq = setTimeout(() => { if (G.waitAI === W8 && W8.asking) { W8.asking = false; fallback(); } }, 8000);   // 背景執行緒沒回答：照原本的打法
   gtoAsk({ key: g.key, path: g.path.slice(), p, combo }, (m) => {
+    clearTimeout(tq);
     W8.asking = false;
-    if (G.waitAI !== W8 || G.gto !== g || g.path.length !== pathLen) return;
+    if (G.waitAI !== W8) return;
+    if (G.gto !== g || g.path.length !== pathLen) { G.waitAI = null; afterBot(); return; }   // 解換了：重新問現在的解（不要卡住）
     const good = !m.none && (m.done || m.pct <= 5 || m.t >= 60);
     if (!good && Date.now() - W8.since < cap && !m.none) { setTimeout(() => { if (G.waitAI === W8) afterBot(); }, 350); return; }
     if (m.none) { fallback(); return; }

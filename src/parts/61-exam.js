@@ -3,27 +3,37 @@
 function examPrep() {
   const E = G.exam;
   for (const s of G.T.seats) s.stack = GAME_STACK;
-  G.T.seats[1].style = examVillain(E);
+  if (E.villains) G.T.seats[1].style = examVillain(E);
 }
 /* newHand 之後、發牌之前：把指定的牌排進牌堆 */
 function examDeal(H) {
+  if (!G.exam.spots) return;                                       // 畢業考、GTO 訓練場：隨機發牌
   const sp = examNextSpot(G.exam, G.rng);
   stackDeck(H, 0, sp.hole, sp.board);
 }
 /* 現在是不是「考核中、輪到你、還沒按」：這時候不給任何建議 */
 function examHiding() { return !!(G.exam && !G.exam.done && G.waitingHero && atHead() && !G.replay); }
+/* GTO 訓練場：翻牌前、翻牌教練代打 */
+function examAutoNow() { return !!(G.exam && G.exam.autoEarly && !G.exam.done && G.H && G.H.street <= 1); }
+/* GTO 訓練場：轉牌、河牌要等解算好才能按（才能用 GTO 評分） */
+function examWaitGto() {
+  const E = G.exam, g = G.gto;
+  return !!(E && E.gto && !E.done && G.waitingHero && G.H && G.H.street >= 2 && g && !g.lost && g.seats.indexOf(0) >= 0 && !gtoAdvUsable());
+}
+function examLockBtns() { return examHiding() && (examAutoNow() || examWaitGto()); }
 /* 一手結束：記分；評滿就存成績 */
 function examHandEnd() {
   const E = G.exam;
   if (!E || E.done) return;
-  if (!examAdd(E, G.review.map((x) => x.grade.mark))) return;
+  if (!examAdd(E, examMarks(E, G.review))) return;
   if (!LP) lpLoad();
   const c = examCounts(E.grades);
   LP.exam = LP.exam || {};
   const prev = LP.exam[E.id];
   const rec = { score: E.score, n: E.grades.length, good: c.good, ok: c.ok, bad: c.bad, pass: E.pass, at: Date.now() };
   LP.exam[E.id] = !E.pass && prev && prev.pass ? Object.assign({}, prev, { last: E.score }) : rec;   // 之前過了、這次沒過：保留過關的成績
-  if (E.pass) {
+  if (E.final) E.graduated = gradCheck(LP);                        // 畢業考：筆試也過了才算畢業
+  else if (E.pass) {
     const s = Math.round(E.score * 100), d = LP.done[E.id];
     if (!d || d.s < s) LP.done[E.id] = { s, n: 100, pct: true, at: Date.now() };
   }
@@ -32,8 +42,8 @@ function examHandEnd() {
 /* 牌桌上方那一條：進度 */
 function examBarHTML() {
   const E = G.exam, n = E.grades.length, c = examCounts(E.grades);
-  if (E.done) return '<b>實戰考核結束</b>・平均 ' + Math.round(E.score * 100) + '%（要 ' + Math.round(E.passAt * 100) + '%）・' + (E.pass ? '過關' : '還差一點');
-  return '<b>實戰考核 ' + esc(E.id) + '</b>・已評 ' + n + '／' + E.need + '・✓ ' + c.good + '　△ ' + c.ok + '　✗ ' + c.bad + (n ? '・目前 ' + Math.round(examScore(E.grades) * 100) + '%' : '') + '・要 ' + Math.round(E.passAt * 100) + '%';
+  if (E.done) return '<b>' + (E.final ? '畢業考・實戰' : E.gto ? 'GTO 訓練場' : '實戰考核') + '結束</b>・平均 ' + Math.round(E.score * 100) + '%（要 ' + Math.round(E.passAt * 100) + '%）・' + (E.pass ? '過關' : '還差一點');
+  return '<b>' + (E.final ? '畢業考・實戰' : E.gto ? 'GTO 訓練場' : '實戰考核 ' + esc(E.id)) + '</b>・' + (E.gto ? 'GTO 已評 ' : '已評 ') + n + '／' + E.need + '・✓ ' + c.good + '　△ ' + c.ok + '　✗ ' + c.bad + (n ? '・目前 ' + Math.round(examScore(E.grades) * 100) + '%' : '') + '・要 ' + Math.round(E.passAt * 100) + '%';
 }
 /* 輪到你：教練框只放提醒 */
 function examHeroHTML(S) {
@@ -45,7 +55,8 @@ function examHeroHTML(S) {
 /* 一手結束時教練框的考核區塊 */
 function examSummaryHTML() {
   const E = G.exam, c = examCounts(E.grades);
-  if (!E.done) return '<p class="note" style="margin-top:10px">實戰考核：已評 ' + E.grades.length + '／' + E.need + ' 個決定（✓ ' + c.good + '、△ ' + c.ok + '、✗ ' + c.bad + '）。</p>';
+  if (!E.done) return '<p class="note" style="margin-top:10px">' + (E.gto ? 'GTO 訓練場：GTO 評分 ' : E.final ? '畢業考：已評 ' : '實戰考核：已評 ') + E.grades.length + '／' + E.need + ' 個決定（✓ ' + c.good + '、△ ' + c.ok + '、✗ ' + c.bad + '）' + (E.gto ? '；翻牌前、翻牌是教練代打，不算分' : E.skipTrivial ? '；明顯該棄的爛牌不算' : '') + '。</p>';
+  if (E.final && E.pass) return '<div class="studiooffer"><b>' + (E.graduated || (LP && LP.grad) ? '🎓 畢業了！' : '🎉 實戰通過！') + '</b><p>' + E.grades.length + ' 個決定：✓ ' + c.good + '、△ ' + c.ok + '、✗ ' + c.bad + '，平均 <b>' + Math.round(E.score * 100) + '%</b>（要 ' + Math.round(E.passAt * 100) + '%）。</p><p class="note">' + (LP && LP.grad ? '筆試和實戰都通過了：回大師之路拿結業證書。' : '還要通過筆試（30 題）才畢業。') + '</p></div>';
   return '<div class="studiooffer"><b>' + (E.pass ? '🎉 實戰考核過關！' : '實戰考核：還差一點') + '</b><p>' + E.grades.length + ' 個決定：✓ ' + c.good + '、△ ' + c.ok + '、✗ ' + c.bad + '，平均 <b>' + Math.round(E.score * 100) + '%</b>（要 ' + Math.round(E.passAt * 100) + '%）。</p>'
     + '<p class="note">' + (E.pass ? '回大師之路繼續下一課。' : '✗ 的決定在每一手的檢討裡都有教練的建議；把第 ' + E.stage + ' 階的課再看一次，再考一次（牌會重新洗）。') + '</p></div>';
 }
@@ -54,6 +65,7 @@ function examOverCtrl(net, marks) {
   const E = G.exam;
   const res = '<b>' + (net > 0 ? '你贏了 ' + net : net < 0 ? '你輸了 ' + (-net) : '沒輸沒贏') + '</b>' + (marks ? '　這手：' + marks : '');
   if (!E.done) return { m: res + '　<span class="why">考核：已評 ' + E.grades.length + '／' + E.need + '</span>', b: '<button class="btn main" data-c="nexthand" id="bNext">下一手 ▶</button><button class="btn" data-c="replay">重看這一手</button>' };
-  return { m: '<b>' + (E.pass ? '🎉 考核過關！' : '考核結束：還差一點') + '</b>　平均 ' + Math.round(E.score * 100) + '%（要 ' + Math.round(E.passAt * 100) + '%）<button type="button" class="linkbtn" data-c="why">看結果</button>',
-    b: '<button class="btn main" data-c="learn" id="bNext">回大師之路 ▶</button><button class="btn" data-c="exam">再考一次</button><button class="btn" data-c="replay">重看這一手</button>' };
+  const grad = E.final && LP && LP.grad;
+  return { m: '<b>' + (grad ? '🎓 畢業了！' : E.pass ? '🎉 ' + (E.final ? '實戰通過！' : '考核過關！') : '考核結束：還差一點') + '</b>　平均 ' + Math.round(E.score * 100) + '%（要 ' + Math.round(E.passAt * 100) + '%）<button type="button" class="linkbtn" data-c="why">看結果</button>',
+    b: '<button class="btn main" data-c="' + (grad ? 'cert' : 'learn') + '" id="bNext">' + (grad ? '看結業證書 ▶' : '回大師之路 ▶') + '</button><button class="btn" data-c="exam">再考一次</button><button class="btn" data-c="replay">重看這一手</button>' };
 }

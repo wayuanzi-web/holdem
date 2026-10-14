@@ -25,19 +25,21 @@ function renderLearn() {
   if (LN.mode === 'map') R.innerHTML = mapHTML();
   else if (LN.mode === 'lesson') R.innerHTML = lessonHTML();
   else if (LN.mode === 'dict') { R.innerHTML = dictHTML(); }
+  else if (LN.mode === 'cert') { R.innerHTML = certHTML(); drawCert(); }
   else R.innerHTML = testHTML();
   if (LN.mode === 'dict' && LN.dictScroll) { LN.dictScroll = false; const d = $('lnDictDetail'); if (d && window.innerWidth < 900) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 
 /* ===== 課程表 ===== */
 const SKIP_OK = {};
-function canSkipTest(sid) { if (!(sid in SKIP_OK)) SKIP_OK[sid] = !!STAGE_GENS[sid] && makeQuiz(STAGE_GENS[sid], 8, makeRng(1)).length >= 8; return SKIP_OK[sid]; }
+function canSkipTest(sid) { if (NO_SKIP[sid]) return false; if (!(sid in SKIP_OK)) SKIP_OK[sid] = !!STAGE_GENS[sid] && makeQuiz(STAGE_GENS[sid], 8, makeRng(1)).length >= 8; return SKIP_OK[sid]; }
 function mapHTML() {
   const c = learnCount(LP), nx = learnNext(LP);
   let h = '<div class="lnhead"><h2>大師之路</h2><p class="note">從規則到 GTO 分八階，每一課：短講解 → 練習 → 過關測驗。進度存在這台裝置，隨時接著上。</p>'
     + '<div class="lnprog"><div class="track"><i style="width:' + (c.done / c.total * 100).toFixed(1) + '%"></i></div><span class="num">' + c.done + '／' + c.total + ' 課</span></div>';
   if (nx) h += '<button class="btn main big lngo" data-ln="go" data-id="' + nx.id + '">' + (c.done ? '繼續' : '開始') + '：第 ' + nx.stage + ' 階・' + esc(nx.title) + ' ▶</button>' + (nx.ready ? '' : '<p class="note">這一課還在製作中（下一批更新），可以先做下面的練習、查起手牌字典，或用跳級測驗往後走。</p>');
   else h += '<p class="lndone">🏆 全部完成！</p>';
+  if (LP.grad) h += '<div class="strow"><button class="btn main lncertb" data-ln="cert">🎓 已畢業：看結業證書</button></div>';
   h += '<div class="strow"><button class="btn" data-ln="place">' + (LP.place ? '重新做分級測驗' : '分級測驗：找到你的起點（12 題）') + '</button><button class="btn" data-ln="dict">起手牌字典（169 手）</button></div>';
   if (LP.place) h += '<p class="note">分級測驗建議從第 ' + LP.place.start + ' 階開始。</p>';
   const nw = (LP.wrong || []).length;
@@ -66,6 +68,7 @@ function mapHTML() {
 /* ===== 上課：講解 → 練習 → 過關測驗 ===== */
 function lessonHTML() {
   const l = LN.lesson, s = COURSE.find((x) => x.id === l.stage);
+  if (l.grad) return gradLessonHTML(l, s);
   if (l.exam) return examLessonHTML(l, s);
   const steps = [['read', '講解'], ['practice', '練習'], ['quiz', '過關測驗']];
   const curI = LN.phase === 'result' ? 2 : steps.findIndex((x) => x[0] === LN.phase);
@@ -97,6 +100,61 @@ function examLessonHTML(l, s) {
   h += '<div class="panel lnread">' + l.read.map(blockHTML).join('') + '</div>';
   if (!R) h += '<div class="lngo2"><button class="btn main big" data-ln="exam" data-id="' + l.id + '">開始實戰考核（到牌桌）▶</button></div>';
   return h;
+}
+/* 畢業考：筆試、實戰兩部分，都過就畢業 */
+function gradLessonHTML(l, s) {
+  const W = LP.gradW, P = (LP.exam || {})['8-5'], X = EXAMS['8-5'];
+  const st = (ok, has) => (ok ? '<span class="lnok">✓ 通過</span>' : has ? '<span class="lnno">還沒過</span>' : '<span class="note">還沒考</span>');
+  let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><span class="note">第 ' + s.id + ' 階　' + esc(s.name) + '</span><b>' + esc(l.id + '　' + l.title) + '</b></div></div>';
+  if (LP.grad) h += '<div class="panel lnres"><p class="lnbig">🎓 畢業了！</p><p>筆試 ' + LP.grad.w + '／' + LP.grad.wn + '、實戰 ' + LP.grad.p + '%。</p><div class="lngo2"><button class="btn main big" data-ln="cert">看結業證書 ▶</button></div></div>';
+  h += '<div class="lngrad">'
+    + '<div class="panel"><h4 class="lnh4">第一部分　筆試 ' + st(W && W.pass, W) + '</h4><p class="note">30 題（第 1–8 階）、每題 ' + GRAD_W.sec + ' 秒，答對 ' + GRAD_W.pass + ' 題通過。' + (W ? '<br>' + (W.pass ? '通過的成績' : '最好成績') + '：' + W.s + '／' + W.n + (W.last !== undefined && W.last !== W.s ? '（上一次 ' + W.last + '）' : '') : '') + '</p><button class="btn' + (W && W.pass ? '' : ' main') + '" data-ln="gradw">' + (W ? '再考筆試' : '開始筆試') + ' ▶</button></div>'
+    + '<div class="panel"><h4 class="lnh4">第二部分　實戰 ' + st(P && P.pass, P) + '</h4><p class="note">6 人桌、高手等級，評 ' + X.need + ' 個決定、平均 ' + Math.round(X.pass * 100) + '%。' + (P ? '<br>' + (P.pass ? '通過的成績' : '上一次') + '：' + Math.round(P.score * 100) + '%（✓ ' + P.good + '、△ ' + P.ok + '、✗ ' + P.bad + '）' : '') + '</p><button class="btn' + (P && P.pass ? '' : ' main') + '" data-ln="exam" data-id="' + l.id + '">' + (P ? '再考實戰' : '開始實戰（到牌桌）') + ' ▶</button></div></div>';
+  h += '<div class="panel lnread">' + l.read.map(blockHTML).join('') + '</div>';
+  return h;
+}
+/* ===== 結業證書 ===== */
+function certHTML() {
+  const G2 = LP.grad;
+  let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><b>結業證書</b></div></div>';
+  if (!G2) return h + '<div class="panel lnres"><p>還沒畢業：通過第 8-5 課的筆試和實戰就會拿到證書。</p></div>';
+  h += '<div class="panel lncert"><label class="lnname2">證書上的名字 <input id="lnCertName" maxlength="16" placeholder="寫上你的名字" value="' + esc(LP.name || '') + '"></label>'
+    + '<canvas id="lnCertCv" width="1200" height="850" hidden></canvas><img id="lnCertImg" alt="結業證書">'
+    + '<div class="lngo2"><a class="btn main" id="lnCertDl" download="德州軍師-結業證書.png">存成圖片 ▼</a></div><p class="note">手機可以長按圖片存到相簿。名字只存在這台裝置。</p></div>';
+  return h;
+}
+function drawCert() {
+  const cv = $('lnCertCv'), G2 = LP.grad;
+  if (!cv || !G2) return;
+  const x = cv.getContext('2d'), W = cv.width, H = cv.height, serif = '"Noto Serif TC", "Songti TC", "PMingLiU", serif', sans = '"PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif';
+  x.fillStyle = '#fbf8f1'; x.fillRect(0, 0, W, H);
+  x.strokeStyle = '#17392f'; x.lineWidth = 14; x.strokeRect(22, 22, W - 44, H - 44);
+  x.strokeStyle = '#d0a84e'; x.lineWidth = 3; x.strokeRect(46, 46, W - 92, H - 92);
+  x.textAlign = 'center'; x.fillStyle = '#17392f';
+  x.font = '600 30px ' + sans; x.fillText('德州軍師・大師之路', W / 2, 130);
+  x.font = '700 84px ' + serif; x.fillText('結 業 證 書', W / 2, 235);
+  x.fillStyle = '#3b4a44'; x.font = '400 30px ' + serif; x.fillText('茲證明', W / 2, 320);
+  const nm = (LP.name || '').trim();
+  x.fillStyle = '#0e1d19'; x.font = '700 64px ' + serif; x.fillText(nm || '＿＿＿＿＿＿', W / 2, 405);
+  x.strokeStyle = '#d0a84e'; x.lineWidth = 2; x.beginPath(); x.moveTo(W / 2 - 260, 425); x.lineTo(W / 2 + 260, 425); x.stroke();
+  x.fillStyle = '#3b4a44'; x.font = '400 30px ' + serif;
+  x.fillText('完成大師之路八階 ' + allLessons().length + ' 課，通過畢業考', W / 2, 490);
+  x.fillText('筆試 ' + G2.w + '／' + G2.wn + '　・　實戰 ' + G2.p + '%', W / 2, 540);
+  x.fillText('特頒此證。', W / 2, 590);
+  x.fillStyle = '#6b7a74'; x.font = '400 21px ' + sans;
+  x.fillText(COURSE.map((c) => c.name).join('・'), W / 2, 660);
+  const d = new Date(G2.at);
+  x.textAlign = 'left'; x.fillStyle = '#3b4a44'; x.font = '400 26px ' + serif;
+  x.fillText(d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日', 110, 760);
+  // 朱印
+  x.save(); x.translate(W - 190, 738); x.rotate(-0.06);                 // 跟標題的印一樣：上排德州、下排軍師
+  x.fillStyle = '#c8372d'; x.fillRect(-60, -60, 120, 120);
+  x.strokeStyle = '#fbf8f1'; x.lineWidth = 3; x.strokeRect(-52, -52, 104, 104);
+  x.fillStyle = '#fbf8f1'; x.font = '700 40px ' + serif; x.textAlign = 'center';
+  x.fillText('德', -21, -6); x.fillText('州', 21, -6); x.fillText('軍', -21, 38); x.fillText('師', 21, 38);
+  x.restore();
+  const url = cv.toDataURL('image/png');
+  $('lnCertImg').src = url; $('lnCertDl').href = url;
 }
 function startQs(kind) {
   const l = LN.lesson;
@@ -177,6 +235,13 @@ function finishQs() {
     LN.avg = avg; LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0);
   }
   if (LN.mode === 'review') { LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0); }
+  if (LN.mode === 'grad') {
+    const n = LN.res.length, prev = LP.gradW, best = !prev || ok > prev.s ? ok : prev.s;   // 記最好的成績
+    LN.pass = ok >= GRAD_W.pass;
+    LP.gradW = { s: best, n, pass: best >= GRAD_W.pass, last: ok, at: Date.now() };
+    LN.justGrad = gradCheck(LP);
+    lpSave(); LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0);
+  }
 }
 function resultHTML() {
   const ok = LN.res.filter((r) => r.ok).length, l = LN.lesson;
@@ -200,9 +265,10 @@ function startTest(mode, stage) {
 }
 function testHTML() {
   const isP = LN.mode === 'place', s = COURSE.find((x) => x.id === LN.stage);
-  const title = isP ? '分級測驗' : LN.mode === 'drill' ? '⚡ 快答：' + LN.drill.name : LN.mode === 'review' ? '📕 錯題本' : '第 ' + s.id + ' 階跳級測驗：' + esc(s.name);
+  const title = isP ? '分級測驗' : LN.mode === 'drill' ? '⚡ 快答：' + LN.drill.name : LN.mode === 'review' ? '📕 錯題本' : LN.mode === 'grad' ? '🎓 畢業考・筆試' : '第 ' + s.id + ' 階跳級測驗：' + esc(s.name);
   let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><b>' + title + '</b></div></div>';
   if (LN.mode === 'drill' || LN.mode === 'review') return h + drillHTML();
+  if (LN.mode === 'grad') return h + gradTestHTML();
   if (LN.phase === 'intro') {
     h += '<div class="panel lnres">' + (isP ? '<p>12 題，大約 3 分鐘：從規則、起手牌、翻牌前、數學、翻牌後、範圍到 GTO，每一階 1–2 題。</p><p>不會的直接按「不知道」，不扣分——第一個答錯的地方，就是你該開始的地方。</p>'
       : '<p>8 題，答對 7 題這一階就直接算通過（課程表上標成「已跳過」，之後還是可以回來上）。</p>')
@@ -222,6 +288,19 @@ function testHTML() {
   }
   h += '<div class="panel lnres"><p class="lnbig">' + (LN.pass ? '🎉 第 ' + s.id + ' 階直接通過！' : '這一階先上課比較好') + '</p><p>答對 ' + ok + '／' + LN.res.length + '（要 7 題）。</p>'
     + '<div class="lngo2"><button class="btn main big" data-ln="map">回課程表</button>' + (LN.pass ? '' : '<button class="btn" data-ln="skip" data-s="' + s.id + '">再考一次</button>') + '</div></div>';
+  return h;
+}
+/* 畢業考的筆試 */
+function gradTestHTML() {
+  if (LN.phase === 'intro') return '<div class="panel lnres"><p>30 題：第 1 到第 8 階都有，照階段排；每題 <b>' + GRAD_W.sec + ' 秒</b>。答對 <b>' + GRAD_W.pass + ' 題</b>通過。</p><div class="lngo2"><button class="btn main big" data-ln="tstart">開始 ▶</button></div></div>';
+  if (LN.phase === 'q') return qHTML();
+  const ok = LN.res.filter((r) => r.ok).length;
+  let h = '<div class="panel lnres"><p class="lnbig">' + (LP.grad && LN.justGrad ? '🎓 畢業了！' : LN.pass ? '🎉 筆試通過' : '還差一點') + '</p><p>答對 <b>' + ok + '／' + LN.res.length + '</b>（要 ' + GRAD_W.pass + ' 題）。</p>';
+  const by = {}; LN.res.forEach((r, i) => { const st = LN.qs[i].stage; by[st] = by[st] || [0, 0]; by[st][1]++; if (r.ok) by[st][0]++; });
+  h += '<ol class="lnplace">' + COURSE.map((c) => { const b = by[c.id]; return b ? '<li class="' + (b[0] === b[1] ? 'ok' : 'no') + '">第 ' + c.id + ' 階 ' + esc(c.name) + '：' + b[0] + '／' + b[1] + '</li>' : ''; }).join('') + '</ol>';
+  const wrong = LN.res.map((r, i) => (r.ok ? null : LN.qs[i])).filter(Boolean);
+  if (wrong.length) h += '<details class="lnwrong"><summary>看答錯的 ' + wrong.length + ' 題</summary>' + wrong.map((q) => '<div class="lnw"><p>' + richH(q.prompt) + '</p><p class="note">答案：' + esc(q.opts.find((o) => o.ok).t) + '。' + richH(q.explain) + '</p></div>').join('') + '</details>';
+  h += '<div class="lngo2">' + (LP.grad && LN.justGrad ? '<button class="btn main big" data-ln="cert">看結業證書 ▶</button>' : '<button class="btn main big" data-ln="lesson" data-id="8-5">回畢業考 ▶</button>') + (LN.pass ? '' : '<button class="btn" data-ln="gradw">再考一次</button>') + '</div></div>';
   return h;
 }
 /* 快答訓練場、錯題本 */
@@ -246,6 +325,7 @@ function drillHTML() {
 function testStart() {
   if (LN.mode === 'drill') { LN.qs = makeQuiz(LN.drill.gens, 20, LN.rng); LN.sec = LN.drill.sec; }
   else if (LN.mode === 'review') { LN.qs = wrongSession(LP, LN.rng); LN.sec = 0; if (!LN.qs.length) { openLearn('map'); return; } }
+  else if (LN.mode === 'grad') { LN.qs = makeGradQuiz(LN.rng); LN.sec = GRAD_W.sec; }
   else if (LN.mode === 'place') {
     LN.qs = makePlacement(LN.rng);
     for (const q of LN.qs) q.opts.push({ t: '不知道', ok: false });
@@ -266,6 +346,7 @@ function visHTML(v) {
   if (v.k === 'cls') return '<div class="lnvis"><div class="lnrow">' + (v.pos ? '<span class="lbl">' + esc(v.pos) + '</span>' : '') + classCards(v.g).map((c) => cardHTML(c)).join('') + '<span class="lnname">' + esc(NAMEZH(v.g)) + '<small>' + esc(clsWords(v.g)) + '</small></span></div></div>';
   if (v.k === 'cls2') return '<div class="lnvis lnpair">' + [v.a, v.b].map((g) => '<div class="lnrow">' + classCards(g).map((c) => cardHTML(c, 'sm')).join('') + '<span class="lnname">' + esc(NAMEZH(g)) + '</span></div>').join('<span class="vs">vs</span>') + '</div>';
   if (v.k === 'seats') return seatsHTML(v.n, v.btn, v.hero, false);
+  if (v.k === 'hands3') return '<div class="lnvis">' + v.hs.map((h, i) => '<div class="lnrow"><span class="lbl">第 ' + (i + 1) + ' 手</span>' + h.map((c) => cardHTML(c, 'sm')).join('') + '</div>').join('') + '<div class="lnrow"><span class="lbl">公牌</span>' + v.board.map((c) => cardHTML(c, 'sm')).join('') + '</div></div>';
   if (v.k === 'flops') return '<div class="lnvis">' + v.fs.map((b, i) => '<div class="lnrow"><span class="lbl">第 ' + (i + 1) + ' 個</span>' + b.map((c) => cardHTML(c, 'sm')).join('') + '</div>').join('') + '</div>';
   return '';
 }
@@ -300,6 +381,9 @@ function blockHTML(b) {
   if (b.k === 'pushTable') return '<div class="tscroll"><table class="stt lnt"><tr><th>位置＼籌碼</th>' + PUSH_BB.map((x) => '<th class="r">' + x + ' 大盲</th>').join('') + '</tr>' + [5, 4, 3, 2, 1].map((B) => '<tr><td>' + PUSH_POS[B] + '</td>' + PUSH_BB.map((x) => '<td class="r num">' + Math.round(pushPct(x, B) * 100) + '%</td>').join('') + '</tr>').join('') + '</table></div><p class="note">數字是「前百分之幾的牌全下」（6 人桌，前面都棄牌）。</p>';
   if (b.k === 'cats2') return '<table class="lncats"><thead><tr><th>牌力</th><th>例子（手牌｜公牌）</th></tr></thead><tbody>' + CATG_GRP.map(([cs, gn]) => '<tr class="lngrp"><td colspan="2">' + esc(gn) + '</td></tr>' + cs.map((c) => '<tr><td><b>' + CATG[c] + '</b><small>' + esc(CATG_NOTE[c]) + '</small></td><td class="cs">' + parseCards(CATG_EX[c][0]).map((x) => cardSpan(x)).join('') + '｜' + parseCards(CATG_EX[c][1]).map((x) => cardSpan(x)).join('') + '</td></tr>').join('')).join('') + '</tbody></table>';
   if (b.k === 'radvTable') return '<div class="tscroll"><table class="stt lnt lnradv"><tr><th>翻牌</th><th class="r">按鈕勝率</th><th class="r">兩對以上<br><small>按鈕／大盲</small></th></tr>' + RANGE_ADV.slice().sort((x, y) => y[1] - x[1]).map(([f, e, nb, nbb]) => '<tr><td class="cs">' + parseCards(f).map((x) => cardSpan(x)).join('') + '</td><td class="r num"><span class="' + (e >= 0.535 ? 'rz' : e <= 0.505 ? 'cz' : '') + '">' + Math.round(e * 100) + '%</span></td><td class="r num">' + (nb > nbb ? '<b>' + pct(nb, 1) + '%</b>' : pct(nb, 1) + '%') + '／' + (nbb > nb ? '<b>' + pct(nbb, 1) + '%</b>' : pct(nbb, 1) + '%') + '</td></tr>').join('') + '</table></div><p class="note">照 6 人桌圖表的範圍（按鈕開牌、大盲跟注）一手一手算到攤牌。紅＝按鈕明顯有利，綠＝接近或大盲有利；粗體＝那一邊的大牌比較多。</p>';
+  if (b.k === 'gtoTable') return '<table class="stt lnt"><tr><th>對手下注</th><th class="r">跟注要的勝率<br><small>＝他的下注裡詐唬可以佔</small></th><th class="r">你最少要繼續</th></tr>' + BET_FR.map(([a, c, t]) => { const f = a / c; return '<tr><td>' + t + '</td><td class="r num"><b>' + Math.round(f / (1 + 2 * f) * 100) + '%</b></td><td class="r num">' + Math.round(100 / (1 + f)) + '%</td></tr>'; }).join('') + '</table>';
+  if (b.k === 'polarTable') return '<div class="tscroll"><table class="stt lnt lnpolar"><tr><th>勝率</th>' + GTO_RIVER.map((S) => '<th class="r cs">' + S.board.slice(0, 3).map((c) => cardSpan(c)).join('') + '<br>' + S.board.slice(3).map((c) => cardSpan(c)).join('') + '</th>').join('') + '</tr>' + [9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((i) => '<tr><td>' + i * 10 + '–' + (i + 1) * 10 + '%</td>' + GTO_RIVER.map((S) => { const x = S.bk[i]; return x < 0 ? '<td class="r note">—</td>' : '<td class="r num" style="background:rgba(201,70,46,' + (x / 100 * 0.75).toFixed(2) + ')">' + x + '%</td>'; }).join('') + '</tr>').join('') + '<tr><td><b>整體</b></td>' + GTO_RIVER.map((S) => '<td class="r num"><b>' + S.ip + '%</b></td>').join('') + '</tr></table></div><p class="note">每一格＝那一組牌平均下注多少（紅色越深下注越多）。最上面（最強）和最下面（最弱）都下注，中間幾乎都過牌。</p>';
+  if (b.k === 'studio') return '<div class="lngo2"><button class="btn" data-ln="studio">打開 GTO 工作室：河牌範例 ▶</button></div>';
   if (b.k === 'openDiff') return '<ol class="lndiff">' + openDiffs(b.t).map((d) => '<li><b>' + esc(POS_ZH[d.pos]) + '</b><span class="note">（開 ' + Math.round(d.pct * 100) + '%）</span>' + (d.pos === 'UTG' ? '：' : '：多開 ') + d.add.map((g) => '<button type="button" class="lnh t' + HAND_TIER[g] + '" data-ln="hand" data-g="' + g + '">' + NAMEZH(g) + '</button>').join('') + '</li>').join('') + '</ol>';
   return '';
 }
@@ -385,13 +469,13 @@ function openHandModal(g) {
 function renderLearnHome() {
   if (!LP) lpLoad();
   const c = learnCount(LP), nx = learnNext(LP);
-  $('hLearnTxt').textContent = c.done ? '已完成 ' + c.done + '／' + c.total + ' 課' + (nx ? '，下一課：' + nx.title : '') : '八階課程，從規則練到 GTO；可以先做分級測驗找起點。';
+  $('hLearnTxt').textContent = LP.grad ? '🎓 已畢業（筆試 ' + LP.grad.w + '／' + LP.grad.wn + '、實戰 ' + LP.grad.p + '%）：可以回去複習、做快答、看證書。' : c.done ? '已完成 ' + c.done + '／' + c.total + ' 課' + (nx ? '，下一課：' + nx.title : '') : '八階課程，從規則練到 GTO；可以先做分級測驗找起點。';
   $('bLearn').textContent = c.done ? '繼續上課 ▶' : '開始 ▶';
 }
 
 function initLearn() {
   lpLoad();
-  if (/[?&]lntest/.test(location.search)) { window.__LN = LN; window.__G = G; }          // 自動測試用
+  if (/[?&]lntest/.test(location.search)) { window.__LN = LN; window.__G = G; window.__GT = GT; }          // 自動測試用
   $('nLearn').addEventListener('click', () => openLearn('map'));
   $('bLearn').addEventListener('click', () => openLearn('map'));
   $('lnModalClose').addEventListener('click', () => { $('lnModal').hidden = true; });
@@ -400,6 +484,7 @@ function initLearn() {
     const b = e.target.closest('[data-ln="hand"]');
     if (b) { $('lnModalBody').innerHTML = handDetailHTML(+b.dataset.g); $('lnModal').querySelector('.mbox').scrollTop = 0; }
   });
+  $('lnRoot').addEventListener('input', (e) => { if (e.target.id === 'lnCertName') { LP.name = e.target.value.slice(0, 16); lpSave(); drawCert(); } });
   $('lnRoot').addEventListener('click', (e) => {
     const b = e.target.closest('[data-ln]');
     if (!b) {                                                   // 答完題目：點空白也能下一題
@@ -411,6 +496,9 @@ function initLearn() {
     else if (a === 'go' || a === 'lesson') { const l = lessonById(b.dataset.id); if (l && l.ready) openLearn('lesson', l); }
     else if (a === 'practice') startQs('practice');
     else if (a === 'exam') { const l = lessonById(b.dataset.id); if (l && l.exam) newGame('exam', l.exam); }
+    else if (a === 'gradw') startTest('grad');
+    else if (a === 'cert') openLearn('cert');
+    else if (a === 'studio') studioLoad(presetSpot('river'), '大師之路 8-3：河牌範例（K♦5♣6♥9♥2♦，大盲跟注 vs 按鈕開牌的範圍）。算完點格子看每一種牌怎麼打；看完按上面的「大師之路」回課程。', true);
     else if (a === 'quiz') startQs('quiz');
     else if (a === 'reread') { clearLnTimers(); LN.phase = 'read'; renderLearn(); window.scrollTo(0, 0); }
     else if (a === 'ans') answerQ(+b.dataset.i);

@@ -220,11 +220,14 @@ function examCounts(grades) { const c = { good: 0, ok: 0, bad: 0 }; for (const g
 /* 開始一次考核：題庫洗牌；對手的風格每兩手換一次 */
 function examNew(id, rng) {
   const X = EXAMS[id];
-  const spots = shuffleArr(EXAM_SPOTS[X.spots].map(([h, b]) => ({ hole: parseCards(h), board: parseCards(b) })), rng);
-  return { id, stage: X.stage, need: X.need, passAt: X.pass, villains: X.villains.slice(), spots, i: 0, hands: 0, grades: [], done: false, score: 0, pass: false };
+  const spots = X.spots ? shuffleArr(EXAM_SPOTS[X.spots].map(([h, b]) => ({ hole: parseCards(h), board: parseCards(b) })), rng) : null;   // 沒有題庫＝隨機發牌
+  return { id, stage: X.stage, need: X.need, passAt: X.pass, villains: X.villains ? X.villains.slice() : null, spots, i: 0, hands: 0, grades: [], done: false, score: 0, pass: false,
+    n: X.n || 2, level: X.level || 2, gto: !!X.gto, autoEarly: !!X.autoEarly, skipTrivial: !!X.skipTrivial, final: !!X.final };
 }
 function examNextSpot(E, rng) { if (E.i >= E.spots.length) { shuffleArr(E.spots, rng); E.i = 0; } return E.spots[E.i++]; }
-function examVillain(E) { return E.villains[Math.floor(E.hands / 2) % E.villains.length]; }
+function examVillain(E) { return E.villains ? E.villains[Math.floor(E.hands / 2) % E.villains.length] : null; }
+/* 一手裡哪些決定要算分：GTO 訓練場只算 GTO 評分的；畢業考不算明顯該棄的爛牌 */
+function examMarks(E, review) { return review.filter((x) => (!E.gto || x.grade.src === 'GTO') && !(E.skipTrivial && x.trivial)).map((x) => x.grade.mark); }
 /* 一手結束：把這一手的評分加進去；夠了就算分數 */
 function examAdd(E, marks) {
   if (E.done) return false;

@@ -255,7 +255,7 @@ onmessage = (e) => {
     else if (m.cmd === 'rvr') doRvr(m);
     else if (m.cmd === 'batch') doBatch(m).catch((err) => postMessage({ cmd: 'batch-done', tag: m.tag, error: String((err && err.message) || err) }));
     else if (m.cmd === 'g-start') gStart(m).catch((err) => postMessage({ cmd: 'g-progress', key: m.key, error: String((err && err.message) || err) }));
-    else if (m.cmd === 'g-query') gQuery(m);
+    else if (m.cmd === 'g-query') { try { gQuery(m); } catch (err) { postMessage({ cmd: 'g-ans', req: m.req, key: m.key, none: true, why: 'error', error: String((err && err.message) || err) }); } }   // 出錯也一定要回答，牌局才不會卡住
     else if (m.cmd === 'g-stop') GSOL = null;
     else if (m.cmd === 'ports') setPorts(m.ports);
     else if (m.cmd === 'helper') beHelper(m.port);

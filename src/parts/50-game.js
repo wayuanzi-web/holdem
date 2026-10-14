@@ -66,9 +66,9 @@ function newGame(kind, examId) {
   const train = kind === true, tour = kind === 'tourney', exam = kind === 'exam';
   GS.train = train; gsSave();
   G.exam = exam ? examNew(examId, G.rng) : null;
-  const n = train || exam ? 2 : tour ? GS.tn || 6 : GS.n, level = train ? 4 : exam ? 2 : GS.level;
+  const n = exam ? G.exam.n : train ? 2 : tour ? GS.tn || 6 : GS.n, level = train ? 4 : exam ? G.exam.level : GS.level;
   const opp = makeOpponents(n, level, G.rng);
-  if (exam) opp[0].style = examVillain(G.exam);
+  if (exam && G.exam.villains) opp[0].style = examVillain(G.exam);
   G.T = newTable({ n, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level, button: (G.rng() * n) | 0, tourney: tour });
   G.tEnd = null;
   G.ctx = { hero: 0, seen: new Set(GS.seen), exam: exam };
@@ -131,7 +131,7 @@ function produce() {
     G.waitingHero = true; G.gtoAdv = null;
     pushStep({ kind: 'hero', adv: G.adv, title: '輪到你', lines: [] });
     gtoHeroTurn(false);
-    if (GS.train && GS.autoPre && H.street <= 1) G.autoHero = setTimeout(() => { if (G.waitingHero && atHead() && !G.replay) heroAct(G.adv.act, true); }, 350);
+    if (((GS.train && GS.autoPre) || examAutoNow()) && H.street <= 1) G.autoHero = setTimeout(() => { if (G.waitingHero && atHead() && !G.replay) heroAct(G.adv.act, true); }, 350);
     return;
   }
   if (gtoBotWait(H.toAct)) return;
@@ -190,7 +190,7 @@ function skipAhead() {
 }
 /* 你按了動作 */
 function heroAct(a, auto) {
-  if (!G.waitingHero || !atHead() || G.replay) return;
+  if (!G.waitingHero || !atHead() || G.replay || (!auto && examLockBtns())) return;
   clearTimeout(G.autoHero);
   const H = G.H, adv = G.adv;
   const ev = applyAction(H, a);
@@ -199,7 +199,7 @@ function heroAct(a, auto) {
   gtoOnAct(ev);
   G.gtoAdv = null;
   if (gg && GS.train) { trainAdd(gg); gsSave(); }
-  if (!auto) G.review.push({ street: ev.street, label: actWord(ev, H), grade: g, adv: gg ? gg.adv : adv.label });
+  if (!auto) G.review.push({ street: ev.street, label: actWord(ev, H), grade: g, adv: gg ? gg.adv : adv.label, trivial: ev.street === 0 && ev.t === 'f' && !!adv.chart && adv.chart.fold >= 0.95 });
   G.waitingHero = false;
   pushStep(eventStep(ev, auto ? {} : { grade: g, adv: gg ? { label: gg.adv } : adv }));
   G.view = G.steps.length - 1;
@@ -411,7 +411,9 @@ function renderCtrl(st) {
     const adv = st.adv, L = legalSnapshot(st.snap);
     const e = adv.eff === undefined ? adv.eq : adv.eff;
     const why = adv.need > 0 ? '你的勝率約 ' + PCT0(e) + (e < adv.eq - 0.005 ? '（打折後）' : '') + '，跟注要 ' + PCT0(adv.need) + ' 以上' : '你的勝率約 ' + PCT0(e);
-    if (examHiding()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">考核中：自己決定，按完評分（已評 ' + G.exam.grades.length + '／' + G.exam.need + '）</span>';
+    if (examHiding() && examAutoNow()) m = '<b>教練代打' + STREET_NAME[G.H.street] + '</b>　<span class="why">GTO 訓練場只評轉牌、河牌</span>';
+    else if (examHiding() && examWaitGto()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">GTO 計算中…算好才能按（' + (G.gto.ready && G.gto.pct < 900 ? '可剝削度 ' + fmt(G.gto.pct, 1) + '%，要 3% 以下' : '準備中') + '）</span>';
+    else if (examHiding()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">考核中：自己決定，按完評分（已評 ' + G.exam.grades.length + '／' + G.exam.need + '）</span>';
     else if (gtoAdvUsable()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<b class="rec">GTO</b> ' + gtoLine() + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
     else m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　建議 <b class="rec">' + esc(adv.label) + '</b><span class="why">（' + why + '）</span>'
       + (G.gto && !G.gto.lost && G.gto.seats.indexOf(0) >= 0 && GS.gtoCoach ? '<span class="why">　GTO 計算中…</span>' : '') + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
@@ -449,6 +451,7 @@ function renderActBtns(st) {
   let allinRec = recA && adv.act.to >= L.maxTo;
   G.recTo = recA ? adv.act.to : 0;
   if (examHiding()) { recF = recP = recA = allinRec = false; G.recTo = 0; }
+  const lock = examLockBtns();
   if (gtoAdvUsable()) {                                     // GTO 最常用的動作
     const ta = G.gtoAdv.acts[gtoBest()], b = gtoActBtn(ta, L);
     recF = b === 'f'; recP = b === 'x' || b === 'c'; recA = b === 'size' || b === 'allin'; allinRec = b === 'allin';
@@ -470,6 +473,7 @@ function renderActBtns(st) {
     else box.innerHTML = h;
     box.dataset.h = h;
   }
+  box.querySelectorAll('button').forEach((b) => { b.disabled = lock; });
   if (G.sizerStep === G.view) { const v = +$('sizeRange').value; openSizer(); if (v) { $('sizeRange').value = v; sizerLabel(); } }   // 重畫時保持打開
   else $('sizer').hidden = true;
 }
@@ -485,6 +489,7 @@ function ctrlCmd(c) {
   else if (c === 'newtourney') newGame('tourney');
   else if (c === 'exam' && G.exam) newGame('exam', G.exam.id);
   else if (c === 'learn' && G.exam) { const l = lessonById(G.exam.id); openLearn('lesson', l); }
+  else if (c === 'cert') openLearn('cert');
   else if (c === 'home') showView('home');
   else if (c === 'replay') { G.replay = true; G.view = 0; G.lastRender = null; clearTimeout(G.timer); renderCur(); }
   else if (c === 'endreplay') { G.replay = false; G.view = G.steps.length - 1; G.lastRender = null; renderCur(); }

@@ -56,6 +56,20 @@ for (const gen of Object.keys(E.QGEN)) {
       if (+ans !== n) fail('combosOnBoard 錯 ' + q.key + ' ' + n);
     }
     if (gen === 'faceBet' && kp[0] === 'fb' && ['棄牌', '跟注', '加注'].indexOf(ans) < 0) fail('faceBet 答案怪');
+    if (gen === 'gtoRiver' && kp[0] === 'gr') { const S = E.GTO_RIVER.find((x) => x.bs === kp[1]), r = S.rows.find((x) => x.h.join(',') === kp[2]); if (ans !== E.gtoRowWord(r)) fail('gtoRiver 錯 ' + q.key); }
+    if (gen === 'gtoPolar' && kp[0] === 'gp') {
+      const S = E.GTO_RIVER.find((x) => x.bs === kp[1]), hs = kp[2].split(',').map((t) => t.split('.').join(',')), rows = hs.map((h) => S.rows.find((x) => x.h.join(',') === h)), bluff = kp[3] === 'true';
+      const i = +ans.match(/\d/)[0] - 1, r = rows[i];
+      if (bluff ? !(r.e <= 15 && r.f >= 75) : !(r.f <= 15 && r.e >= 25)) fail('gtoPolar 錯 ' + q.key);
+      if (rows.filter((x) => (bluff ? x.e <= 15 && x.f >= 75 : x.f <= 15)).length !== 1) fail('gtoPolar 不只一個答案 ' + q.key);
+    }
+    if (gen === 'bluffRatio') { const fr = E.BET_FR.find((x) => x[2] === kp[1]), f = fr[0] / fr[1]; if (ans !== Math.round(f / (1 + 2 * f) * 100) + '%') fail('bluffRatio 錯'); }
+    if (gen === 'rngPick' && kp[0] === 'rp') {
+      const acts = kp[1].split('~'), fs = kp[2].split(',').map(Number), n = +kp[3];
+      if (fs.reduce((a, b) => a + b, 0) !== 100) fail('rngPick 頻率加起來不是 100');
+      let lo = 0, exp = ''; acts.forEach((t, k) => { if (n >= lo && n < lo + fs[k]) exp = t; lo += fs[k]; });
+      if (ans !== exp) fail('rngPick 錯 ' + q.key);
+    }
     if (gen === 'rule24') { const n = +kp[1], flop = kp[2] === 'true'; if (ans !== (flop ? n * 4 - Math.max(0, n - 8) : n * 2) + '%') fail('rule24 錯'); }
   }
 }
@@ -89,7 +103,7 @@ for (const t of ['6', '9']) { const d = E.openDiffs(t); for (let i = 1; i < d.le
 // 課表
 const ls = E.allLessons(), ids = new Set(ls.map((l) => l.id));
 if (ids.size !== ls.length) fail('課號重複');
-for (const l of ls.filter((x) => x.exam)) if (!E.EXAMS[l.exam] || !E.EXAM_SPOTS[E.EXAMS[l.exam].spots]) fail(l.id + ' 考核設定不見了');
+for (const l of ls.filter((x) => x.exam)) { const X = E.EXAMS[l.exam]; if (!X || (X.spots && !E.EXAM_SPOTS[X.spots]) || !(X.need > 0 && X.pass > 0 && X.pass < 1)) fail(l.id + ' 考核設定不對'); }
 for (const l of ls.filter((x) => x.ready && !x.exam)) {
   const a = E.makeQuiz(l.practice.gens, l.practice.n, rng), b = E.makeQuiz(l.quiz.gens, l.quiz.n, rng);
   if (a.length !== l.practice.n || b.length !== l.quiz.n) fail(l.id + ' 題目不夠');
@@ -123,6 +137,30 @@ for (const k of Object.keys(E.EXAM_SPOTS)) for (const [h, b] of E.EXAM_SPOTS[k])
   if (Math.abs(X.score - 16 / 21) > 1e-9 || !X.pass) fail('考核分數算錯 ' + X.score);
   if (E.examAdd(X, ['good'])) fail('結束了還在加');
   if (E.examScore(['ok', 'ok', 'bad', 'good']) !== 0.5) fail('examScore 錯');
+}
+// 河牌 GTO 的資料：兩極化（最強、最弱下注多，中間過牌）
+for (const S of E.GTO_RIVER) {
+  if (S.rows.length < 30 || S.rows.some((r) => !(r.f >= 0 && r.f <= 100 && r.e >= 0 && r.e <= 100) || r.h.length !== 2 || r.h.some((c) => S.board.indexOf(c) >= 0))) fail('GTO_RIVER 資料怪 ' + S.bs);
+  if (!(S.bk[9] >= 90 && S.bk[0] >= 90 && S.bk[4] <= 10 && S.bk[5] <= 10)) fail('GTO_RIVER 不是兩極 ' + S.bs);
+}
+// 畢業考
+{
+  const gq = E.makeGradQuiz(rng);
+  if (gq.length !== 30) fail('畢業考筆試不是 30 題：' + gq.length);
+  for (let s2 = 1; s2 <= 8; s2++) if (!gq.some((q) => q.stage === s2)) fail('畢業考筆試沒有第 ' + s2 + ' 階');
+  const L3 = E.learnBlank(); L3.exam = {};
+  L3.gradW = { s: 27, n: 30, pass: true };
+  if (E.gradCheck(L3)) fail('只有筆試就畢業了');
+  L3.exam['8-5'] = { score: 0.84, pass: true, n: 25, good: 20, ok: 2, bad: 3 };
+  if (!E.gradCheck(L3) || !L3.grad || !L3.done['8-5']) fail('兩部分都過沒有畢業');
+  if (E.gradCheck(L3)) fail('畢業兩次');
+  if (E.lessonDone(L3, '8-5') !== true) fail('畢業沒有標成完成');
+  if (!E.NO_SKIP[8]) fail('第 8 階應該不能跳級');
+  // 算分：GTO 訓練場只算 GTO 評分；畢業考不算明顯該棄的爛牌
+  const rv = [{ grade: { mark: 'good', src: 'GTO' } }, { grade: { mark: 'bad' } }, { grade: { mark: 'good', src: 'chart' }, trivial: true }];
+  if (E.examMarks(E.examNew('8-4', rng), rv).join() !== 'good') fail('GTO 訓練場算分錯');
+  if (E.examMarks(E.examNew('8-5', rng), rv).join() !== 'good,bad') fail('畢業考算分錯');
+  if (E.examNew('8-5', rng).spots !== null || E.examNew('8-5', rng).n !== 6) fail('畢業考設定錯');
 }
 // 分級
 const pl = E.makePlacement(rng);
