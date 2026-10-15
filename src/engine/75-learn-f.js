@@ -170,6 +170,7 @@ COURSE[1].lessons.push(lessonFinish({ id: '2-8', title: '陷阱牌：看起來�
   '<b>牌桌上的三秒檢查</b>：兩張都 10 以上？→ 可以（越前面要越大）。對子？→ 可以。同花又差 3 以內、或同花帶 A？→ 中後位可以。都不是？→ <b>棄</b>，除非在關煞位、按鈕偷盲（同花的 K-x、Q-x 才考慮）。',
   '<b>陷阱榜、遺珠榜</b>（對隨機牌的勝率排名和實戰排名差最多的牌，點開可以看詳細）：',
   { k: 'trapGems' },
+  { k: 'lens', spot: '6/vsOpen/BB/BTN#call', hero: 'Ks6s', board: 'Kh8d3c', label: '用範圍透視自己看：K6s 在 K♥8♦3♣ 上對大盲的範圍' },
   '<b>一個誠實的提醒</b>：跟遊戲裡「新手」「普通」等級的電腦打，亂開大配小的牌常常也會贏——因為它們會用更差的牌付錢。圖表是對會打的對手算的；練習時照圖表養習慣，遇到很弱的對手再有意識地放寬。',
 ], practice: { gens: ['shapeOf', 'trapPair', 'showdownTrap', 's2t'], n: 8 }, quiz: { gens: ['shapeOf', 'trapPair', 'showdownTrap', 's2t', 'trapPair'], n: 8, pass: 7 } }, 2));
 

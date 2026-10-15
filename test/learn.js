@@ -200,6 +200,19 @@ for (const S of E.GTO_RIVER) {
   const B2 = E.topPairBreak(E.parseCards('KsJs'), E.parseCards('Kh8d3c'));
   if (!(B2.strongEq > 0.45)) fail('KJs 翻牌中頂對的數字怪 ' + B2.strongEq);
 }
+// 範圍透視：每個局面都解得開；比例加起來是 1；動作會縮小範圍
+{
+  const sp = E.lensSpots();
+  if (sp.length < 40) fail('範圍透視的局面太少 ' + sp.length);
+  for (const x of sp) { const w = E.lensPreflop(x.id); if (!w || E.lensStats(w, 1).combos < 10) fail('範圍透視解不開 ' + x.id); }
+  const w = E.lensPreflop('6/rfi/UTG#raise'), st = E.lensStats(w, 8), sh = E.lensShapes(w);
+  if (Math.abs(sh.reduce((a, x) => a + x.share, 0) - 1) > 1e-6 || !(st.top.reduce((a, x) => a + x.share, 0) > 0.3 && st.top[0].share < 0.06)) fail('範圍透視的比例怪');
+  const board = E.parseCards('Kh8d3c'), hero = E.parseCards('Ks6s'), B = E.lensBoard(w, board, hero);
+  if (Math.abs(B.rows.reduce((a, r) => a + r.share, 0) - 1) > 1e-6 || !(B.all > 0.6 && B.all < 0.9)) fail('範圍透視翻牌的數字怪');
+  const w2 = E.lensNarrow(w, board, 'bet', 'tag'), B2 = E.lensBoard(w2, board, hero);
+  if (!(E.lensStats(w2, 1).combos < st.combos && B2.strongShare > B.strongShare)) fail('下注之後範圍應該變強、變小');
+  if (E.lensRangeTable().length !== 7) fail('範圍表不是 7 列');
+}
 // 做過的題目
 {
   const L4 = E.learnBlank();

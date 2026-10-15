@@ -629,6 +629,7 @@ function initGame() {
     const sb = e.target.closest('button[data-studio]');
     if (sb) studioFromGame(+sb.dataset.studio);
     if (e.target.closest('button[data-deep="rvr"]')) { const st = G.steps[G.view]; if (st && st.adv) { clearTimeout(G.timer); deepToRvr(st.adv.detail); } }
+    if (e.target.closest('button[data-deep="lens"]')) { const st = G.steps[G.view]; if (st && st.adv) { clearTimeout(G.timer); lensFromGame(st.adv.detail); } }
   });
   // 詳細解說打開或收起：記住，下一次照你上次的習慣
   $('cBody').addEventListener('toggle', (e) => { if (e.target.classList && e.target.classList.contains('deep')) { GS.deepOpen = e.target.open; gsSave(); } }, true);

@@ -62,8 +62,8 @@ function deepHTML(d) {
     }
     h += '<h4>結論</h4><p><b>' + P1(d.eff) + '% ' + (d.eff >= d.need ? '≥' : '＜') + ' ' + P1(d.need) + '%</b>：' + (d.eff >= d.need ? '跟注長期會賺。' : d.eff + (d.implied || 0) >= d.need ? '差一點，但有隱含賠率，可以跟。' : '跟下去長期會虧，棄牌。') + '</p>';
   }
-  h += '<div class="strow"><button type="button" class="btn sm" data-deep="rvr">用「範圍對範圍」自己算一次</button></div>'
-    + '<p class="note">會打開「工具 → 勝率計算機」，A 是你這手牌、B 是' + esc(d.opps[0] ? d.opps[0].name : '對手') + '的估計範圍' + (d.board.length ? '、公牌照現在' : '') + '。看完按上面的「回到牌局」接著打。</p>';
+  h += '<div class="strow"><button type="button" class="btn sm" data-deep="lens">🔍 範圍透視：他現在可能有什麼</button><button type="button" class="btn sm" data-deep="rvr">用「範圍對範圍」自己算一次</button></div>'
+    + '<p class="note">範圍透視會列出' + esc(d.opps[0] ? d.opps[0].name : '對手') + '的估計範圍裡每一類牌佔多少、你對每一類的勝率；範圍對範圍會打開勝率計算機自己模擬。看完按上面的「回到牌局」接著打。</p>';
   return h;
 }
 

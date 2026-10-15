@@ -450,6 +450,19 @@ body.intable .brand p { display: none; }
 .lnchips { display: flex; flex-wrap: wrap; gap: 6px; }
 .lnh { border: 1px solid var(--line); background: var(--felt2); color: var(--text); border-radius: 8px; padding: 4px 8px; font-size: 13.5px; cursor: pointer; }
 .lnh small { color: var(--mute); margin-left: 4px; font-size: 11px; }
+.lens .panel { margin-bottom: 12px; }
+.lsl { display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--mute); margin-bottom: 10px; }
+.lsl select, .lsacts select { font: inherit; font-size: 15px; color: var(--text); background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; max-width: 100%; }
+.lsnum { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 8px 0; }
+.lsnum div { background: rgba(255,255,255,.04); border-radius: 10px; padding: 8px 6px; text-align: center; }
+.lsnum b { display: block; font-size: 20px; color: var(--brass); } .lsnum small { display: block; color: var(--mute); font-size: 11.5px; line-height: 1.2; margin-top: 2px; }
+.lsshape div { display: grid; grid-template-columns: 6em 1fr 3em; align-items: center; gap: 8px; font-size: 14px; margin: 3px 0; }
+.lsshape i { display: block; height: 10px; background: var(--brass); border-radius: 5px; min-width: 2px; } .lsshape div.tr i { background: #c9462e; } .lsshape div.dim { color: var(--mute); } .lsshape div.dim i { background: var(--line); }
+.lsshape b { text-align: right; font-variant-numeric: tabular-nums; }
+.lsgrid { margin: 10px 0 4px; } .lsgrid .cell { cursor: default; } .lsgrid .cell span { font-size: 9px; }
+.lsacts { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 4px; } .lsacts label { display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: var(--mute); }
+.lsres tr.st td { background: rgba(208,168,78,.08); } .lsres td small { display: block; color: var(--mute); font-size: 11px; font-weight: 400; } .lsres tr.lnsum td { border-top: 2px solid var(--brass); }
+@media (max-width: 640px) { .lsnum { grid-template-columns: repeat(2, 1fr); } }
 .lnh.t1 { border-color: #c9462e; } .lnh.t2 { border-color: #d98a2b; } .lnh.t3 { border-color: #b9a234; } .lnh.t4 { border-color: #3f9d6a; }
 .lnh.tr { opacity: .7; }
 .lndiff { padding-left: 1.2em; } .lndiff li { margin: 8px 0; } .lndiff .lnh { margin: 2px 3px 2px 0; }
@@ -918,6 +931,7 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 <nav class="tabs" role="tablist" aria-label="工具">
   <button role="tab" id="tCalc" aria-controls="pCalc" aria-selected="true">勝率計算機</button>
   <button role="tab" id="tChart" aria-controls="pChart" aria-selected="false">翻牌前圖表</button>
+  <button role="tab" id="tLens" aria-controls="pLens" aria-selected="false">範圍透視</button>
   <button role="tab" id="tSolve" aria-controls="pSolve" aria-selected="false">GTO 工作室</button>
   <button role="tab" id="tBench" aria-controls="pBench" aria-selected="false">效能測試</button>
 </nav>
@@ -1118,6 +1132,24 @@ body.noexplain .xp, body.noexplain .how { display: none; }
     </div>
   </section>
 
+  <section id="pLens" role="tabpanel" aria-labelledby="tLens" hidden>
+    <div class="lens">
+      <div class="panel">
+        <h2>範圍透視：廢牌拿掉之後，他剩什麼</h2>
+        <p class="note" style="margin:0 0 10px">對手會玩的牌照他的位置和動作決定（翻牌前照圖表）。這裡把廢牌拿掉，看他剩下的範圍有多大、長什麼樣子；放上公牌和他的動作，看範圍怎麼一步一步縮小。</p>
+        <label class="lsl">對手的位置和動作<select id="lsSpot"></select></label>
+        <p id="lsCustom" class="note" hidden></p>
+        <div id="lsSummary"></div>
+      </div>
+      <div class="panel">
+        <div class="strow" style="margin:0 0 8px"><h3 style="margin:0">你的牌、公牌（可以不填）</h3><button type="button" class="btn sm" data-ls="flop">隨機發翻牌</button><button type="button" class="btn sm" data-ls="clear">清除</button></div>
+        <div class="slots" id="lsSlots"></div>
+        <div class="deck" id="lsDeck"></div>
+        <div id="lsActs"></div>
+      </div>
+      <div class="panel" id="lsResult"></div>
+    </div>
+  </section>
   <section id="pBench" role="tabpanel" aria-labelledby="tBench" hidden>
     <div class="panel">
       <h2>量這台裝置跑多快</h2>
