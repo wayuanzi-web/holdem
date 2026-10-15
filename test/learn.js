@@ -184,6 +184,18 @@ for (const S of E.GTO_RIVER) {
   if (E.examMarks(E.examNew('8-5', rng), rv).join() !== 'good,bad') fail('畢業考算分錯');
   if (E.examNew('8-5', rng).spots !== null || E.examNew('8-5', rng).n !== 6) fail('畢業考設定錯');
 }
+// 做過的題目
+{
+  const L4 = E.learnBlank();
+  for (let i = 0; i < 320; i++) { const q = E.makeQ(i % 2 ? 'potOdds' : 'gtoRiver', rng); E.histAdd(L4, q, 0, i % 3 === 0, '測試', E.genStage(q.gen)); }
+  if (L4.hist.length !== E.HIST_MAX) fail('做過的題目沒有限制在 ' + E.HIST_MAX + ' 題');
+  const all = E.histList(L4, 'all'), wr = E.histList(L4, 'wrong'), s8 = E.histList(L4, 8);
+  if (all[0].at < all[all.length - 1].at || wr.some((x) => x.ok) || !s8.length || s8.some((x) => x.stage !== 8)) fail('做過的題目篩選錯');
+  if (E.genStage('potOdds') !== 5 || E.genStage('gtoRiver') !== 8 || E.genStage('whoWins') !== 1) fail('genStage 錯');
+  const ss = E.histSession(all, 10, rng);
+  if (ss.length !== 10 || new Set(ss.map((q) => q.key)).size !== 10 || ss.some((q) => q.opts.filter((o) => o.ok).length !== 1)) fail('抽題再考錯');
+  if (JSON.stringify(L4).length > 1500000) fail('做過的題目太大：' + JSON.stringify(L4).length);
+}
 // 分級
 const pl = E.makePlacement(rng);
 if (pl.length !== 12) fail('分級測驗不是 12 題');

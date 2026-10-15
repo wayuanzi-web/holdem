@@ -13,7 +13,7 @@ const richH = (s) => String(s).replace(/\{c(\d+)\}/g, (m, c) => cardSpan(+c));
 function openLearn(mode, arg) {
   clearLnTimers();
   LN.mode = mode || 'map';
-  LN.phase = 'read'; LN.answered = false;                            // 離開題目畫面：鍵盤不會再答到看不見的題目
+  LN.phase = 'read'; LN.answered = false; LN.vi = null; LN.browsing = false;   // 離開題目畫面：鍵盤不會再答到看不見的題目
   if (LN.mode === 'lesson') LN.lesson = arg;
   if (LN.mode === 'dict') LN.dictG = arg === undefined ? (LN.dictG >= 0 ? LN.dictG : 0) : arg;
   showView('learn');
@@ -23,10 +23,12 @@ function openLearn(mode, arg) {
 function clearLnTimers() { clearInterval(LN.timer); clearTimeout(LN.autoT); LN.timer = 0; LN.autoT = 0; }
 function renderLearn() {
   const R = $('lnRoot');
+  if (LN.browsing) { R.innerHTML = '<div class="lnbar"><button type="button" class="btn sm" data-ln="unbrowse">← 回到結果</button><div class="lnttl"><b>逐題看解釋</b></div></div>' + qHTML(); return; }
   if (LN.mode === 'map') R.innerHTML = mapHTML();
   else if (LN.mode === 'lesson') R.innerHTML = lessonHTML();
   else if (LN.mode === 'dict') { R.innerHTML = dictHTML(); }
   else if (LN.mode === 'cert') { R.innerHTML = certHTML(); drawCert(); }
+  else if (LN.mode === 'hist') R.innerHTML = histHTML();
   else R.innerHTML = testHTML();
   if (LN.mode === 'dict' && LN.dictScroll) { LN.dictScroll = false; const d = $('lnDictDetail'); if (d && window.innerWidth < 900) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
@@ -45,6 +47,8 @@ function mapHTML() {
   if (LP.place) h += '<p class="note">分級測驗建議從第 ' + LP.place.start + ' 階開始。</p>';
   const nw = (LP.wrong || []).length;
   if (nw) h += '<div class="strow"><button class="btn lnwbtn" data-ln="review">📕 錯題本（' + nw + ' 題）：複習答錯過的題目</button></div>';
+  const nh = (LP.hist || []).length;
+  if (nh) h += '<div class="strow"><button class="btn lnwbtn" data-ln="hist">📜 做過的題目（' + nh + ' 題）：回頭看解釋、抽題再考</button></div>';
   h += '<details class="lndrills"><summary>⚡ 快答訓練場：計時練速度，記最好成績</summary><div class="lndgrid">' + DRILLS.map((d) => { const b = LP.best[d.id]; return '<button type="button" class="lndr" data-ln="drill" data-d="' + d.id + '"><b>' + esc(d.name) + '</b><span class="note">20 題・每題 ' + d.sec + ' 秒' + (b ? '<br>最好 ' + b.ok + '／' + b.n + '・' + fmt(b.ms / 1000, 1) + ' 秒' : '') + '</span></button>'; }).join('') + '</div></details>';
   h += '</div>';
   for (const s of COURSE) {
@@ -82,7 +86,7 @@ function lessonHTML() {
   else if (LN.phase === 'pdone') {
     const ok = LN.res.filter((r) => r.ok).length;
     h += '<div class="panel lnres"><p>練習完了：答對 <b>' + ok + '／' + LN.res.length + '</b>。</p><p>過關測驗：' + l.quiz.n + ' 題答對 ' + l.quiz.pass + ' 題過關' + (l.quiz.sec ? '，每題 <b>' + l.quiz.sec + ' 秒</b>內要答' : '') + '。</p>'
-      + '<div class="lngo2"><button class="btn main big" data-ln="quiz">開始過關測驗 ▶</button><button class="btn" data-ln="practice">再練一次</button><button type="button" class="linkbtn" data-ln="reread">回去看講解</button></div></div>';
+      + '<div class="lngo2"><button class="btn main big" data-ln="quiz">開始過關測驗 ▶</button><button class="btn" data-ln="practice">再練一次</button>' + browseBtn() + '<button type="button" class="linkbtn" data-ln="reread">回去看講解</button></div></div>';
   } else if (LN.phase === 'result') h += resultHTML();
   return h;
 }
@@ -173,28 +177,82 @@ function startQs(kind) {
   clearLnTimers();
   LN.rng = lnRng(); LN.kind = kind; LN.phase = kind;
   const cfg = kind === 'practice' ? l.practice : l.quiz;
-  LN.qs = makeQuiz(cfg.gens, cfg.n, LN.rng); LN.qi = 0; LN.res = []; LN.answered = false;
+  LN.qs = makeQuiz(cfg.gens, cfg.n, LN.rng); LN.qi = 0; LN.res = []; LN.answered = false; LN.vi = null; LN.browsing = false;
   LN.sec = kind === 'quiz' ? (cfg.sec || 0) : 0;
   renderLearn(); startQTimer();
   window.scrollTo(0, 0);
 }
 /* 題目畫面（上課、分級、跳級共用） */
-function qHTML() {
-  const q = LN.qs[LN.qi], n = LN.qs.length, ok = LN.res.filter((r) => r.ok).length;
-  let h = '<div class="panel lnq"><div class="lnqtop"><span class="num">第 ' + (LN.qi + 1) + '／' + n + ' 題</span><span class="num">✓ ' + ok + '</span></div>';
-  if (LN.sec) h += '<div class="lntime"><i id="lnTimeBar"></i></div>';
-  h += '<p class="lnprompt">' + richH(q.prompt) + '</p>' + visHTML(q.vis);
-  const r = LN.answered ? LN.res[LN.res.length - 1] : null;
+/* 一題的內容（題目、圖、選項、解釋）：r＝作答結果 {pick, ok, timeout}；hide＝先遮住答案（自己想） */
+function qBodyHTML(q, r, live, hide) {
+  let h = '<p class="lnprompt">' + richH(q.prompt) + '</p>' + visHTML(q.vis);
+  const show = r && !hide;
   h += '<div class="lnopts' + (q.opts.length > 3 ? ' many' : '') + '">' + q.opts.map((o, i) => {
     let cls = '';
-    if (r) cls = o.ok ? ' right' : r.pick === i ? ' wrong' : ' dim';
-    return '<button type="button" class="lnopt' + cls + '" data-ln="ans" data-i="' + i + '"' + (r ? ' disabled' : '') + '><span class="k">' + (i + 1) + '</span>' + esc(o.t) + '</button>';
+    if (show) cls = o.ok ? ' right' : r.pick === i ? ' wrong' : ' dim';
+    return '<button type="button" class="lnopt' + cls + '"' + (live ? ' data-ln="ans" data-i="' + i + '"' : '') + (r || !live ? ' disabled' : '') + '><span class="k">' + (i + 1) + '</span>' + esc(o.t) + (show && r.pick === i && !live ? '<small class="lnmine">你選的</small>' : '') + '</button>';
   }).join('') + '</div>';
-  if (r) {
-    h += '<div class="lnfb ' + (r.ok ? 'ok' : 'no') + '"><b>' + (r.ok ? '✓ 對了' : r.timeout ? '⏰ 時間到' : '✗ 不對') + '</b>　' + richH(q.explain) + '</div>'
-      + '<div class="lngo2"><button class="btn main" id="lnNext" data-ln="next">' + (LN.qi + 1 < n ? '下一題 ▶' : '看結果 ▶') + '</button></div>';
+  if (show) h += '<div class="lnfb ' + (r.ok ? 'ok' : 'no') + '"><b>' + (r.ok ? '✓ 對了' : r.timeout ? '⏰ 時間到' : r.pick < 0 ? '答案' : '✗ 不對') + '</b>　' + richH(q.explain) + '</div>';
+  return h;
+}
+function qHTML() {
+  const n = LN.qs.length, ok = LN.res.filter((r) => r.ok).length;
+  if (LN.vi !== null && LN.vi !== undefined) {                     // 回頭看前面做過的題目
+    const i = LN.vi, q = LN.qs[i], r = LN.res[i], last = LN.browsing ? LN.res.length - 1 : LN.qi - 1;
+    return '<div class="panel lnq lnpast"><div class="lnqtop"><span class="num">第 ' + (i + 1) + '／' + n + ' 題・回頭看</span><span class="num">' + (r.ok ? '✓ 答對' : '✗ 答錯') + '</span></div>' + qBodyHTML(q, r, false)
+      + '<div class="lngo2">' + (i > 0 ? '<button class="btn" data-ln="qprev">◀ 上一題</button>' : '') + '<button class="btn main" id="lnNext" data-ln="qnext">' + (i < last ? '下一題 ▶' : LN.browsing ? '回到結果 ▶' : '回到第 ' + (LN.qi + 1) + ' 題 ▶') + '</button></div></div>';
   }
+  const q = LN.qs[LN.qi];
+  let h = '<div class="panel lnq"><div class="lnqtop"><span class="num">第 ' + (LN.qi + 1) + '／' + n + ' 題</span><span class="num">✓ ' + ok + '</span></div>';
+  if (LN.sec) h += '<div class="lntime"><i id="lnTimeBar"></i></div>';
+  const r = LN.answered ? LN.res[LN.res.length - 1] : null;
+  h += qBodyHTML(q, r, true);
+  const back = LN.qi > 0 && (r || !LN.sec) ? '<button class="btn" data-ln="qprev">◀ 上一題</button>' : '';   // 計時中不能回頭看
+  if (r) h += '<div class="lngo2">' + back + '<button class="btn main" id="lnNext" data-ln="next">' + (LN.qi + 1 < n ? '下一題 ▶' : '看結果 ▶') + '</button></div>';
+  else if (back) h += '<div class="lngo2">' + back + '</div>';
   return h + '</div>';
+}
+/* 結果頁：逐題看每一題的解釋 */
+function browseBtn() { return LN.res && LN.res.length ? '<button class="btn" data-ln="browse">📖 逐題看解釋（' + LN.res.length + ' 題）</button>' : ''; }
+function qNav(d) {
+  if (d < 0) {
+    if (LN.vi === null || LN.vi === undefined) { if (LN.qi < 1 || (LN.sec && !LN.answered)) return; clearInterval(LN.timer); LN.vi = LN.qi - 1; }
+    else if (LN.vi > 0) LN.vi--;
+  } else {
+    if (LN.vi === null || LN.vi === undefined) return;
+    const last = LN.browsing ? LN.res.length - 1 : LN.qi - 1;
+    if (LN.vi < last) LN.vi++;
+    else { LN.vi = null; if (LN.browsing) LN.browsing = false; }
+  }
+  renderLearn(); window.scrollTo(0, 0);
+  const nb = $('lnNext'); if (nb) nb.focus({ preventScroll: true });
+}
+
+/* ===== 做過的題目：照時間倒著看，可以篩選、先遮住答案、抽題再考 ===== */
+function histFilters() {
+  const H = LP.hist || [], st = new Set(H.map((x) => x.stage).filter(Boolean));
+  return [['all', '全部'], ['wrong', '答錯的'], ['right', '答對的']].concat([...st].sort((a, b) => a - b).map((s) => [s, '第 ' + s + ' 階']));
+}
+function histHTML() {
+  const list = histList(LP, LN.hf === undefined ? 'all' : LN.hf), H = LP.hist || [];
+  const nw = H.filter((x) => !x.ok).length;
+  let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><b>📜 做過的題目</b><span class="note">最近 ' + H.length + ' 題（最多 ' + HIST_MAX + ' 題）：答對 ' + (H.length - nw) + '、答錯 ' + nw + '</span></div></div>';
+  h += '<div class="lnchips lnhf">' + histFilters().map(([k, t]) => '<button type="button" class="chip' + ((LN.hf === undefined ? 'all' : LN.hf) === k ? ' on' : '') + '" data-ln="hf" data-f="' + k + '">' + t + '</button>').join('') + '</div>';
+  if (!list.length) return h + '<div class="panel lnres"><p>這裡還沒有題目。</p></div>';
+  const i = Math.min(LN.hi || 0, list.length - 1), x = list[i], d = new Date(x.at);
+  const hide = !!LP.histHide && !LN.hshow;
+  h += '<div class="panel lnq lnpast"><div class="lnqtop"><span class="num">第 ' + (i + 1) + '／' + list.length + ' 題</span><span class="note">' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + '・' + esc(x.src) + (hide ? '' : '・' + (x.ok ? '✓ 答對' : '✗ 答錯')) + '</span></div>'
+    + qBodyHTML(x.q, { pick: x.pick, ok: x.ok, timeout: x.pick < 0 && !x.ok }, false, hide)
+    + (hide ? '<div class="lngo2"><button class="btn main" data-ln="hshow">看答案和解釋</button></div>' : '')
+    + '<div class="lngo2">' + (i > 0 ? '<button class="btn" data-ln="hprev">◀ 上一題</button>' : '') + (i + 1 < list.length ? '<button class="btn' + (hide ? '' : ' main') + '" id="lnNext" data-ln="hnext">下一題 ▶</button>' : '') + '</div>'
+    + '<label class="lnhide"><input type="checkbox" id="lnHistHide"' + (LP.histHide ? ' checked' : '') + '> 先遮住答案（自己想好再看）</label></div>';
+  h += '<div class="lngo2"><button class="btn" data-ln="redo">🔁 從' + (LN.hf === undefined || LN.hf === 'all' ? '全部' : '這些') + '題目抽 ' + Math.min(10, new Set(list.map((y) => y.q.key)).size) + ' 題再考一次</button></div>';
+  return h;
+}
+function histGo(d) {
+  const n = histList(LP, LN.hf === undefined ? 'all' : LN.hf).length;
+  LN.hi = Math.max(0, Math.min(n - 1, (LN.hi || 0) + d)); LN.hshow = false;
+  renderLearn(); window.scrollTo(0, 0);
 }
 function startQTimer() {
   clearInterval(LN.timer);
@@ -214,11 +272,15 @@ function answerQ(i) {
   LN.res.push({ ok, pick: i, timeout: i < 0, key: q.key, stage: q.stage, ms: LN.sec ? Date.now() - LN.t0 : 0 });
   if (LN.mode === 'review') wrongResult(LP, q.key, ok);
   else if (!ok && LN.mode !== 'place') wrongAdd(LP, q);
-  if (LN.mode === 'review' || (!ok && LN.mode !== 'place')) lpSave();
+  histAdd(LP, q, i, ok, histSrc(), LN.mode === 'lesson' ? LN.lesson.stage : q.stage || genStage(q.gen));
+  lpSave();
   renderLearn();
   const nb = $('lnNext');
-  if (nb) nb.focus({ preventScroll: true });
-  if (ok) LN.autoT = setTimeout(nextQ, LN.sec ? 900 : 1600);        // 答對自動下一題；答錯讓你看完解釋再按
+  if (nb) nb.focus({ preventScroll: true });                       // 答對、答錯都停下來讓你看解釋，自己按「下一題」
+}
+function histSrc() {
+  const m = LN.mode;
+  return m === 'lesson' ? LN.lesson.id + ' ' + (LN.kind === 'practice' ? '練習' : '測驗') : m === 'place' ? '分級測驗' : m === 'skip' ? '第 ' + LN.stage + ' 階跳級測驗' : m === 'drill' ? '快答：' + LN.drill.name : m === 'review' ? '錯題本' : m === 'grad' ? '畢業考筆試' : m === 'redo' ? '再考一次' : '';
 }
 function nextQ() {
   clearLnTimers();
@@ -246,7 +308,7 @@ function finishQs() {
     if (LN.newBest) { LP.best[LN.drill.id] = { ok, n: LN.res.length, ms: Math.round(avg), at: Date.now() }; lpSave(); }
     LN.avg = avg; LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0);
   }
-  if (LN.mode === 'review') { LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0); }
+  if (LN.mode === 'review' || LN.mode === 'redo') { LN.phase = 'result'; renderLearn(); window.scrollTo(0, 0); }
   if (LN.mode === 'grad') {
     const n = LN.res.length, prev = LP.gradW, best = !prev || ok > prev.s ? ok : prev.s;   // 記最好的成績
     LN.pass = ok >= GRAD_W.pass;
@@ -259,8 +321,7 @@ function resultHTML() {
   const ok = LN.res.filter((r) => r.ok).length, l = LN.lesson;
   const timed = LN.res.filter((r) => r.ms > 0), avg = timed.length ? timed.reduce((a, r) => a + r.ms, 0) / timed.length / 1000 : 0;
   let h = '<div class="panel lnres"><p class="lnbig">' + (LN.pass ? '🎉 過關！' : '還差一點') + '</p><p>答對 <b>' + ok + '／' + LN.res.length + '</b>（要 ' + l.quiz.pass + ' 題）' + (avg ? '，平均每題 ' + fmt(avg, 1) + ' 秒' : '') + '。</p>';
-  const wrong = LN.res.map((r, i) => (r.ok ? null : LN.qs[i])).filter(Boolean);
-  if (wrong.length) h += '<details class="lnwrong"><summary>看答錯的 ' + wrong.length + ' 題</summary>' + wrong.map((q) => '<div class="lnw"><p>' + richH(q.prompt) + '</p><p class="note">答案：' + esc(q.opts.find((o) => o.ok).t) + '。' + richH(q.explain) + '</p></div>').join('') + '</details>';
+  h += '<div class="lngo2">' + browseBtn() + '</div>';
   const nx = learnNext(LP);
   if (LN.pass) h += '<div class="lngo2">' + (nx && nx.ready ? '<button class="btn main big" data-ln="go" data-id="' + nx.id + '">下一課：' + esc(nx.title) + ' ▶</button>' : '') + '<button class="btn" data-ln="map">課程表</button><button class="btn" data-ln="quiz">再考一次（新題目）</button></div>'
     + (nx && !nx.ready ? '<p class="note">下一課「' + esc(nx.title) + '」還在製作中，下一批更新會上線。</p>' : '');
@@ -277,9 +338,9 @@ function startTest(mode, stage) {
 }
 function testHTML() {
   const isP = LN.mode === 'place', s = COURSE.find((x) => x.id === LN.stage);
-  const title = isP ? '分級測驗' : LN.mode === 'drill' ? '⚡ 快答：' + LN.drill.name : LN.mode === 'review' ? '📕 錯題本' : LN.mode === 'grad' ? '🎓 畢業考・筆試' : '第 ' + s.id + ' 階跳級測驗：' + esc(s.name);
+  const title = isP ? '分級測驗' : LN.mode === 'drill' ? '⚡ 快答：' + LN.drill.name : LN.mode === 'review' ? '📕 錯題本' : LN.mode === 'redo' ? '📜 做過的題目・再考一次' : LN.mode === 'grad' ? '🎓 畢業考・筆試' : '第 ' + s.id + ' 階跳級測驗：' + esc(s.name);
   let h = '<div class="lnbar"><button type="button" class="btn sm" data-ln="map">← 課程表</button><div class="lnttl"><b>' + title + '</b></div></div>';
-  if (LN.mode === 'drill' || LN.mode === 'review') return h + drillHTML();
+  if (LN.mode === 'drill' || LN.mode === 'review' || LN.mode === 'redo') return h + drillHTML();
   if (LN.mode === 'grad') return h + gradTestHTML();
   if (LN.phase === 'intro') {
     h += '<div class="panel lnres">' + (isP ? '<p>12 題，大約 3 分鐘：從規則、起手牌、翻牌前、數學、翻牌後、範圍到 GTO，每一階 1–2 題。</p><p>不會的直接按「不知道」，不扣分——第一個答錯的地方，就是你該開始的地方。</p>'
@@ -295,11 +356,11 @@ function testHTML() {
     h += '<div class="panel lnres"><p class="lnbig">建議從第 ' + P.start + ' 階開始</p><p>答對 ' + ok + '／' + LN.res.length + '。各階的結果：</p><ol class="lnplace">'
       + COURSE.map((c) => { const b = P.by[c.id]; return '<li class="' + (b && b.ok === b.n ? 'ok' : 'no') + '">第 ' + c.id + ' 階 ' + esc(c.name) + '：' + (b ? b.ok + '／' + b.n : '—') + '</li>'; }).join('') + '</ol>'
       + '<div class="lngo2">' + (P.start > 1 ? '<button class="btn main big" data-ln="pstart" data-s="' + P.start + '">從第 ' + P.start + ' 階開始（前面 ' + (P.start - 1) + ' 階標成已通過）▶</button>' : '') + '<button class="btn' + (P.start > 1 ? '' : ' main big') + '" data-ln="pstart" data-s="1">從第 1 階開始</button></div>'
-      + (COURSE[P.start - 1].lessons.some((l) => l.ready) ? '' : '<p class="note">第 ' + P.start + ' 階的課程還在製作中；可以先把前面的課當複習，或用起手牌字典和第 2 階的快答練速度。</p>') + '</div>';
+      + '<div class="lngo2">' + browseBtn() + '</div></div>';
     return h;
   }
   h += '<div class="panel lnres"><p class="lnbig">' + (LN.pass ? '🎉 第 ' + s.id + ' 階直接通過！' : '這一階先上課比較好') + '</p><p>答對 ' + ok + '／' + LN.res.length + '（要 7 題）。</p>'
-    + '<div class="lngo2"><button class="btn main big" data-ln="map">回課程表</button>' + (LN.pass ? '' : '<button class="btn" data-ln="skip" data-s="' + s.id + '">再考一次</button>') + '</div></div>';
+    + '<div class="lngo2"><button class="btn main big" data-ln="map">回課程表</button>' + (LN.pass ? '' : '<button class="btn" data-ln="skip" data-s="' + s.id + '">再考一次</button>') + browseBtn() + '</div></div>';
   return h;
 }
 /* 畢業考的筆試 */
@@ -310,9 +371,7 @@ function gradTestHTML() {
   let h = '<div class="panel lnres"><p class="lnbig">' + (LP.grad && LN.justGrad ? '🎓 畢業了！' : LN.pass ? '🎉 筆試通過' : '還差一點') + '</p><p>答對 <b>' + ok + '／' + LN.res.length + '</b>（要 ' + GRAD_W.pass + ' 題）。</p>';
   const by = {}; LN.res.forEach((r, i) => { const st = LN.qs[i].stage; by[st] = by[st] || [0, 0]; by[st][1]++; if (r.ok) by[st][0]++; });
   h += '<ol class="lnplace">' + COURSE.map((c) => { const b = by[c.id]; return b ? '<li class="' + (b[0] === b[1] ? 'ok' : 'no') + '">第 ' + c.id + ' 階 ' + esc(c.name) + '：' + b[0] + '／' + b[1] + '</li>' : ''; }).join('') + '</ol>';
-  const wrong = LN.res.map((r, i) => (r.ok ? null : LN.qs[i])).filter(Boolean);
-  if (wrong.length) h += '<details class="lnwrong"><summary>看答錯的 ' + wrong.length + ' 題</summary>' + wrong.map((q) => '<div class="lnw"><p>' + richH(q.prompt) + '</p><p class="note">答案：' + esc(q.opts.find((o) => o.ok).t) + '。' + richH(q.explain) + '</p></div>').join('') + '</details>';
-  h += '<div class="lngo2">' + (LP.grad && LN.justGrad ? '<button class="btn main big" data-ln="cert">看結業證書 ▶</button>' : '<button class="btn main big" data-ln="lesson" data-id="8-5">回畢業考 ▶</button>') + (LN.pass ? '' : '<button class="btn" data-ln="gradw">再考一次</button>') + '</div></div>';
+  h += '<div class="lngo2">' + browseBtn() + (LP.grad && LN.justGrad ? '<button class="btn main big" data-ln="cert">看結業證書 ▶</button>' : '<button class="btn main big" data-ln="lesson" data-id="8-5">回畢業考 ▶</button>') + (LN.pass ? '' : '<button class="btn" data-ln="gradw">再考一次</button>') + '</div></div>';
   return h;
 }
 /* 快答訓練場、錯題本 */
@@ -321,6 +380,7 @@ function drillHTML() {
   if (LN.phase === 'intro') {
     const b = isD && LP.best[LN.drill.id];
     return '<div class="panel lnres">' + (isD ? '<p>20 題，每題 <b>' + LN.drill.sec + ' 秒</b>。目標：全部答對、越快越好。</p>' + (b ? '<p class="note">你的最好成績：' + b.ok + '／' + b.n + '，平均 ' + fmt(b.ms / 1000, 1) + ' 秒。</p>' : '')
+      : LN.mode === 'redo' ? '<p>從「做過的題目」（' + esc(LN.redoName || '全部') + '）抽 ' + Math.min(10, LN.redoN || 10) + ' 題再考一次，不限時。答錯的會放進錯題本。</p>'
       : '<p>錯題本有 ' + (LP.wrong || []).length + ' 題：之前答錯的題目，一題答對兩次就會拿掉。這一次複習最舊的 ' + Math.min(15, (LP.wrong || []).length) + ' 題，不限時。</p>')
       + '<div class="lngo2"><button class="btn main big" data-ln="tstart">開始 ▶</button></div></div>';
   }
@@ -328,16 +388,16 @@ function drillHTML() {
   const ok = LN.res.filter((r) => r.ok).length;
   let h = '<div class="panel lnres">';
   if (isD) h += '<p class="lnbig">' + (LN.newBest ? '🏅 新紀錄！' : '完成') + '</p><p>答對 <b>' + ok + '／' + LN.res.length + '</b>，平均每題 ' + fmt(LN.avg / 1000, 1) + ' 秒。</p>';
+  else if (LN.mode === 'redo') h += '<p class="lnbig">考完了</p><p>答對 <b>' + ok + '／' + LN.res.length + '</b>。</p>';
   else h += '<p class="lnbig">複習完了</p><p>答對 <b>' + ok + '／' + LN.res.length + '</b>。錯題本還有 ' + (LP.wrong || []).length + ' 題。</p>';
-  const wrong = LN.res.map((r, i) => (r.ok ? null : LN.qs[i])).filter(Boolean);
-  if (wrong.length) h += '<details class="lnwrong"><summary>看答錯的 ' + wrong.length + ' 題</summary>' + wrong.map((q) => '<div class="lnw"><p>' + richH(q.prompt) + '</p><p class="note">答案：' + esc(q.opts.find((o) => o.ok).t) + '。' + richH(q.explain) + '</p></div>').join('') + '</details>';
-  h += '<div class="lngo2"><button class="btn main big" data-ln="' + (isD ? 'drill" data-d="' + LN.drill.id : 'review') + '">再一次 ▶</button><button class="btn" data-ln="map">課程表</button></div></div>';
+  h += '<div class="lngo2"><button class="btn main big" data-ln="' + (isD ? 'drill" data-d="' + LN.drill.id : LN.mode === 'redo' ? 'redo' : 'review') + '">再一次 ▶</button>' + browseBtn() + '<button class="btn" data-ln="' + (LN.mode === 'redo' ? 'hist' : 'map') + '">' + (LN.mode === 'redo' ? '做過的題目' : '課程表') + '</button></div></div>';
   return h;
 }
 function testStart() {
   if (LN.mode === 'drill') { LN.qs = makeQuiz(LN.drill.gens, 20, LN.rng); LN.sec = LN.drill.sec; }
   else if (LN.mode === 'review') { LN.qs = wrongSession(LP, LN.rng); LN.sec = 0; if (!LN.qs.length) { openLearn('map'); return; } }
   else if (LN.mode === 'grad') { LN.qs = makeGradQuiz(LN.rng); LN.sec = GRAD_W.sec; }
+  else if (LN.mode === 'redo') { LN.qs = histSession(histList(LP, LN.redoF), 10, LN.rng); LN.sec = 0; if (!LN.qs.length) { openLearn('hist'); return; } }
   else if (LN.mode === 'place') {
     LN.qs = makePlacement(LN.rng);
     for (const q of LN.qs) q.opts.push({ t: '不知道', ok: false });
@@ -346,7 +406,7 @@ function testStart() {
     LN.qs = makeQuiz(gens, 8, LN.rng);
     for (const q of LN.qs) q.stage = LN.stage;
   }
-  LN.qi = 0; LN.res = []; LN.answered = false; LN.phase = 'q';
+  LN.qi = 0; LN.res = []; LN.answered = false; LN.phase = 'q'; LN.vi = null; LN.browsing = false;
   renderLearn(); window.scrollTo(0, 0); startQTimer();
 }
 
@@ -497,13 +557,11 @@ function initLearn() {
     if (b) { $('lnModalBody').innerHTML = handDetailHTML(+b.dataset.g); $('lnModal').querySelector('.mbox').scrollTop = 0; }
   });
   let certT = 0;
+  $('lnRoot').addEventListener('change', (e) => { if (e.target.id === 'lnHistHide') { LP.histHide = e.target.checked; LN.hshow = false; lpSave(); renderLearn(); } });
   $('lnRoot').addEventListener('input', (e) => { if (e.target.id === 'lnCertName') { LP.name = e.target.value.slice(0, 16); clearTimeout(certT); certT = setTimeout(() => { lpSave(); drawCert(); }, 350); } });
   $('lnRoot').addEventListener('click', (e) => {
     const b = e.target.closest('[data-ln]');
-    if (!b) {                                                   // 答完題目：點空白也能下一題
-      if (LN.answered && e.target.closest('.lnfb')) nextQ();
-      return;
-    }
+    if (!b) return;
     const a = b.dataset.ln;
     if (a === 'map') openLearn('map');
     else if (a === 'go' || a === 'lesson') { const l = lessonById(b.dataset.id); if (l && l.ready) openLearn('lesson', l); }
@@ -517,6 +575,16 @@ function initLearn() {
     else if (a === 'reread') { clearLnTimers(); LN.phase = 'read'; renderLearn(); window.scrollTo(0, 0); }
     else if (a === 'ans') answerQ(+b.dataset.i);
     else if (a === 'next') nextQ();
+    else if (a === 'qprev') qNav(-1);
+    else if (a === 'qnext') qNav(1);
+    else if (a === 'browse') { clearLnTimers(); LN.browsing = true; LN.vi = 0; renderLearn(); window.scrollTo(0, 0); }
+    else if (a === 'unbrowse') { LN.browsing = false; LN.vi = null; renderLearn(); window.scrollTo(0, 0); }
+    else if (a === 'hist') { openLearn('hist'); LN.hi = 0; LN.hshow = false; renderLearn(); }
+    else if (a === 'hf') { const f = b.dataset.f; LN.hf = /^\d+$/.test(f) ? +f : f; LN.hi = 0; LN.hshow = false; renderLearn(); }
+    else if (a === 'hprev') histGo(-1);
+    else if (a === 'hnext') histGo(1);
+    else if (a === 'hshow') { LN.hshow = true; renderLearn(); }
+    else if (a === 'redo') { const f = LN.mode === 'hist' ? (LN.hf === undefined ? 'all' : LN.hf) : LN.redoF; const nm = (histFilters().find((x) => x[0] === f) || [0, '全部'])[1]; startTest('redo'); LN.redoF = f; LN.redoName = nm; LN.redoN = new Set(histList(LP, f).map((y) => y.q.key)).size; renderLearn(); }
     else if (a === 'dict') openLearn('dict');
     else if (a === 'place') startTest('place');
     else if (a === 'skip') startTest('skip', +b.dataset.s);
@@ -542,8 +610,14 @@ function initLearn() {
     if ($('vLearn').hidden || e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input,textarea,select')) return;
     if (!$('lnModal').hidden) { if (e.key === 'Escape') $('lnModal').hidden = true; return; }
     if (document.querySelector('.modal:not([hidden])')) return;          // 其他視窗開著（牌型、統計）：不要答到後面的題目
-    const inQ = (LN.mode === 'lesson' && (LN.phase === 'practice' || LN.phase === 'quiz')) || (['place', 'skip', 'drill', 'review', 'grad'].indexOf(LN.mode) >= 0 && LN.phase === 'q');
+    if (LN.mode === 'hist') { if (e.key === 'ArrowLeft') { e.preventDefault(); histGo(-1); } else if (e.key === 'ArrowRight') { e.preventDefault(); histGo(1); } return; }
+    if (LN.vi !== null && LN.vi !== undefined) {                   // 回頭看：只能換題
+      if (e.key === 'ArrowLeft') { e.preventDefault(); qNav(-1); } else if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); qNav(1); }
+      return;
+    }
+    const inQ = (LN.mode === 'lesson' && (LN.phase === 'practice' || LN.phase === 'quiz')) || (['place', 'skip', 'drill', 'review', 'grad', 'redo'].indexOf(LN.mode) >= 0 && LN.phase === 'q');
     if (!inQ) return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); qNav(-1); return; }
     if (!LN.answered && /^[1-6]$/.test(e.key)) { const i = +e.key - 1; if (LN.qs[LN.qi] && i < LN.qs[LN.qi].opts.length) { e.preventDefault(); answerQ(i); } }
     else if (LN.answered && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight')) { e.preventDefault(); nextQ(); }
   });
