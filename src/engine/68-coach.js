@@ -377,8 +377,14 @@ function narrate(ev, H, ctx) {
     title = '發手牌';
     const g = heroCls(hero.cards);
     L.push('每人兩張，只有自己看得到。你拿到 ' + CARDS_TOK(sortedCards(hero.cards)) + '（' + clsWords(g) + '）' + (ctx.exam ? '。' : '：在 169 種起手牌排第 ' + PRE_RANK[g] + ' 名，' + strengthWord(PRE_PCT[g], PRE_RANK[g]) + '。'));
+    if (!ctx.exam && typeof handShape === 'function') {
+      const sh = handShape(g);
+      if (sh.trap) L.push('⚠ 這是「大配小」的陷阱牌：一張大牌配一張小牌，看起來不錯，其實中了頂對踢腳輸、沒中就什麼都沒有' + (sh.suited ? '；同花只多一條同花的路，要到後位偷盲才開' : '，順子也湊不出來') + '（第 2-8 課）。');
+      else if (sh.k === 'sconn') L.push('💎 同花連張：對隨機牌的勝率不高，但順子、同花兩條路都寬，沒中就棄、輸得少——實戰比看起來強。');
+    }
     if (H.toAct >= 0) L.push('翻牌前從' + name(H.toAct) + '開始說話' + (H.n > 2 ? '（大盲左邊那一位）' : '（兩人時按鈕先說話）') + '，順時針一個一個來。');
     tip = tipOnce(ctx, 'deal', '之後中間會陸續發 5 張公牌，大家共用。最後每個人用自己 2 張加 5 張公牌，挑最好的 5 張比大小。說話時可以：棄牌（放棄這一手）、跟注（跟到目前最高的注）、加注（下更多）。');
+    if (!tip && !ctx.exam && typeof handShape === 'function' && handShape(g).trap) tip = tipOnce(ctx, 'shape', '能玩的起手牌只有四種樣子：兩張都大（都 10 以上）、對子、同花連張、同花 A。「大配小」是最常見的虧錢牌：對手會跟你打到底的都是好牌，你中頂對時他的踢腳幾乎都比你大——贏小輸大。');
   } else if (ev.k === 'act') {
     const p = H.players[ev.seat];
     if (ev.seat === ctx.hero) { title = '你' + actWord(ev, H); }

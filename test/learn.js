@@ -87,6 +87,9 @@ for (const gen of Object.keys(E.QGEN)) {
       let lo = 0, exp = ''; acts.forEach((t, k) => { if (n >= lo && n < lo + fs[k]) exp = t; lo += fs[k]; });
       if (ans !== exp) fail('rngPick 錯 ' + q.key);
     }
+    if (gen === 'shapeOf') { const g = +kp[1]; if (ans !== E.SHAPE_ZH[E.handShape(g).k]) fail('shapeOf 錯 ' + q.key); }
+    if (gen === 'trapPair' && kp[0] === 'tp') { const t = +kp[1], m = +kp[2]; if (ans !== E.className(m).replace('T', '10') && ans !== E.NAMEZH(m)) fail('trapPair 答案錯 ' + q.key); if (!(E.PRE_RANK[m] < E.PRE_RANK[t] && E.handInfo(t).eq1 > E.handInfo(m).eq1)) fail('trapPair 不是陷阱 ' + q.key); }
+    if (gen === 'showdownTrap' && kp[0] === 'sdt') { const h = kp[1].split(',').map(Number), b = kp[2].split(',').map(Number), B = E.topPairBreak(h, b); if (ans !== Math.max(5, Math.round(B.strongEq * 100 / 5) * 5) + '%') fail('showdownTrap 錯 ' + q.key + ' ' + B.strongEq); }
     if (gen === 'rule24') { const n = +kp[1], flop = kp[2] === 'true'; if (ans !== (flop ? n * 4 - Math.max(0, n - 8) : n * 2) + '%') fail('rule24 錯'); }
   }
 }
@@ -183,6 +186,19 @@ for (const S of E.GTO_RIVER) {
   if (E.examMarks(E.examNew('8-4', rng), rv).join() !== 'good') fail('GTO 訓練場算分錯');
   if (E.examMarks(E.examNew('8-5', rng), rv).join() !== 'good,bad') fail('畢業考算分錯');
   if (E.examNew('8-5', rng).spots !== null || E.examNew('8-5', rng).n !== 6) fail('畢業考設定錯');
+}
+// 陷阱牌：四種樣子跟圖表一致；題目答案照 handShape、排名、精確列舉
+{
+  const T = E.shapeTable(), by = {}; for (const r of T) by[r.k] = r;
+  if (by.pair.co !== 13 || by.bigbig.co !== 20 || by.aces.co !== 8) fail('對子、兩張都大、同花 A 應該關煞位全開');
+  if (by.junk.btn !== 0 || by.bigsmall.utg > 2) fail('垃圾按鈕不開、大配小槍口幾乎不開');
+  if (T.reduce((a, r) => a + r.n, 0) !== 169) fail('四種樣子沒有涵蓋 169 種');
+  const TG = E.trapGems();
+  if (TG.traps.some((x) => !E.handShape(x.g).trap) || TG.gems.some((x) => E.handShape(x.g).k !== 'sconn')) fail('陷阱榜、遺珠榜跟樣子不一致');
+  const hero = E.parseCards('Ks6s'), B = E.topPairBreak(hero, E.parseCards('Kh8d3c'));
+  if (!(B.strongEq < 0.3 && B.all > 0.7)) fail('K6s 翻牌中頂對的數字怪 ' + B.strongEq + ' ' + B.all);
+  const B2 = E.topPairBreak(E.parseCards('KsJs'), E.parseCards('Kh8d3c'));
+  if (!(B2.strongEq > 0.45)) fail('KJs 翻牌中頂對的數字怪 ' + B2.strongEq);
 }
 // 做過的題目
 {

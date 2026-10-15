@@ -268,7 +268,7 @@ QGEN.tierOf = (rng, o) => {
   const g = pickOne(poolFromTiers(o && o.tiers), rng), t = HAND_TIER[g];
   const opts = [1, 2, 3, 4, 5].map((k) => ({ t: TIER_NAME[k], ok: k === t }));
   return { gen: 'tierOf', prompt: '「' + NAMEZH(g) + '」屬於哪一層？', vis: { k: 'cls', g }, opts,
-    explain: NAMEZH(g) + ' 是' + TIER_NAME[t] + (t === 5 ? '（' + (isMarginal(g) ? '邊緣：後位可以開' : '垃圾：幾乎不玩') + '）' : '') + '，強度排第 ' + PRE_RANK[g] + ' 名。' + (HAND_NOTES[className(g)] || TIER_NOTE[t]) };
+    explain: NAMEZH(g) + ' 是' + TIER_NAME[t] + (t === 5 ? '（' + (isMarginal(g) ? '邊緣：只有後位沒人加注時開' : '垃圾：幾乎不玩') + '）' : '') + '，強度排第 ' + PRE_RANK[g] + ' 名。' + (typeof shapeLine === 'function' ? '樣子是' + shapeLine(g) + ' ' : '') + (HAND_NOTES[className(g)] || (t === 5 ? '' : TIER_NOTE[t])) };
 };
 QGEN.stronger = (rng, o) => {
   const pool = poolFromTiers(o && o.tiers);

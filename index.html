@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1d19"><meta name="description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="德州軍師"><meta property="og:type" content="website"><meta property="og:title" content="德州軍師"><meta property="og:description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><meta property="og:image" content="https://wayuanzi-web.github.io/holdem/og.png"><meta property="og:url" content="https://wayuanzi-web.github.io/holdem/"><meta name="twitter:card" content="summary_large_image"><title>德州軍師</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%9F%E4%B8%A6%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%98%E4%B9%9D%E4%B9%9F%E4%B9%BE%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%8B%E4%BB%8D%E4%BB%94%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A4%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BC%BC%E4%BD%86%E4%BD%88%E4%BD%8D%E4%BD%8E%E4%BD%8F%E4%BD%94%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%82%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%99%E5%82%B3%E5%82%BE%E5%83%8F%E5%83%B9%E5%84%AA%E5%84%B2%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AB%E5%85%AC%E5%85%AD%E5%85%B1%E5%85%B6%E5%85%B7%E5%85%B8%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%9F%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%A2%E5%8B%BE%E5%8C%85%E5%8C%96%E5%8C%AF%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%9A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%83%E5%8F%88%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%A6%E5%90%AB%E5%91%8A%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%8F%E5%95%9F%E5%96%9C%E5%96%AE%E5%97%8E%E5%98%9B%E5%99%A8%E5%9A%87%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9B%BA%E5%9C%88%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9C%BE%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%83%E5%9E%8B%E5%9F%B7%E5%9F%BA%E5%A0%85%E5%A0%B1%E5%A0%B4%E5%A1%97%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AB%8C%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AD%B8%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%9F%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%88%E5%B0%8A%E5%B0%8D%E5%B0%8E%E5%B0%8F%E5%B0%91%E5%B0%AC%E5%B0%B1%E5%B0%B7%E5%B0%BA%E5%B0%BE%E5%B1%80%E5%B1%95%E5%B1%A4%E5%B1%AC%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B7%B4%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%85%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%B4%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%A7%E5%BA%AB%E5%BB%BA%E5%BC%84%E5%BC%88%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%A9%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8B%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%85%E5%BF%97%E5%BF%A0%E5%BF%AB%E5%BF%B5%E6%80%8E%E6%80%95%E6%80%9D%E6%80%A7%E6%83%85%E6%83%B3%E6%84%8F%E6%84%9B%E6%85%8B%E6%85%A2%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%88%90%E6%88%91%E6%88%96%E6%88%B0%E6%88%B2%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%A3%E6%89%B9%E6%89%BE%E6%8A%8A%E6%8A%93%E6%8A%95%E6%8A%98%E6%8A%BD%E6%8B%96%E6%8B%AC%E6%8B%BF%E6%8C%81%E6%8C%87%E6%8C%89%E6%8C%91%E6%8C%96%E6%8D%A8%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A7%E6%8E%A8%E6%8F%9B%E6%90%8D%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%87%E6%93%8A%E6%93%8B%E6%93%9A%E6%93%A0%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BB%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%A2%E6%95%A3%E6%95%B4%E6%95%B8%E6%96%87%E6%96%99%E6%96%9C%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%96%BD%E6%97%A5%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%99%AF%E6%9A%97%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9B%B8%E6%9C%80%E6%9C%83%E6%9C%88%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%91%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9E%B6%E6%9F%90%E6%9F%A5%E6%A0%B8%E6%A0%B9%E6%A0%BC%E6%A1%86%E6%A1%88%E6%A1%8C%E6%A2%85%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%9A%E6%A5%AD%E6%A5%B5%E6%A6%82%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A1%E6%AD%A3%E6%AD%A4%E6%AD%A5%E6%AE%B5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B0%A3%E6%B0%B8%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B2%BF%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B4%97%E6%B4%9E%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B7%BA%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E6%BB%BF%E6%BC%8F%E6%BF%95%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%86%9F%E7%87%A5%E7%88%9B%E7%88%BE%E7%89%87%E7%89%88%E7%89%8C%E7%89%B9%E7%8A%AF%E7%8C%9C%E7%8D%8E%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%BE%E7%90%86%E7%94%9A%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%8C%E7%95%99%E7%95%A2%E7%95%A5%E7%95%AB%E7%95%B6%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%A4%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%81%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%AD%E7%9F%B3%E7%A0%94%E7%A1%AC%E7%A2%BA%E7%A2%BC%E7%A4%8E%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A8%B1%E7%A9%8D%E7%A9%A9%E7%A9%B6%E7%A9%BA%E7%A9%BF%E7%AA%81%E7%AA%84%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%94%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B0%BF%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%80%E7%B4%84%E7%B4%85%E7%B4%94%E7%B4%9A%E7%B4%AF%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B5%B1%E7%B6%93%E7%B6%A0%E7%B6%AD%E7%B6%B2%E7%B7%8A%E7%B7%92%E7%B7%9A%E7%B7%A3%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B8%BE%E7%B9%9E%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BE%85%E7%BE%8E%E7%BF%92%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%8C%E8%83%BD%E8%85%A6%E8%85%B3%E8%87%AA%E8%87%B3%E8%88%87%E8%88%8A%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8C%B2%E8%8E%8A%E8%90%AC%E8%90%BD%E8%91%97%E8%91%AB%E8%92%99%E8%96%84%E8%98%86%E8%99%95%E8%99%9B%E8%99%A7%E8%99%B9%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A1%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%8B%E8%A6%8F%E8%A6%BD%E8%A7%80%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%93%E8%A8%98%E8%A8%A3%E8%A8%AD%E8%A8%B4%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A2%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%A9%B3%E8%AA%8D%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AA%B2%E8%AA%BF%E8%AB%8B%E8%AB%96%E8%AC%9B%E8%AD%89%E8%AD%B0%E8%AD%B7%E8%AE%80%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%AA%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B6%95%E8%B6%A3%E8%B7%91%E8%B7%9B%E8%B7%9D%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8A%E9%81%8B%E9%81%8E%E9%81%93%E9%81%94%E9%81%A0%E9%81%A9%E9%81%AE%E9%81%B8%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%91%E9%87%9D%E9%88%95%E9%8C%84%E9%8C%A2%E9%8C%A6%E9%8C%AF%E9%8C%B6%E9%8D%B5%E9%8E%96%E9%90%98%E9%95%B7%E9%96%80%E9%96%89%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%B2%E9%98%BB%E9%98%BF%E9%99%84%E9%99%8D%E9%99%90%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%8E%E9%9A%94%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A2%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A0%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%88%E9%A0%90%E9%A0%92%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8C%E9%A1%8D%E9%A1%8F%E9%A1%98%E9%A1%9E%E9%A1%AF%E9%A2%A8%E9%A6%96%E9%A6%AC%E9%A9%97%E9%A9%9F%E9%AA%A8%E9%AA%B0%E9%AB%92%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%9F%E4%B8%A6%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%98%E4%B9%9D%E4%B9%9F%E4%B9%BE%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%8B%E4%BB%8D%E4%BB%94%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A4%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BC%BC%E4%BD%86%E4%BD%88%E4%BD%8D%E4%BD%8E%E4%BD%8F%E4%BD%94%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%82%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%92%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%99%E5%82%B3%E5%82%BE%E5%83%8F%E5%83%B9%E5%84%AA%E5%84%B2%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AB%E5%85%AC%E5%85%AD%E5%85%B1%E5%85%B6%E5%85%B7%E5%85%B8%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%9F%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%A2%E5%8B%BE%E5%8C%85%E5%8C%96%E5%8C%AF%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%9A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%83%E5%8F%88%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%A6%E5%90%AB%E5%91%8A%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%8F%E5%95%9F%E5%96%9C%E5%96%AE%E5%97%8E%E5%98%9B%E5%99%A8%E5%9A%87%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9B%BA%E5%9C%88%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9C%BE%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%83%E5%9E%8B%E5%9F%B7%E5%9F%BA%E5%A0%85%E5%A0%B1%E5%A0%B4%E5%A1%97%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AB%8C%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AD%B8%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%9F%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%88%E5%B0%8A%E5%B0%8D%E5%B0%8E%E5%B0%8F%E5%B0%91%E5%B0%AC%E5%B0%B1%E5%B0%B7%E5%B0%BA%E5%B0%BE%E5%B1%80%E5%B1%95%E5%B1%A4%E5%B1%AC%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B7%B4%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%85%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%B4%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%A7%E5%BA%AB%E5%BB%BA%E5%BC%84%E5%BC%88%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%A9%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8B%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%85%E5%BF%97%E5%BF%A0%E5%BF%AB%E5%BF%B5%E6%80%8E%E6%80%95%E6%80%9D%E6%80%A7%E6%83%85%E6%83%B3%E6%84%8F%E6%84%9B%E6%85%8B%E6%85%98%E6%85%A2%E6%85%A3%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%87%B2%E6%88%90%E6%88%91%E6%88%96%E6%88%B0%E6%88%B2%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%A3%E6%89%B9%E6%89%BE%E6%8A%8A%E6%8A%93%E6%8A%95%E6%8A%98%E6%8A%BD%E6%8B%96%E6%8B%AC%E6%8B%BF%E6%8C%81%E6%8C%87%E6%8C%89%E6%8C%91%E6%8C%96%E6%8D%A8%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A7%E6%8E%A8%E6%8F%90%E6%8F%9B%E6%90%8D%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%87%E6%93%8A%E6%93%8B%E6%93%9A%E6%93%A0%E6%93%AC%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BB%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%A2%E6%95%A3%E6%95%B4%E6%95%B8%E6%96%87%E6%96%99%E6%96%9C%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%96%BD%E6%97%A5%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%99%AF%E6%9A%97%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9B%B8%E6%9C%80%E6%9C%83%E6%9C%88%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%91%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9E%B6%E6%9F%90%E6%9F%A5%E6%A0%B8%E6%A0%B9%E6%A0%BC%E6%A1%86%E6%A1%88%E6%A1%8C%E6%A2%85%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%9A%E6%A5%AD%E6%A5%B5%E6%A6%82%E6%A6%9C%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A1%E6%AD%A3%E6%AD%A4%E6%AD%A5%E6%AE%B5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B0%A3%E6%B0%B8%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B2%BF%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B4%97%E6%B4%9E%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B7%BA%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E6%BB%BF%E6%BC%8F%E6%BF%95%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%86%9F%E7%87%A5%E7%88%9B%E7%88%BE%E7%89%87%E7%89%88%E7%89%8C%E7%89%B9%E7%8A%AF%E7%8C%9C%E7%8D%8E%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%A0%E7%8F%BE%E7%90%86%E7%94%9A%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%8C%E7%95%99%E7%95%A2%E7%95%A5%E7%95%AB%E7%95%B6%E7%96%91%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%A4%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%81%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%AD%E7%9F%B3%E7%A0%94%E7%A1%AC%E7%A2%BA%E7%A2%BC%E7%A4%8E%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A8%B1%E7%A9%8D%E7%A9%A9%E7%A9%B6%E7%A9%BA%E7%A9%BF%E7%AA%81%E7%AA%84%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%94%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B0%BF%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%80%E7%B4%84%E7%B4%85%E7%B4%94%E7%B4%9A%E7%B4%AF%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B5%B1%E7%B6%93%E7%B6%A0%E7%B6%AD%E7%B6%B2%E7%B7%8A%E7%B7%92%E7%B7%9A%E7%B7%A3%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B8%BE%E7%B9%9E%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BD%B0%E7%BE%85%E7%BE%8E%E7%BE%A4%E7%BF%92%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%8C%E8%83%BD%E8%84%86%E8%85%A6%E8%85%B3%E8%87%89%E8%87%AA%E8%87%B3%E8%88%87%E8%88%8A%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8C%B2%E8%8E%8A%E8%90%AC%E8%90%BD%E8%91%97%E8%91%AB%E8%92%99%E8%96%84%E8%98%86%E8%99%95%E8%99%9B%E8%99%A7%E8%99%B9%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A1%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%8B%E8%A6%8F%E8%A6%BD%E8%A7%80%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%93%E8%A8%98%E8%A8%A3%E8%A8%AD%E8%A8%B4%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A2%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%A9%B3%E8%AA%8D%E8%AA%A0%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AA%B2%E8%AA%BF%E8%AB%8B%E8%AB%96%E8%AC%9B%E8%AD%89%E8%AD%98%E8%AD%B0%E8%AD%B7%E8%AE%80%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%AA%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B6%95%E8%B6%A3%E8%B7%91%E8%B7%9B%E8%B7%9D%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8A%E9%81%8B%E9%81%8E%E9%81%93%E9%81%94%E9%81%A0%E9%81%A9%E9%81%AE%E9%81%B8%E9%81%BA%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%86%92%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%91%E9%87%9D%E9%88%95%E9%8C%84%E9%8C%A2%E9%8C%A6%E9%8C%AF%E9%8C%B6%E9%8D%B5%E9%8E%96%E9%90%98%E9%95%B7%E9%96%80%E9%96%89%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%B2%E9%98%BB%E9%98%BF%E9%99%84%E9%99%8D%E9%99%90%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%8E%E9%9A%94%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A2%E9%9B%A3%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A0%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%88%E9%A0%90%E9%A0%92%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8C%E9%A1%8D%E9%A1%8F%E9%A1%98%E9%A1%9E%E9%A1%AF%E9%A2%A8%E9%A4%8A%E9%A6%96%E9%A6%AC%E9%A8%99%E9%A9%97%E9%A9%9F%E9%AA%A8%E9%AA%B0%E9%AB%92%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
 <style>
 :root {
   --ink: #0e1d19;        /* 牌桌陰影裡的深綠 */
@@ -581,6 +581,11 @@ body.intable .brand p { display: none; }
 .lnmine { float: right; font-size: 12px; opacity: .85; margin-left: 8px; font-weight: 400; }
 .lnhf { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
 .lnhide { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 14px; color: var(--mute); }
+.lntrap tr.tr td, .lnshape tr.tr td { background: rgba(201,70,46,.12); } .lntrap tr.gm td { background: rgba(63,157,106,.12); } .lnshape tr.dim td { color: var(--mute); }
+.lntrap td small, .lnshape td small { display: block; color: var(--mute); font-size: 12px; }
+.lntpb { font-size: 13px; table-layout: fixed; width: 100%; } .lntpb td:first-child, .lntpb th:first-child { white-space: normal; width: 38%; } .lntpb td.r, .lntpb th.r { white-space: nowrap; padding-left: 3px; padding-right: 3px; } .lntpb td small { display: block; color: var(--mute); font-size: 11px; font-weight: 400; } .lntpb tr.lnsum td { border-top: 2px solid var(--brass); }
+.lnh.trap { border-color: #c9462e; } .lnh small { display: block; font-size: 11px; opacity: .8; }
+.lnbadge { font-size: 12px; padding: 1px 8px; border-radius: 999px; vertical-align: middle; font-weight: 500; } .lnbadge.trap { background: rgba(201,70,46,.25); color: #f0a08f; } .lnbadge.gem { background: rgba(63,157,106,.25); color: #8fe0ad; }
 .sizer { background: rgba(0,0,0,.25); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
 .presets { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
 .presets button { border: 1px solid var(--line); background: var(--felt2); border-radius: 8px; padding: 5px 10px; cursor: pointer; font-size: 14px; }
@@ -4285,8 +4290,14 @@ function narrate(ev, H, ctx) {
     title = '發手牌';
     const g = heroCls(hero.cards);
     L.push('每人兩張，只有自己看得到。你拿到 ' + CARDS_TOK(sortedCards(hero.cards)) + '（' + clsWords(g) + '）' + (ctx.exam ? '。' : '：在 169 種起手牌排第 ' + PRE_RANK[g] + ' 名，' + strengthWord(PRE_PCT[g], PRE_RANK[g]) + '。'));
+    if (!ctx.exam && typeof handShape === 'function') {
+      const sh = handShape(g);
+      if (sh.trap) L.push('⚠ 這是「大配小」的陷阱牌：一張大牌配一張小牌，看起來不錯，其實中了頂對踢腳輸、沒中就什麼都沒有' + (sh.suited ? '；同花只多一條同花的路，要到後位偷盲才開' : '，順子也湊不出來') + '（第 2-8 課）。');
+      else if (sh.k === 'sconn') L.push('💎 同花連張：對隨機牌的勝率不高，但順子、同花兩條路都寬，沒中就棄、輸得少——實戰比看起來強。');
+    }
     if (H.toAct >= 0) L.push('翻牌前從' + name(H.toAct) + '開始說話' + (H.n > 2 ? '（大盲左邊那一位）' : '（兩人時按鈕先說話）') + '，順時針一個一個來。');
     tip = tipOnce(ctx, 'deal', '之後中間會陸續發 5 張公牌，大家共用。最後每個人用自己 2 張加 5 張公牌，挑最好的 5 張比大小。說話時可以：棄牌（放棄這一手）、跟注（跟到目前最高的注）、加注（下更多）。');
+    if (!tip && !ctx.exam && typeof handShape === 'function' && handShape(g).trap) tip = tipOnce(ctx, 'shape', '能玩的起手牌只有四種樣子：兩張都大（都 10 以上）、對子、同花連張、同花 A。「大配小」是最常見的虧錢牌：對手會跟你打到底的都是好牌，你中頂對時他的踢腳幾乎都比你大——贏小輸大。');
   } else if (ev.k === 'act') {
     const p = H.players[ev.seat];
     if (ev.seat === ctx.hero) { title = '你' + actWord(ev, H); }
@@ -4617,7 +4628,7 @@ QGEN.tierOf = (rng, o) => {
   const g = pickOne(poolFromTiers(o && o.tiers), rng), t = HAND_TIER[g];
   const opts = [1, 2, 3, 4, 5].map((k) => ({ t: TIER_NAME[k], ok: k === t }));
   return { gen: 'tierOf', prompt: '「' + NAMEZH(g) + '」屬於哪一層？', vis: { k: 'cls', g }, opts,
-    explain: NAMEZH(g) + ' 是' + TIER_NAME[t] + (t === 5 ? '（' + (isMarginal(g) ? '邊緣：後位可以開' : '垃圾：幾乎不玩') + '）' : '') + '，強度排第 ' + PRE_RANK[g] + ' 名。' + (HAND_NOTES[className(g)] || TIER_NOTE[t]) };
+    explain: NAMEZH(g) + ' 是' + TIER_NAME[t] + (t === 5 ? '（' + (isMarginal(g) ? '邊緣：只有後位沒人加注時開' : '垃圾：幾乎不玩') + '）' : '') + '，強度排第 ' + PRE_RANK[g] + ' 名。' + (typeof shapeLine === 'function' ? '樣子是' + shapeLine(g) + ' ' : '') + (HAND_NOTES[className(g)] || (t === 5 ? '' : TIER_NOTE[t])) };
 };
 QGEN.stronger = (rng, o) => {
   const pool = poolFromTiers(o && o.tiers);
@@ -5806,6 +5817,184 @@ function genStage(gen) {
   }
   return GEN_STAGE[gen] || 0;
 }
+
+/* ===== 75-learn-f：陷阱牌（看起來好的垃圾、看起來弱的遺珠）——四種樣子、對手不是隨機、壓制與贏小輸大 ===== */
+
+/* ===== 四種樣子：能玩的牌只有四種樣子，其他是「大配小」或垃圾 ===== */
+const SHAPE_ZH = { pair: '對子', bigbig: '兩張都大', aces: '同花 A', sconn: '同花連張', bigsmall: '大配小', junk: '其他（垃圾）' };
+const SHAPE_ORDER = ['bigbig', 'pair', 'sconn', 'aces', 'bigsmall', 'junk'];
+const R_T = RANKS.indexOf('T'), R_A = RANKS.indexOf('A');
+function handShape(g) {
+  const n = className(g), r1 = RANKS.indexOf(n[0]), r2 = RANKS.indexOf(n[1]), s = n[2] === 's';
+  let k;
+  if (r1 === r2) k = 'pair';
+  else if (r2 >= R_T) k = 'bigbig';
+  else if (s && r1 - r2 <= 3) k = 'sconn';
+  else if (s && r1 === R_A) k = 'aces';
+  else if (r1 >= R_T) k = 'bigsmall';
+  else k = 'junk';
+  return { k, zh: SHAPE_ZH[k], suited: s, trap: k === 'bigsmall', gem: k === 'sconn' || (k === 'pair' && r1 <= RANKS.indexOf('5')) };
+}
+/* 一句話：這種樣子為什麼好或不好，加上圖表從哪裡開 */
+function shapeLine(g) {
+  const sh = handShape(g), i = handInfo(g), open = openLine(i);
+  const why = {
+    pair: '對子：本身就是一對，中三條（翻牌約 12%）就是大牌，兩條路都有',
+    bigbig: '兩張都大：中頂對踢腳也大，兩張都能中，還常常有順子的機會',
+    aces: '同花 A：堅果同花，手上的 A 又擋住對手的 AA、AK；後位能開、也能拿來 3-bet 詐唬',
+    sconn: '同花連張：順子、同花兩條路，沒中就乾脆放棄——輸小贏大',
+    bigsmall: '大配小：中了頂對踢腳輸，沒中頂對什麼都沒有，順子幾乎不可能——看起來不錯，其實是最常虧錢的牌' + (sh.suited ? '（同花只多一條同花的路，所以後位偷盲可以開）' : ''),
+    junk: '兩張都小又不連：一條路都沒有',
+  }[sh.k];
+  return why + '。' + open + '。';
+}
+/* 四種樣子各有幾種牌、6 人桌各位置開幾種（照圖表即時算） */
+function shapeTable() {
+  const out = {};
+  for (const k of SHAPE_ORDER) out[k] = { k, zh: SHAPE_ZH[k], n: 0, combos: 0, utg: 0, co: 0, btn: 0, hands: [] };
+  for (let g = 0; g < 169; g++) {
+    const r = out[handShape(g).k];
+    r.n++; r.combos += classSize(g); r.hands.push(g);
+    if (chartFreq('6/rfi/UTG', g) >= 0.5) r.utg++;
+    if (chartFreq('6/rfi/CO', g) >= 0.5) r.co++;
+    if (chartFreq('6/rfi/BTN', g) >= 0.5) r.btn++;
+  }
+  return SHAPE_ORDER.map((k) => out[k]);
+}
+
+/* ===== 陷阱榜、遺珠榜：對隨機牌的勝率排名 vs 實戰排名 ===== */
+let TRAP_CACHE = null;
+function trapGems() {
+  if (TRAP_CACHE) return TRAP_CACHE;
+  const byRand = []; for (let g = 0; g < 169; g++) byRand.push(g);
+  byRand.sort((a, b) => handInfo(b).eq1 - handInfo(a).eq1);
+  const rankRand = new Int16Array(169); byRand.forEach((g, i) => { rankRand[g] = i + 1; });
+  const rows = []; for (let g = 0; g < 169; g++) rows.push({ g, rnd: rankRand[g], real: PRE_RANK[g], d: PRE_RANK[g] - rankRand[g], eq1: handInfo(g).eq1 });
+  const traps = rows.filter((x) => x.eq1 >= 0.5).sort((a, b) => b.d - a.d).slice(0, 12);
+  const gems = rows.filter((x) => x.d < 0).sort((a, b) => a.d - b.d).slice(0, 12);
+  TRAP_CACHE = { traps, gems, rankRand };
+  return TRAP_CACHE;
+}
+/* 對隨機牌 vs 對「會跟你打的牌」的勝率（離線用 rangeVsRange 各 2 萬次算好；對前 x% 用開牌排名） */
+const TRAP_EQ = [['K6s', 57, 48, 43, 40, 34], ['K6o', 54, 45, 39, 36, 30], ['Q7o', 52, 41, 35, 34, 27], ['A8o', 60, 55, 49, 45, 36], ['KTo', 60, 53, 47, 42, 34], ['A5s', 60, 53, 49, 46, 39],
+  ['22', 50, 47, 44, 42, 39], ['76s', 45, 40, 39, 37, 33], ['54s', 41, 39, 37, 36, 34], ['JTs', 58, 49, 43, 41, 35], ['AJo', 64, 60, 57, 53, 43], ['AKo', 65, 65, 63, 61, 57]];
+
+/* ===== 翻牌中頂對之後：對手範圍裡每一類牌的比例、你對那一類的勝率（精確列舉） ===== */
+const TP_CLASSES = ['兩對以上', '頂對・踢腳比你大', '頂對・踢腳跟你一樣', '頂對・踢腳比你小', '口袋對子（比頂對小）', '中對、弱對', '什麼都沒中'];
+function topPairBreak(hero, board, rangeKey, which) {
+  const R0 = chartRanges(rangeKey || '6/vsOpen/BB/BTN'), R = R0[which || 'call'];
+  const dead = new Set(hero.concat(board)), top = Math.max(...board.map((c) => c >> 2));
+  const myKick = hero.map((c) => c >> 2).filter((r) => r !== top)[0];
+  const wt = {}, w = {};
+  for (let k = 0; k < NCOMBO; k++) {
+    if (!(R[k] > 0)) continue;
+    const a = COMBO_A[k], b = COMBO_B[k];
+    if (dead.has(a) || dead.has(b)) continue;
+    const c = handCategory(a, b, board), ra = a >> 2, rb = b >> 2;
+    let name;
+    if (c <= 5) name = TP_CLASSES[0];
+    else if (c === 7) { const kick = ra === top ? rb : ra; name = kick > myKick ? TP_CLASSES[1] : kick === myKick ? TP_CLASSES[2] : TP_CLASSES[3]; }
+    else if (ra === rb) name = TP_CLASSES[4];
+    else if (c === 8 || c === 9) name = TP_CLASSES[5];
+    else name = TP_CLASSES[6];
+    (wt[name] = wt[name] || new Float32Array(NCOMBO))[k] = R[k]; w[name] = (w[name] || 0) + R[k];
+  }
+  let tot = 0; for (const n in w) tot += w[n];
+  const all = new Float32Array(NCOMBO); for (let k = 0; k < NCOMBO; k++) if (!dead.has(COMBO_A[k]) && !dead.has(COMBO_B[k])) all[k] = R[k];
+  const rows = [], strongN = TP_CLASSES.slice(0, 4);
+  let sw = 0, se = 0;
+  for (const n of TP_CLASSES) {
+    if (!w[n]) continue;
+    const eq = exactHU(hero, board, wt[n]).eq, share = w[n] / tot;
+    rows.push({ name: n, share, eq });
+    if (strongN.indexOf(n) >= 0) { sw += share; se += share * eq; }
+  }
+  return { rows, all: exactHU(hero, board, all).eq, strongShare: sw, strongEq: sw ? se / sw : 0 };
+}
+
+/* ===== 題目 ===== */
+QGEN.shapeOf = (rng) => {
+  const g = (rng() * 169) | 0, sh = handShape(g);
+  return { gen: 'shapeOf', prompt: '照「四種樣子」，「' + NAMEZH(g) + '」是哪一種？', vis: { k: 'cls', g },
+    opts: SHAPE_ORDER.map((k) => ({ t: SHAPE_ZH[k], ok: k === sh.k })), explain: NAMEZH(g) + '：' + shapeLine(g), key: 'shp|' + g };
+};
+/* 兩手牌：對隨機牌的勝率高的那一手，實戰反而弱（陷阱 vs 遺珠或小對子） */
+QGEN.trapPair = (rng) => {
+  const TG = trapGems();
+  for (let i = 0; i < 100; i++) {
+    const t = pickOne(TG.traps, rng).g, m = rng() < 0.75 ? pickOne(TG.gems, rng).g : classByName(pickOne(['22', '33', '44', '55'], rng));
+    if (!(handInfo(t).eq1 > handInfo(m).eq1 + 0.02 && PRE_RANK[m] < PRE_RANK[t] - 10)) continue;
+    const flip = rng() < 0.5, a = flip ? m : t, b = flip ? t : m;
+    const e = (g) => Math.round(handInfo(g).eq1 * 100) + '%';
+    return { gen: 'trapPair', prompt: '對隨機牌的勝率：A ' + e(a) + '、B ' + e(b) + '。實戰上（6 人桌開牌圖表）哪一手比較強？', vis: { k: 'cls2', a, b },
+      opts: shuffleArr([{ t: NAMEZH(a), ok: a === m }, { t: NAMEZH(b), ok: b === m }], rng),
+      explain: NAMEZH(m) + ' 實戰排第 ' + PRE_RANK[m] + ' 名，' + NAMEZH(t) + ' 排第 ' + PRE_RANK[t] + ' 名——對隨機牌的勝率反過來。' + NAMEZH(t) + ' 是' + shapeLine(t) + ' ' + NAMEZH(m) + ' 是' + shapeLine(m) + ' 對手不會拿隨機牌跟你打：會跟你打到底的都是好牌，所以「對隨機牌的勝率」不算數。', key: 'tp|' + t + '|' + m };
+  }
+  return QGEN.shapeOf(rng);
+};
+/* 翻牌中頂對：對「會跟你打到底的牌」你剩多少勝率 */
+QGEN.showdownTrap = (rng) => {
+  let topR, kick, suited;
+  for (let i = 0; i < 50; i++) {                                           // 只出按鈕圖表真的會開的牌（題目說你在按鈕開牌）
+    topR = pickOne([R_A, RANKS.indexOf('K'), RANKS.indexOf('K'), RANKS.indexOf('Q')], rng);
+    kick = pickOne([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].filter((r) => r < topR), rng); suited = rng() < 0.5;
+    if (chartFreq('6/rfi/BTN', classIndex(topR, kick, suited)) >= 0.5) break;
+  }
+  const sTop = (rng() * 4) | 0, sK = suited ? sTop : (sTop + 1 + ((rng() * 3) | 0)) % 4;
+  const hero = [topR * 4 + sTop, kick * 4 + sK];
+  let board = null;
+  for (let i = 0; i < 100 && !board; i++) {
+    const lo = dealN(rng, 2, hero).map((c) => c), rs = lo.map((c) => c >> 2);
+    if (rs[0] === rs[1] || rs.some((r) => r >= topR || r === kick) || rs.some((r) => r > RANKS.indexOf('9'))) continue;
+    const sB = (sTop + 2) % 4, b0 = topR * 4 + sB;
+    if (b0 === hero[0]) continue;
+    const ss = [sB, lo[0] & 3, lo[1] & 3]; if (new Set(ss).size < 3) continue;   // 三種花色
+    if (lo.some((c) => c === hero[0] || c === hero[1])) continue;
+    board = [b0, lo[0], lo[1]];
+  }
+  if (!board) return QGEN.shapeOf(rng);
+  const g = classIndex(topR, kick, suited), B = topPairBreak(hero, board);
+  const ans = Math.max(5, Math.round(B.strongEq * 100 / 5) * 5), all = Math.round(B.all * 100);
+  const rowsTxt = B.rows.filter((r) => r.share >= 0.005).map((r) => r.name + ' ' + Math.round(r.share * 100) + '%（你 ' + Math.round(r.eq * 100) + '%）').join('；');
+  return { gen: 'showdownTrap', prompt: '你在按鈕開牌、大盲跟注。翻牌你中了頂對：對他整個範圍你有 ' + all + '%。但會跟你打到底的是他「頂對以上」的牌（約佔 ' + Math.round(B.strongShare * 100) + '%）——只看這些牌，你的勝率大約？', vis: { k: 'hand', hole: sortedCards(hero), board },
+    opts: pctOpts(ans, [ans + 20, ans - 20, ans + 35, ans - 35, all, 50].map((x) => Math.round(x / 5) * 5), rng),
+    explain: '照大盲跟注的範圍一手一手算：' + rowsTxt + '。只看頂對以上：' + Math.round(B.strongEq * 100) + '%。' + (B.strongEq < 0.4 ? '這就是「贏小輸大」：對手沒中會棄牌（你贏小底池），中了比你大才跟到底（你輸大底池）。踢腳 ' + RANK_TXT[kick] + ' 太小，頂對常常是第二好的頂對。' : '踢腳 ' + RANK_TXT[kick] + ' 夠大：被跟到底時多半還是你贏，可以放心下注收錢。') + ' 這手牌是' + shapeLine(g), key: 'sdt|' + hero.join(',') + '|' + board.join(',') };
+};
+addStatic('s2t', [
+  { prompt: 'K6s 對隨機牌的勝率 57%、76s 只有 45%，為什麼圖表 76s 槍口就開、K6s 要到關煞位才開？', opts: ['對手不會拿隨機牌跟你打：對會打的牌，K6s 只剩三四成，而且中頂對常被踢腳壓制', '圖表算錯了', '因為 76s 比較難被看出來', '因為 K6s 容易被 3-bet'], ans: 0,
+    explain: '勝率要看「會跟你打的牌」：對前 20% 的牌，K6s 40%、76s 37%，差不多；但 K6s 中頂對會被更大的 K 壓制、沒有順子的路，76s 中了是順子同花、沒中就棄——輸小贏大。' },
+  { prompt: '「贏小輸大」是什麼意思？', opts: ['你中頂對時，對手沒中會棄牌（你只贏小底池），對手比你大才跟到底（你輸大底池）', '小注贏、大注輸', '贏的次數少、輸的次數多', '籌碼少的人會輸'], ans: 0,
+    explain: '踢腳小的頂對最典型：你贏的時候對手手上沒東西、很快棄牌；你輸的時候對手是更大的頂對或兩對，跟你打到底。平均起來是虧的——這叫反向隱含賠率。' },
+  { prompt: '你拿 K♠6♠，翻牌 K♥8♦3♣。對手（大盲跟注的範圍）也有一張 K 的時候，他的踢腳比你大的機率大約？', opts: ['八成以上', '一半', '兩成', '幾乎不會'], ans: 0,
+    explain: '會跟注開牌的範圍裡，K 配的都是比較大的牌（KQ、KJ、KT、K9……）；配 5 以下的只有同花的少數幾手。所以「都中頂對」的時候你幾乎都是輸的那個。' },
+  { prompt: '哪一手牌是「大配小」的陷阱牌？', opts: ['Q8o', 'QJo', '88', '87s'], ans: 0,
+    explain: 'Q8o：一張大牌配一張小牌，不同花、不連。QJo 兩張都大，88 是對子，87s 是同花連張——這三種都有兩條路，Q8o 一條都沒有。' },
+  { prompt: '同樣是「大配小」，K6s 按鈕可以開、K6o 按鈕不開，差在哪裡？', opts: ['同花多了一條同花的路（翻牌同花聽牌約 11%），偷盲被跟還有機會', '同花的勝率高很多', '同花比較不會被 3-bet', '規則規定同花比較大'], ans: 0,
+    explain: '同花只比不同花多約 3% 的勝率，差別不在勝率，在「路」：K6s 有同花這條路，被跟了還有辦法贏大的；K6o 被跟就只剩踢腳小的頂對。' },
+  { prompt: '跟遊戲裡「新手」「普通」等級的電腦打，亂開大配小的牌常常也會贏。這代表？', opts: ['對手太弱、會付錢，不代表這些牌好；對會打的人就會被懲罰', '圖表是錯的', '大配小其實是好牌', '應該永遠亂開'], ans: 0,
+    explain: '弱的對手用更差的牌跟你打到底、很少加注，陷阱牌就能贏。圖表是對會打的對手算出來的；練習時照圖表，對弱的對手再有意識地放寬。' },
+]);
+
+/* ===== 課：第 2 階最後一課 ===== */
+COURSE[1].lessons.push(lessonFinish({ id: '2-8', title: '陷阱牌：看起來好的垃圾、看起來弱的遺珠', sum: '為什麼 K6s 是垃圾、76s 能玩：對手不是隨機、壓制、贏小輸大；四種樣子口訣。', read: [
+  '上一課背了每個位置開哪些牌，這一課講<b>為什麼</b>。最常見的疑問：K6s 對隨機牌的勝率 <b>57%</b>，比 76s 的 <b>45%</b> 高很多，為什麼圖表裡 76s 槍口就開、K6s 要到關煞位（倒數第二個位置）才開？因為「對隨機牌的勝率」看的是錯的東西。',
+  '<b>原理一：對手不是隨機牌。</b>會跟你打的人手上都是好牌（差的早就棄了），所以要看的是「對會打的牌」的勝率：',
+  { k: 'trapEq' },
+  '對會打的牌，K6s 只剩三四成，跟 76s 差不多；但接下來兩個原理會讓 K6s 更慘。',
+  '<b>原理二：壓制——贏小輸大。</b>你拿 K6s 翻牌中了頂對 K，看起來很好；但對手範圍裡的 K 幾乎都配比 6 大的牌。下面是你在按鈕開牌、大盲跟注，翻牌 [Kh8d3c]，照大盲跟注的範圍一手一手精確算的：',
+  { k: 'topPairBreak' },
+  { k: 'tip', html: '對<b>整個範圍</b>兩手牌差不多（79% 對 84%）；但對手<b>沒中的牌會棄牌</b>，只有頂對以上才會跟你打到底——只看那些牌，K6s 剩 <b>20%</b>、KJs 有 <b>53%</b>。贏的時候贏小底池，輸的時候輸大底池，這就是<b>反向隱含賠率</b>。' },
+  '<b>原理三：只有一條路。</b>好的起手牌要有兩條贏大錢的路：① 中頂對、踢腳也大；② 中大牌（三條、順子、同花）。K-6 差 7 點，<b>一個順子都湊不出來</b>；同花要翻牌中同花聽牌（約 11%）再補到（約 35%）；頂對的路又被壓制。76s 相反：頂對的路不好，但順子、同花兩條路都寬，沒中就棄、輸得少。',
+  { k: 'tip', html: '<b>口訣：大配小，最會騙。</b>能玩的牌只有四種樣子：<b>兩張都大</b>（都 10 以上）、<b>對子</b>、<b>同花連張</b>（差 3 以內）、<b>同花 A</b>。一張大牌配一張小牌（K6、Q7、A8o、J8）看起來有頭有臉，其實是垃圾：不同花的幾乎永遠棄（只有 A 配中張、9 配大牌在後位），同花的 K-x、Q-x 要到後面兩個位置偷盲才開。下表是四種樣子照圖表的實際數字：' },
+  { k: 'shapes' },
+  '<b>牌桌上的三秒檢查</b>：兩張都 10 以上？→ 可以（越前面要越大）。對子？→ 可以。同花又差 3 以內、或同花帶 A？→ 中後位可以。都不是？→ <b>棄</b>，除非在關煞位、按鈕偷盲（同花的 K-x、Q-x 才考慮）。',
+  '<b>陷阱榜、遺珠榜</b>（對隨機牌的勝率排名和實戰排名差最多的牌，點開可以看詳細）：',
+  { k: 'trapGems' },
+  '<b>一個誠實的提醒</b>：跟遊戲裡「新手」「普通」等級的電腦打，亂開大配小的牌常常也會贏——因為它們會用更差的牌付錢。圖表是對會打的對手算的；練習時照圖表養習慣，遇到很弱的對手再有意識地放寬。',
+], practice: { gens: ['shapeOf', 'trapPair', 'showdownTrap', 's2t'], n: 8 }, quiz: { gens: ['shapeOf', 'trapPair', 'showdownTrap', 's2t', 'trapPair'], n: 8, pass: 7 } }, 2));
+
+STAGE_GENS[2].push('shapeOf', 'trapPair');
+DRILLS.push({ id: 'trap', name: '陷阱牌：看樣子', gens: ['shapeOf', 'trapPair'], sec: 3 });
 
 </script>
 <script type="text/plain" id="workersrc">
@@ -9413,6 +9602,22 @@ function blockHTML(b) {
   if (b.k === 'gtoTable') return '<table class="stt lnt"><tr><th>對手下注</th><th class="r">跟注要的勝率<br><small>＝他的下注裡詐唬可以佔</small></th><th class="r">你最少要繼續</th></tr>' + BET_FR.map(([a, c, t]) => { const f = a / c; return '<tr><td>' + t + '</td><td class="r num"><b>' + Math.round(f / (1 + 2 * f) * 100) + '%</b></td><td class="r num">' + Math.round(100 / (1 + f)) + '%</td></tr>'; }).join('') + '</table>';
   if (b.k === 'polarTable') return '<div class="tscroll"><table class="stt lnt lnpolar"><tr><th>勝率</th>' + GTO_RIVER.map((S) => '<th class="r cs">' + S.board.slice(0, 3).map((c) => cardSpan(c)).join('') + '<br>' + S.board.slice(3).map((c) => cardSpan(c)).join('') + '</th>').join('') + '</tr>' + [9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((i) => '<tr><td>' + i * 10 + '–' + (i + 1) * 10 + '%</td>' + GTO_RIVER.map((S) => { const x = S.bk[i]; return x < 0 ? '<td class="r note">—</td>' : '<td class="r num" style="background:rgba(201,70,46,' + (x / 100 * 0.75).toFixed(2) + ')">' + x + '%</td>'; }).join('') + '</tr>').join('') + '<tr><td><b>整體</b></td>' + GTO_RIVER.map((S) => '<td class="r num"><b>' + S.ip + '%</b></td>').join('') + '</tr></table></div><p class="note">每一格＝那一組牌平均下注多少（紅色越深下注越多）。最上面（最強）和最下面（最弱）都下注，中間幾乎都過牌。</p>';
   if (b.k === 'studio') return '<div class="lngo2"><button class="btn" data-ln="studio">打開 GTO 工作室：河牌範例 ▶</button></div>';
+  if (b.k === 'trapEq') return '<div class="tscroll"><table class="stt lnt lntrap"><tr><th>手牌</th><th class="r">對隨機牌</th><th class="r">對前 50%</th><th class="r">對前 30%</th><th class="r">對前 20%</th><th class="r">對前 10%</th><th class="r">實戰排名</th></tr>' + TRAP_EQ.map(([n, a, b2, c, d, e]) => { const g = classByName(n), sh = handShape(g); return '<tr class="' + (sh.trap ? 'tr' : sh.gem ? 'gm' : '') + '"><td><button type="button" class="lnh t' + HAND_TIER[g] + '" data-ln="hand" data-g="' + g + '">' + NAMEZH(g) + '</button><small>' + sh.zh + '</small></td><td class="r num">' + a + '%</td><td class="r num">' + b2 + '%</td><td class="r num">' + c + '%</td><td class="r num"><b>' + d + '%</b></td><td class="r num">' + e + '%</td><td class="r num">第 ' + PRE_RANK[g] + '</td></tr>'; }).join('') + '</table></div><p class="note">「對前 x%」＝對手只拿開牌排名前 x% 的牌跟你打到底時你的勝率。大配小的牌對隨機牌很好看，對會打的牌掉得最快；同花連張、小對子反而幾乎不掉。</p>';
+  if (b.k === 'topPairBreak') {
+    const board = parseCards('Kh8d3c'), hs = ['Ks6s', 'KsJs'];
+    const Bs = hs.map((h) => topPairBreak(parseCards(h), board));
+    let h = '<table class="stt lnt lntpb"><tr><th>大盲跟注的範圍裡</th>' + hs.map((x, i) => '<th class="r">你拿 ' + parseCards(x).map((c) => cardSpan(c)).join('') + '<br><small>佔他／你的勝率</small></th>').join('') + '</tr>';
+    for (const name of TP_CLASSES) {
+      const cells = Bs.map((B) => { const r = B.rows.find((x) => x.name === name); return r && r.share >= 0.005 ? '<td class="r num">' + Math.round(r.share * 100) + '%／<b>' + Math.round(r.eq * 100) + '%</b></td>' : '<td class="r note">—</td>'; });
+      if (cells.every((c) => c.indexOf('—') >= 0)) continue;
+      h += '<tr><td>' + name + '</td>' + cells.join('') + '</tr>';
+    }
+    h += '<tr class="lnsum"><td>對整個範圍</td>' + Bs.map((B) => '<td class="r num">' + Math.round(B.all * 100) + '%</td>').join('') + '</tr>';
+    h += '<tr class="lnsum"><td><b>只看頂對以上</b><small>會跟你打到底的牌</small></td>' + Bs.map((B) => '<td class="r num"><b>' + Math.round(B.strongEq * 100) + '%</b></td>').join('') + '</tr></table>';
+    return h;
+  }
+  if (b.k === 'shapes') return '<table class="stt lnt lnshape"><tr><th>樣子</th><th class="r">幾種牌<br><small>（佔全部組合）</small></th><th class="r">槍口開</th><th class="r">關煞位開</th><th class="r">按鈕開</th></tr>' + shapeTable().map((r) => '<tr class="' + (r.k === 'bigsmall' ? 'tr' : r.k === 'junk' ? 'dim' : '') + '"><td><b>' + r.zh + '</b><small>' + ({ bigbig: '都 10 以上', pair: '', sconn: '同花、差 3 以內', aces: 'A2s–A9s', bigsmall: '一張 10 以上配一張小的', junk: '兩張都小又不連' })[r.k] + '</small></td><td class="r num">' + r.n + '<small>（' + Math.round(r.combos / NCOMBO * 100) + '%）</small></td><td class="r num">' + r.utg + '</td><td class="r num">' + r.co + '</td><td class="r num">' + r.btn + '</td></tr>').join('') + '</table><p class="note">「開」＝6 人桌圖表在那個位置會開的種數。大配小是最大的一群（全部組合的四成以上），槍口只開 K9s 一種；關煞位開的 16 種是同花的 K-x、Q-x（偷盲用）、A 配中張（A9o–A5o）和 9 配大牌（K9o–T9o）；不同花的 K8o 以下連按鈕都不開。</p>';
+  if (b.k === 'trapGems') { const TG = trapGems(); const row = (list, cls) => '<div class="lnchips">' + list.map((x) => '<button type="button" class="lnh ' + cls + '" data-ln="hand" data-g="' + x.g + '">' + NAMEZH(x.g) + '<small>隨機 ' + Math.round(x.eq1 * 100) + '%・第 ' + x.real + ' 名</small></button>').join('') + '</div>'; return '<h4 class="lnh4">⚠ 陷阱榜：對隨機牌 50% 以上，實戰排名卻差很多</h4>' + row(TG.traps, 't5 trap') + '<h4 class="lnh4">💎 遺珠榜：對隨機牌看起來弱，實戰排名好很多</h4>' + row(TG.gems, 't4') + '<p class="note">「隨機」＝對一手隨機牌的勝率；「第 n 名」＝實戰排名（照開牌圖表）。陷阱榜清一色是大配小的不同花，遺珠榜清一色是同花連張。</p>'; }
   if (b.k === 'openDiff') return '<ol class="lndiff">' + openDiffs(b.t).map((d) => '<li><b>' + esc(POS_ZH[d.pos]) + '</b><span class="note">（開 ' + Math.round(d.pct * 100) + '%）</span>' + (d.pos === 'UTG' ? '：' : '：多開 ') + d.add.map((g) => '<button type="button" class="lnh t' + HAND_TIER[g] + '" data-ln="hand" data-g="' + g + '">' + NAMEZH(g) + '</button>').join('') + '</li>').join('') + '</ol>';
   return '';
 }
@@ -9484,6 +9689,8 @@ function handDetailHTML(g) {
   const row = (lbl, x) => (x ? '<tr><td>' + lbl + '</td><td class="r num">' + (x.r > 0.004 ? '<span class="rz">3-bet ' + Math.round(x.r * 100) + '%</span> ' : '') + (x.c > 0.004 ? '<span class="cz">跟 ' + Math.round(x.c * 100) + '%</span> ' : '') + (x.f > 0.004 ? '<span class="fz">棄 ' + Math.round(x.f * 100) + '%</span>' : '') + '</td></tr>' : '');
   h += '<h4 class="lnh4">面對加注（6 人桌）</h4><table class="stt">' + i.def.map((d) => row(DEFENDER_ZH[d.d].replace('（非盲注）', '') + '面對' + openerZh('6', d.o) + '開牌', d.x)).join('') + '</table>';
   h += '<h4 class="lnh4">你開牌後被 3-bet（6 人桌）</h4><table class="stt">' + i.v3.map((d) => row('從' + openerZh('6', d.o) + '開牌', d.x && { r: d.x.r, c: d.x.c, f: d.x.f })).join('').replace(/3-bet/g, '4-bet') + '</table>';
+  const sh = handShape(g), TG = trapGems(), ti = TG.traps.findIndex((x) => x.g === g), gi = TG.gems.findIndex((x) => x.g === g);
+  h += '<h4 class="lnh4">樣子：' + esc(sh.zh) + (ti >= 0 ? ' <span class="lnbadge trap">⚠ 陷阱榜第 ' + (ti + 1) + '</span>' : gi >= 0 ? ' <span class="lnbadge gem">💎 遺珠榜第 ' + (gi + 1) + '</span>' : sh.trap ? ' <span class="lnbadge trap">⚠ 大配小</span>' : '') + '</h4><p>' + esc(shapeLine(g)) + (sh.trap || ti >= 0 || gi >= 0 ? '<span class="note">　對隨機牌 ' + pct(i.eq1, 0) + '%、對前 20% 的牌 ' + pct(i.eqTop22, 0) + '%（第 2-8 課）。</span>' : '') + '</p>';
   h += '<h4 class="lnh4">怎麼打</h4>' + (i.note ? '<p>' + esc(i.note) + '</p>' : '') + '<p class="note">' + esc(TIER_NAME[i.tier]) + '：' + esc(i.tierNote) + '</p>';
   h += '<div class="lngo2 hdnav">' + (prev >= 0 ? '<button class="btn" data-ln="hand" data-g="' + prev + '">◀ 第 ' + (i.rank - 1) + ' 名 ' + NAMEZH(prev) + '</button>' : '') + (next >= 0 ? '<button class="btn" data-ln="hand" data-g="' + next + '">第 ' + (i.rank + 1) + ' 名 ' + NAMEZH(next) + ' ▶</button>' : '') + '</div>';
   return h;
