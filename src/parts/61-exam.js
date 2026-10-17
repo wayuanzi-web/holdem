@@ -76,8 +76,8 @@ function examSummaryHTML() {
 function examOverCtrl(net, marks) {
   const E = G.exam;
   const res = '<b>' + (net > 0 ? '你贏了 ' + net : net < 0 ? '你輸了 ' + (-net) : '沒輸沒贏') + '</b>' + (marks ? '　這手：' + marks : '');
-  if (!E.done) return { m: res + '　<span class="why">考核：已評 ' + E.grades.length + '／' + E.need + '</span>', b: '<button class="btn main" data-c="nexthand" id="bNext">下一手 ▶</button><button class="btn" data-c="replay">重看這一手</button>' };
+  if (!E.done) return { m: res + '　<span class="why">考核：已評 ' + E.grades.length + '／' + E.need + '</span>', b: '<button class="btn main" data-c="nexthand" id="bNext">下一手 ▶</button>' + (G.review.length ? '<button class="btn" data-c="review">逐步檢討</button>' : '') + '<button class="btn" data-c="replay">重看這一手</button>' };
   const grad = E.final && LP && LP.grad;
   return { m: '<b>' + (grad ? '🎓 畢業了！' : E.pass ? '🎉 ' + (E.final ? '實戰通過！' : '考核過關！') : '考核結束：還差一點') + '</b>　平均 ' + Math.round(E.score * 100) + '%（要 ' + Math.round(E.passAt * 100) + '%）<button type="button" class="linkbtn" data-c="why">看結果</button>',
-    b: '<button class="btn main" data-c="' + (grad ? 'cert' : 'learn') + '" id="bNext">' + (grad ? '看結業證書 ▶' : '回大師之路 ▶') + '</button><button class="btn" data-c="exam">再考一次</button><button class="btn" data-c="replay">重看這一手</button>' };
+    b: '<button class="btn main" data-c="' + (grad ? 'cert' : 'learn') + '" id="bNext">' + (grad ? '看結業證書 ▶' : '回大師之路 ▶') + '</button><button class="btn" data-c="exam">再考一次</button>' + (G.review.length ? '<button class="btn" data-c="review">逐步檢討</button>' : '') + '<button class="btn" data-c="replay">重看這一手</button>' };
 }

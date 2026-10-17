@@ -450,6 +450,19 @@ body.intable .brand p { display: none; }
 .lnchips { display: flex; flex-wrap: wrap; gap: 6px; }
 .lnh { border: 1px solid var(--line); background: var(--felt2); color: var(--text); border-radius: 8px; padding: 4px 8px; font-size: 13.5px; cursor: pointer; }
 .lnh small { color: var(--mute); margin-left: 4px; font-size: 11px; }
+.revsum { margin: 0 0 10px; }
+.revd { border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 10px 0; }
+.revd.good { border-left-color: #3f9d6a; } .revd.ok { border-left-color: #d0a84e; } .revd.bad { border-left-color: #c9462e; }
+.revh { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .revh .mk { font-weight: 800; font-size: 18px; }
+.revd.good .mk { color: #6fd08f; } .revd.ok .mk { color: var(--brass); } .revd.bad .mk { color: #f08a7a; }
+.revrow, .revact { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin: 6px 0; } .revrow .lbl, .revact .lbl { color: var(--mute); font-size: 13px; margin-right: 4px; }
+.revact span:last-child { margin-left: 6px; font-size: 14px; }
+.revd .ok { color: #8fe0ad; } .revd .no { color: #f0a08f; }
+.revg { background: rgba(255,255,255,.04); border-radius: 8px; padding: 8px 10px; margin: 8px 0; font-size: 14px; }
+.revo { margin: 8px 0; padding-top: 6px; border-top: 1px dashed var(--line); } .revo:first-of-type { border-top: 0; padding-top: 0; }
+.revverdict { margin-top: 4px; padding: 6px 8px; border-radius: 6px; font-size: 13.5px; } .revverdict.hit { background: rgba(63,157,106,.15); } .revverdict.edge { background: rgba(208,168,78,.15); } .revverdict.miss { background: rgba(201,70,46,.15); }
+.revwhy { margin: 6px 0; font-size: 14px; } .revwhy summary { cursor: pointer; color: var(--brass); } .revwhy ol { margin: 6px 0 0 18px; padding: 0; }
+.revls { font-size: 14px; margin: 6px 0 0; }
 .lens .panel { margin-bottom: 12px; }
 .lsl { display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--mute); margin-bottom: 10px; }
 .lsl select, .lsacts select { font: inherit; font-size: 15px; color: var(--text); background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; max-width: 100%; }
@@ -894,6 +907,9 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 
 <div id="lnModal" class="modal" hidden role="dialog" aria-modal="true" aria-label="起手牌">
   <div class="mbox rbox lnmbox"><div id="lnModalBody"></div><div class="strow rmbtns"><button class="btn main" id="lnModalClose">關閉</button></div></div>
+</div>
+<div id="revModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="revTitle">
+  <div class="mbox rbox lnmbox"><h2 id="revTitle">逐步檢討</h2><div id="revBody"></div><div class="strow rmbtns"><button class="btn main" id="revClose">關閉</button></div></div>
 </div>
 <div id="statsModal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="statsTitle">
   <div class="mbox rbox"><h2 id="statsTitle">你的統計</h2><div id="statsBody"></div>

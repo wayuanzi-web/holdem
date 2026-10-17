@@ -387,6 +387,7 @@ function summaryHTML(S) {
       h += '<li class="' + x.grade.mark + '"><span class="mk">' + mk + '</span><div><b>' + STREET_NAME[x.street] + '　' + esc(x.label) + '</b>' + (x.grade.src === 'GTO' ? ' <span class="srcg">GTO 評分</span>' : '') + '<br>' + esc(x.grade.text) + (x.grade.mark !== 'good' ? '（' + (x.grade.src === 'GTO' ? 'GTO 最常' : '建議') + '：' + esc(x.adv) + '）' : '') + '</div></li>';
     }
     h += '</ul>';
+    h += '<div class="strow"><button type="button" class="btn sm main" data-c="review">📝 逐步檢討：當時猜的範圍、他實際的牌、每一步對不對</button></div>';
   } else h += '<p class="note">這一手你不用做決定。</p>';
   if (G.exam) h += examSummaryHTML();
   h += studioOfferHTML();
@@ -442,7 +443,7 @@ function renderCtrl(st) {
     const marks = G.review.map((x) => MK[x.grade.mark]).join('');
     m = '<b>' + (net > 0 ? '你贏了 ' + net + '！' : net < 0 ? '你輸了 ' + (-net) : '沒輸沒贏') + '</b>' + (marks ? '　你的決定：' + marks : '') + '<button type="button" class="linkbtn" data-c="why">檢討</button>'
       + (GS.train ? '<div class="why">' + esc(trainStatsText()) + '</div>' : '');
-    b = '<button class="btn main" data-c="nexthand" id="bNext">再來一手 ▶</button><button class="btn" data-c="replay">重看這一手</button>' + (studioBest() ? '<button class="btn" data-c="gto">GTO 分析</button>' : '');
+    b = '<button class="btn main" data-c="nexthand" id="bNext">再來一手 ▶</button>' + (G.review.length ? '<button class="btn" data-c="review">逐步檢討</button>' : '') + '<button class="btn" data-c="replay">重看這一手</button>' + (studioBest() ? '<button class="btn" data-c="gto">GTO 分析</button>' : '');
     if (G.tEnd) {
       const E = G.tEnd;
       m = '<b>' + (E.place === 1 ? '🏆 你拿到第 1 名！' : '你在第 ' + E.place + ' 名出局') + '</b>（' + E.n + ' 人）' + (E.prize ? '　獎金 ' + E.prize + ' 點（每人報名 100 點）' : '　沒有進獎金圈（前 ' + G.T.tourney.pay.length + ' 名）') + (marks ? '　這手：' + marks : '') + '<button type="button" class="linkbtn" data-c="why">檢討</button>';
@@ -510,6 +511,7 @@ function ctrlCmd(c) {
   else if (c === 'exam' && G.exam) newGame('exam', G.exam.id);
   else if (c === 'learn' && G.exam) { const l = lessonById(G.exam.id); openLearn('lesson', l); }
   else if (c === 'cert') openLearn('cert');
+  else if (c === 'review') { if (G.over) openReview(); }
   else if (c === 'home') showView('home');
   else if (c === 'replay') { G.replay = true; G.view = 0; G.lastRender = null; clearTimeout(G.timer); renderCur(); }
   else if (c === 'endreplay') { G.replay = false; G.view = G.steps.length - 1; G.lastRender = null; renderCur(); }
@@ -643,7 +645,7 @@ function initGame() {
   $('ranksModal').addEventListener('click', (e) => { if (e.target === $('ranksModal')) $('ranksModal').hidden = true; });
   // 鍵盤：→／空白＝下一步或再來一手；←＝上一步；輪到你時 F 棄牌、C 過牌／跟注、B 下注／加注、A 全下
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { $('ranksModal').hidden = true; $('rangeModal').hidden = true; closeStats(); }
+    if (e.key === 'Escape') { $('ranksModal').hidden = true; $('rangeModal').hidden = true; $('revModal').hidden = true; closeStats(); }
     if (document.querySelector('.modal:not([hidden])')) return;     // 有視窗開著：按鍵不動背後的牌局
     if ($('vTable').hidden || e.target.closest('input,textarea,select') || e.ctrlKey || e.metaKey || e.altKey) return;
     const k = e.key.toLowerCase();

@@ -22,6 +22,6 @@ initLens();
 initBench();
 try { const t = localStorage.getItem('dz-tab'); if (t && $(t)) showTab(t); } catch (e) { /* 忽略 */ }
 initGame();
-initStats(); initLearn();
+initStats(); initLearn(); initReview();
 gtoInit();
 studioFromHash();
