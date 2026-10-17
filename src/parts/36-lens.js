@@ -1,15 +1,103 @@
 /* ===== 36-lens：工具「範圍透視」——對手的範圍（廢牌拿掉之後剩什麼）、你的牌對它的勝率、公牌和動作怎麼把它縮小 ===== */
-const LS = { spot: '6/rfi/UTG#raise', custom: null, slots: [-1, -1, -1, -1, -1, -1, -1], active: 0, acts: { 1: '', 2: '', 3: '' }, style: 'tag', ret: null };
+const LS = { spot: '6/rfi/UTG#raise', custom: null, slots: [-1, -1, -1, -1, -1, -1, -1], active: 0, acts: { 1: '', 2: '', 3: '' }, style: 'tag', ret: null, narrow: 'coach', gto: null, gtoKey: 0, req: 0, cbs: new Map() };
+/* 範圍透視自己的 GTO 背景執行緒（跟牌局的分開，不會互相搶） */
+let LW_ = null;
+function LW() {
+  if (LW_) return LW_;
+  const src = $('engine').textContent + '\n' + $('workersrc').textContent;
+  const w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  w.onmessage = (e) => {
+    const m = e.data;
+    if (m.cmd === 'g-progress') lensProgress(m);
+    else if (m.cmd === 'g-ans') { const f = LS.cbs.get(m.req); if (f) { LS.cbs.delete(m.req); f(m); } }
+  };
+  w.onerror = (e) => { console.error(e); if (LS.gto) { LS.gto.error = '背景執行緒出錯'; renderLens(); } };
+  LW_ = { send(m) { w.postMessage(m); } };
+  return LW_;
+}
+function lensAsk(msg, cb) { const req = ++LS.req; LS.cbs.set(req, cb); LW().send(Object.assign({ cmd: 'g-query', req }, msg)); }
+/* 現在要不要（能不能）用 GTO 縮小；回傳說明文字（不能的原因）或 null（可以） */
+function lensGtoWhy() {
+  const b = lsBoard();
+  if (LS.custom) return LS.custom.gto ? null : '牌局帶入的範圍沒有正在算的 GTO 解（只有單挑的轉牌、河牌才有）。';
+  if (b.length < 3) return '放上公牌才有東西可以縮小。';
+  if (b.length < 4) return '翻牌的求解太大（記憶體要上 GB、要算幾分鐘），跟牌局一樣只在轉牌、河牌用 GTO：請放上第 4 張牌。翻牌的動作先用教練的估計縮小，再從轉牌開始算。';
+  if (!lensPair(LS.spot)) return '這個局面配不出對手的另一邊（9 人桌、被 4-bet 沒有對應的圖表），先用教練的估計。';
+  return null;
+}
+/* 需要的話開始（或接著）求解；回傳目前的狀態 */
+function lensGtoEnsure() {
+  if (LS.narrow !== 'gto' || lensGtoWhy()) return null;
+  if (LS.custom) return LS.gto && LS.gto.sig === 'game' ? LS.gto : lensGtoFromGame();
+  const b = lsBoard(), sig = [LS.spot, b.join(','), LS.acts[1], LS.acts[2], LS.acts[3], LS.style].join('|');
+  if (LS.gto && LS.gto.sig === sig) return LS.gto;
+  const pair = lensPair(LS.spot), S = lensSolveCfg(pair, b, LS.acts, LS.style);
+  if (!S) { LS.gto = { sig, error: '這條線在下注樹上對不到。' }; return LS.gto; }
+  const key = ++LS.gtoKey;
+  LS.gto = { sig, key, S, pair, pct: 999, t: 0, done: false, ready: false, reach: null, before: null, asked: 0, est: estimateSolve(S.cfg) };
+  if (LS.gto.est.mb > deviceMB()) { LS.gto.error = '這個解要 ' + Math.round(LS.gto.est.mb) + ' MB 記憶體，這台裝置不夠。'; return LS.gto; }
+  LW().send({ cmd: 'g-start', key, cfg: S.cfg });
+  return LS.gto;
+}
+function lensProgress(m) {
+  const g = LS.gto;
+  if (!g || g.key !== m.key) return;
+  if (m.error) { g.error = m.error; renderLens(); return; }
+  g.t = m.t; g.pct = m.pct; g.done = m.done; g.ready = true;
+  const usable = m.done || m.pct <= 3;
+  if (usable && (!g.reach || m.done) && g.asked !== m.t) {       // 夠準了（或算完了）就把範圍讀出來；算完再讀最後一次
+    g.asked = m.t;
+    const key = g.key;
+    lensAsk({ key, path: g.S.path, reach: true }, (a) => { if (LS.gto !== g || a.none) return; g.reach = a.reach; g.rpct = a.pct; lensAsk({ key, path: g.S.before, reach: true }, (b2) => { if (LS.gto !== g || b2.none) return; g.before = b2.reach; renderLens(); }); });
+  } else if (!g.reach && m.t % 20 === 0) lensRenderProgress();
+}
+function lensRenderProgress() { const el = $('lsGtoMsg'); if (el && LS.gto) el.textContent = 'GTO 計算中…第 ' + LS.gto.t + ' 次，可剝削度 ' + (LS.gto.pct < 900 ? fmt(LS.gto.pct, 1) + '%' : '—') + '（降到 3% 以下就顯示）'; }
+/* 牌局帶入：牌局裡正在算的解（單挑轉牌、河牌）在現在這個節點的範圍 */
+function lensGtoFromGame() {
+  const c = LS.custom, g = typeof G !== 'undefined' && G.gto;
+  LS.gto = { sig: 'game', pct: 999, reach: null, before: null, pair: { oppIP: c.gto.p === 1 } };
+  if (!g || g.lost || !g.ready || g.key !== c.gto.key) { LS.gto.error = '牌局裡的解已經換了。'; return LS.gto; }
+  const me = LS.gto;
+  gtoAsk({ key: g.key, path: g.path.slice(), reach: true }, (m) => { if (LS.gto !== me) return; if (m.none) { me.error = '解還沒準備好。'; } else { me.reach = m.reach; me.pct = m.pct; me.done = m.done; } renderLens(); });
+  return LS.gto;
+}
 const LS_ACT_ZH = { '': '還沒動作／不知道', check: '過牌', bet: '下注或加注', call: '跟注' };
 function lsHero() { const s = LS.slots; return s[0] >= 0 && s[1] >= 0 ? [s[0], s[1]] : null; }
 function lsBoard() { const b = LS.slots.slice(2).filter((c) => c >= 0); return b.length >= 3 ? b : []; }
-/* 現在的範圍：翻牌前的起點，再照每條街的公牌和動作縮小 */
+/* 現在的範圍：翻牌前的起點，再照每條街的公牌和動作縮小（教練公式；GTO 算好的話用 GTO 的） */
 function lsWeights() {
   let w = LS.custom ? LS.custom.w : lensPreflop(LS.spot);
   if (!w) return null;
   const b = lsBoard(), steps = [];
+  const g = lensGtoEnsure();
+  if (g && g.reach) {
+    const oppP = LS.custom ? LS.custom.gto.p : g.S.oppP;
+    return { w: Float32Array.from(g.reach[oppP]), steps: [1, 2, 3].filter((st) => b.length >= st + 2 && LS.acts[st]), gto: g, oppP };
+  }
   if (!LS.custom) for (let st = 1; st <= 3; st++) { const n = st + 2; if (b.length >= n && LS.acts[st]) { w = lensNarrow(w, b.slice(0, n), LS.acts[st], LS.style); steps.push(st); } }
-  return { w, steps };
+  return { w, steps, gto: g };
+}
+/* GTO 區塊：狀態、他這個動作的整體頻率 */
+function lensGtoHTML(W) {
+  const b = lsBoard();
+  if (b.length < 3) return '';
+  const why = LS.narrow === 'gto' ? lensGtoWhy() : null;
+  let h = '<div class="lsnarrow"><span class="note">縮小的方式</span><div class="seg"><button type="button" data-ls="narrow" data-v="coach" aria-pressed="' + (LS.narrow === 'coach') + '">教練估計</button><button type="button" data-ls="narrow" data-v="gto" aria-pressed="' + (LS.narrow === 'gto') + '">GTO 求解</button></div></div>';
+  if (LS.narrow !== 'gto') return h + '<p class="note">教練估計：照他的動作把每一手牌的份量乘上一個比例（強牌下注多、弱牌過牌多），是經驗公式。切到「GTO 求解」會用求解器算轉牌、河牌的均衡策略，照他的動作讀出範圍。</p>';
+  if (why) return h + '<p class="note">' + esc(why) + '</p>';
+  const g = W.gto;
+  if (!g) return h;
+  if (g.error) return h + '<p class="note">GTO：' + esc(g.error) + '</p>';
+  if (!g.reach) return h + '<p class="note" id="lsGtoMsg">GTO 計算中…' + (g.est ? '（估計 ' + fmt(g.est.n ? g.est.n[0] : 0, 0) + '／' + fmt(g.est.n ? g.est.n[1] : 0, 0) + ' 手牌）' : '') + '</p>';
+  let after = 0, before = 0;
+  const oppP = W.oppP;
+  for (let k = 0; k < NCOMBO; k++) { after += g.reach[oppP][k]; if (g.before) before += g.before[oppP][k]; }
+  const pair = g.pair, streetZh = g.S ? STREET_NAME[g.S.street] : '這條街';
+  const last = g.S ? [3, 2, 1].find((st) => b.length >= st + 2 && LS.acts[st]) : 0;
+  h += '<p><b>GTO 求解</b>' + (g.S ? '（從' + streetZh + '開始算：' + esc(pair.who) + '，底池 ' + pair.pot + '、籌碼 ' + pair.stack + ' 個大盲；可剝削度 ' + fmt(g.rpct !== undefined ? g.rpct : g.pct, 1) + '%' + (g.done ? '' : '，還在算') + '）' : '（牌局裡正在算的解，可剝削度 ' + (g.pct < 900 ? fmt(g.pct, 1) + '%' : '—') + '）')
+    + (g.before && before > 0 && last ? '：照均衡策略，他在' + STREET_NAME[last] + '「' + LS_ACT_ZH[LS.acts[last]] + '」的牌佔他範圍的 <b>' + Math.round(after / before * 100) + '%</b>。' : '。') + '</p>'
+    + '<p class="note">下面的格子、類別表、勝率都是照 GTO 的範圍。' + (g.S ? '求解之前的街（翻牌' + (g.S.street === 3 ? '、轉牌' : '') + '）的動作仍用教練的公式縮小。' : '求解開始之前的動作用教練的估計，這條街起照均衡策略。') + '</p>';
+  return h;
 }
 function lensGridHTML(w) {
   let h = '<div class="grid13 lsgrid">';
@@ -37,7 +125,7 @@ function renderLens() {
   h += '<p class="note">1,326 個組合裡他只會有這 ' + Math.round(st0.combos) + ' 個（廢牌都拿掉了），但還是分散在 ' + st0.classes + ' 種牌上：你猜不中「哪一手」，猜得到的是<b>分布</b>——下面的樣子和類別。</p>';
   h += '<div class="lsshape">' + sh.map((x) => '<div class="' + (x.k === 'bigsmall' ? 'tr' : x.k === 'junk' ? 'dim' : '') + '"><span>' + x.zh + '</span><i style="width:' + (x.share * 100).toFixed(1) + '%"></i><b>' + Math.round(x.share * 100) + '%</b></div>').join('') + '</div>';
   h += '<p class="note">最可能的幾種：' + st.top.map((x) => '<button type="button" class="lnh t' + HAND_TIER[x.g] + '" data-ln="hand" data-g="' + x.g + '">' + NAMEZH(x.g) + ' ' + pct(x.share, 1) + '%</button>').join('') + '</p>';
-  h += lensGridHTML(W.w) + '<p class="note">13×13：越亮越可能（右上同花、左下不同花、斜線對子）。' + (W.steps.length ? '已經照' + W.steps.map((s) => STREET_NAME[s] + '「' + LS_ACT_ZH[LS.acts[s]] + '」').join('、') + '縮小：剩約 ' + Math.round(st.combos) + ' 個組合的份量。' : '') + '</p>';
+  h += lensGridHTML(W.w) + '<p class="note">13×13：越亮越可能（右上同花、左下不同花、斜線對子）。' + (W.steps.length ? '已經照' + W.steps.map((s) => STREET_NAME[s] + '「' + LS_ACT_ZH[LS.acts[s]] + '」').join('、') + (W.gto && W.gto.reach ? '用 GTO ' : '') + '縮小：剩約 ' + Math.round(st.combos) + ' 個組合的份量。' : '') + '</p>';
   $('lsSummary').innerHTML = h;
   // 你的牌、公牌
   const s = LS.slots;
@@ -49,11 +137,11 @@ function renderLens() {
   // 翻牌後的動作
   let ah = '';
   if (b.length >= 3 && !LS.custom) {
-    ah = '<p>他在每一條街做了什麼？（照教練估範圍的公式縮小）</p><div class="lsacts">';
+    ah = '<p>他在每一條街做了什麼？</p><div class="lsacts">';
     for (let stI = 1; stI <= 3; stI++) { if (b.length < stI + 2) break; ah += '<label>' + STREET_NAME[stI] + '<select data-lsact="' + stI + '">' + Object.keys(LS_ACT_ZH).map((k) => '<option value="' + k + '"' + (LS.acts[stI] === k ? ' selected' : '') + '>' + LS_ACT_ZH[k] + '</option>').join('') + '</select></label>'; }
     ah += '<label>他的風格<select id="lsStyle">' + ['tag', 'lag', 'rock', 'station', 'maniac'].map((k) => '<option value="' + k + '"' + (LS.style === k ? ' selected' : '') + '>' + STYLES[k].zh + '</option>').join('') + '</select></label></div>';
   }
-  $('lsActs').innerHTML = ah;
+  $('lsActs').innerHTML = ah + lensGtoHTML(W);
   // 結果
   let r = '';
   if (b.length >= 3) {
@@ -73,6 +161,7 @@ function lsNextActive() { for (let k = 1; k <= 7; k++) { const i = (LS.active + 
 /* 從課程或牌局帶入 */
 function lensLoad(o) {
   LS.custom = o.custom || null;
+  if (o.narrow) LS.narrow = o.narrow;
   if (o.spot) LS.spot = o.spot;
   LS.slots = [-1, -1, -1, -1, -1, -1, -1];
   (o.hero || []).forEach((c, i) => { LS.slots[i] = c; });
@@ -85,8 +174,10 @@ function lensLoad(o) {
 }
 function lensFromGame(d) {
   if (!d || !d.opps.length) return;
-  const o = d.opps[0];
-  lensLoad({ custom: { w: parseRange(o.range), name: o.name + '（' + styleZh(o.style) + '）' }, hero: d.cards.slice(), board: d.board.slice() });
+  const o = d.opps[0], custom = { w: parseRange(o.range), name: o.name + '（' + styleZh(o.style) + '）' };
+  const g = G.gto;
+  if (g && !g.lost && g.ready && G.H) { const seat = G.H.players.findIndex((p) => p.name === o.name), p = g.seats.indexOf(seat); if (p >= 0 && g.seats.indexOf(0) >= 0) custom.gto = { key: g.key, p }; }
+  lensLoad({ custom, hero: d.cards.slice(), board: d.board.slice(), narrow: custom.gto ? 'gto' : 'coach' });
 }
 function initLens() {
   $('lsSpot').addEventListener('change', (e) => { LS.spot = e.target.value; renderLens(); });
@@ -101,6 +192,7 @@ function initLens() {
       if (a === 'clear') { LS.slots = [-1, -1, -1, -1, -1, -1, -1]; LS.active = 0; LS.acts = { 1: '', 2: '', 3: '' }; }
       else if (a === 'flop') { const used = new Set(LS.slots.filter((c) => c >= 0)); const rng = lnRng(); for (let i = 2; i < 5; i++) if (LS.slots[i] < 0) { let c; do { c = (rng() * 52) | 0; } while (used.has(c)); used.add(c); LS.slots[i] = c; } LS.active = LS.slots.indexOf(-1); }
       else if (a === 'uncustom') LS.custom = null;
+      else if (a === 'narrow') LS.narrow = b.dataset.v;
       renderLens(); return;
     }
     const hb = e.target.closest('[data-ln="hand"]');

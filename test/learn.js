@@ -212,6 +212,17 @@ for (const S of E.GTO_RIVER) {
   const w2 = E.lensNarrow(w, board, 'bet', 'tag'), B2 = E.lensBoard(w2, board, hero);
   if (!(E.lensStats(w2, 1).combos < st.combos && B2.strongShare > B.strongShare)) fail('下注之後範圍應該變強、變小');
   if (E.lensRangeTable().length !== 7) fail('範圍表不是 7 列');
+  // GTO 縮小：6 人桌的局面都配得出另一邊；每種線都對得到下注樹
+  let paired = 0;
+  for (const x of sp) { const pr = E.lensPair(x.id); if (!pr) { if (x.id.indexOf('6/') === 0 && x.id.indexOf('vs4bet') < 0) fail('配不出對手 ' + x.id); continue; } paired++;
+    for (const acts of [{ 1: 'bet', 2: 'bet' }, { 1: 'check', 2: 'call' }, { 1: '', 2: 'check', 3: 'bet' }, { 1: 'bet', 2: '', 3: 'call' }]) {
+      const b5 = E.parseCards('Kh8d3c2s7d'), S = E.lensSolveCfg(pr, acts[3] ? b5 : b5.slice(0, 4), acts, 'tag');
+      if (!S || !S.path || !S.before || S.path.length <= S.before.length) { fail('GTO 的線對不到 ' + x.id + ' ' + JSON.stringify(acts)); break; }
+      if (!(S.cfg.ranges[0].some((v) => v > 0) && S.cfg.ranges[1].some((v) => v > 0))) { fail('GTO 的範圍是空的 ' + x.id); break; }
+    }
+  }
+  if (paired < 30) fail('配得出對手的局面太少 ' + paired);
+  if (E.lensLine('bet', true).steps.length !== 3 || E.lensLine('bet', false).readAt !== 1) fail('lensLine 錯');
 }
 // 做過的題目
 {

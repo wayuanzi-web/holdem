@@ -91,3 +91,85 @@ function lensRangeTable() {
     return { zh, pct: st.pct, combos: st.combos, classes: st.classes, top: st.top, shapes: sh };
   });
 }
+
+/* ===== GTO 縮小：把局面配成單挑（對手的範圍＋我方的範圍、誰有位置、底池、籌碼），轉牌／河牌交給求解器，照他的動作讀出 GTO 的範圍 ===== */
+const LENS_RFI6 = { UTG: 'EP', HJ: 'MP', CO: 'CO', BTN: 'BTN', SB: 'SB' };
+const LENS_OPEN6 = { EP: 'UTG', MP: 'HJ', CO: 'CO', BTN: 'BTN', SB: 'SB' };
+/* 單位：大盲。回傳 null＝這個局面配不出對手（9 人桌、被 4-bet） */
+function lensPair(spotId) {
+  const [key, which] = spotId.split('#'), parts = key.split('/'), t = parts[0], kind = parts[1];
+  if (t !== '6') return null;
+  const R = chartRanges(key); if (!R) return null;
+  const opp = Float32Array.from(R[which || 'raise']);
+  if (kind === 'rfi') {
+    const pos = parts[2], g = LENS_RFI6[pos], me = chartRanges('6/vsOpen/BB/' + g); if (!me) return null;
+    return { opp, me: Float32Array.from(me.call), oppIP: pos !== 'SB', pot: pos === 'SB' ? 5 : 5.5, stack: 97.5, who: POS_ZH[pos] + '開牌，大盲跟注', meZh: '大盲' };
+  }
+  if (kind === 'vsOpen') {
+    const d = parts[2], o = parts[3], opener = LENS_OPEN6[o];
+    const oppIP = d === 'IP' || (d === 'BB' && o === 'SB');
+    if (which === 'call') {
+      const me = chartRanges('6/rfi/' + opener); if (!me) return null;
+      const pot = d === 'IP' ? 6.5 : d === 'SB' ? 6 : o === 'SB' ? 5 : 5.5;
+      return { opp, me: Float32Array.from(me.raise), oppIP, pot, stack: 97.5, who: openerZh('6', o) + '開牌，' + DEFENDER_ZH[d].replace('（非盲注）', '') + '跟注', meZh: openerZh('6', o) };
+    }
+    const me = chartRanges('6/vs3bet/' + o); if (!me) return null;
+    const to = d === 'IP' ? 7.5 : 8.75, pot = 2 * to + (d === 'IP' ? 1.5 : d === 'SB' ? 1 : o === 'SB' ? 0 : 0.5);
+    return { opp, me: Float32Array.from(me.call), oppIP, pot, stack: 100 - to, who: openerZh('6', o) + '開牌，' + DEFENDER_ZH[d].replace('（非盲注）', '') + ' 3-bet，' + openerZh('6', o) + '跟注', meZh: openerZh('6', o) };
+  }
+  if (kind === 'vs3bet') {
+    const o = parts[2], bb = chartRanges('6/vsOpen/BB/' + o); if (!bb) return null;
+    const oppIP = o !== 'SB';
+    if (which === 'call') return { opp, me: Float32Array.from(bb.raise), oppIP, pot: 2 * 8.75 + (o === 'SB' ? 0 : 0.5), stack: 100 - 8.75, who: openerZh('6', o) + '開牌，大盲 3-bet，' + openerZh('6', o) + '跟注', meZh: '大盲' };
+    const v4 = chartRanges('6/vs4bet'); if (!v4) return null;
+    return { opp, me: Float32Array.from(v4.call), oppIP, pot: 2 * 22 + (o === 'SB' ? 0 : 0.5), stack: 78, who: openerZh('6', o) + '開牌，大盲 3-bet，' + openerZh('6', o) + ' 4-bet，大盲跟注', meZh: '大盲' };
+  }
+  return null;
+}
+/* 一條街的線：他做了什麼（sel），我方照最被動的打法補上。回傳 [{p, t}]，和「讀他範圍」的位置（做完第幾個動作） */
+function lensLine(sel, oppIP) {
+  const O = oppIP ? 1 : 0, M = 1 - O;
+  if (oppIP) {
+    if (sel === 'bet') return { steps: [{ p: M, t: 'x' }, { p: O, t: 'b' }, { p: M, t: 'c' }], readAt: 2 };
+    if (sel === 'call') return { steps: [{ p: M, t: 'b' }, { p: O, t: 'c' }], readAt: 2 };
+    return { steps: [{ p: M, t: 'x' }, { p: O, t: 'x' }], readAt: 2 };
+  }
+  if (sel === 'bet') return { steps: [{ p: O, t: 'b' }, { p: M, t: 'c' }], readAt: 1 };
+  if (sel === 'call') return { steps: [{ p: O, t: 'x' }, { p: M, t: 'b' }, { p: O, t: 'c' }], readAt: 3 };
+  return { steps: [{ p: O, t: 'x' }, { p: M, t: 'x' }], readAt: 1 };
+}
+/* 求解的設定：board 4–5 張；acts {1,2,3}；翻牌（和不求解的轉牌）先用教練的公式縮小雙方的範圍 */
+function lensSolveCfg(pair, board, acts, styleKey, fromStreet) {
+  const nb = board.length;
+  if (nb < 4) return null;
+  const st = fromStreet || (nb === 5 && !acts[2] ? 3 : 2);
+  let wO = pair.opp, wM = pair.me;
+  const assumeMe = (sel) => (sel === 'bet' ? 'call' : sel === 'call' ? 'bet' : 'check');
+  for (let s = 1; s < st; s++) {
+    const b = board.slice(0, s + 2), sel = acts[s] || '';
+    if (sel) { wO = lensNarrow(wO, b, sel, styleKey); wM = lensNarrow(wM, b, assumeMe(sel), 'tag'); }
+  }
+  const dead = new Set(board);
+  const clean = (w) => { let mx = 0; for (let c = 0; c < NCOMBO; c++) if (!dead.has(COMBO_A[c]) && !dead.has(COMBO_B[c]) && w[c] > mx) mx = w[c]; const q = new Float32Array(NCOMBO); for (let c = 0; c < NCOMBO; c++) { if (dead.has(COMBO_A[c]) || dead.has(COMBO_B[c]) || !mx) continue; const x = w[c] / mx; if (x >= 0.04) q[c] = Math.round(x * 100) / 100 || 0.01; } return q; };
+  const oppP = pair.oppIP ? 1 : 0, ranges = []; ranges[oppP] = clean(wO); ranges[1 - oppP] = clean(wM);
+  const T = GTO_TREE[st], unit = GAME_BB;
+  const cfg = { board: board.slice(0, st === 2 ? 4 : 5), pot: Math.round(pair.pot * unit), stack: Math.round(pair.stack * unit), ranges, bet: T.bet, raise: T.raise, cap: T.cap, allin: 0.67, addAllin: true, target: T.target, maxIters: T.maxIters };
+  // 路徑：這條街（和河牌）的線
+  const tree = buildTree(cfg), path = [], before = [];
+  let nd = tree.root, readPath = null, readBefore = null;
+  for (let s = st; s <= 3; s++) {
+    if (board.length < s + 2) break;
+    if (s > st) { if (!nd || nd.kind !== N_CHANCE) return null; path.push({ c: board[s + 1] }); nd = nd.kids[0]; }
+    const L = lensLine(acts[s] || '', pair.oppIP);
+    for (let i = 0; i < L.steps.length; i++) {
+      const sp = L.steps[i];
+      if (!nd || nd.kind !== N_ACT || nd.p !== sp.p) return null;
+      const a = matchAct(nd.acts, sp.t === 'b' ? { t: 'b', to: nd.acts.find((x) => x.t === 'b') ? nd.acts.find((x) => x.t === 'b').to : 0 } : { t: sp.t });
+      if (a < 0) return null;
+      if (i + 1 === L.readAt) readBefore = path.slice();
+      path.push({ a }); nd = nd.kids[a];
+      if (i + 1 === L.readAt) readPath = path.slice();
+    }
+  }
+  return { cfg, oppP, street: st, path: readPath, before: readBefore, tree };
+}
