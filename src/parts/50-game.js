@@ -1,6 +1,6 @@
 /* ===== 50-game：牌局（首頁、牌桌、教練框、上一步／下一步、動作列、一手結束的檢討與重看） ===== */
 const SAVE_KEY = 'dezhou-game-1';
-/* flow：auto 電腦自己出牌、輪到你才停（預設）；step 每一件事都停，按「下一步」。speed：1 慢、2 中、3 快、4 超快（電腦幾乎不停；你棄牌就直接發下一手） */
+/* flow：auto 電腦自己出牌、輪到你才停（預設）；step 每一件事都停，按「下一步」。speed：1 慢、2 中、3 快、4 超快（電腦幾乎不停；你棄牌就直接跳到這一手結束，停在結果讓你決定要不要再來一手） */
 const GS = { n: 6, flow: 'auto', speed: 2, level: 2, peek: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false, gtoCoach: true, train: false, autoPre: false, trainStats: null };
 function gsLoad() {
   try { Object.assign(GS, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) { /* 沒有存檔 */ }
@@ -14,7 +14,7 @@ function gsSave() {
 const G = { T: null, H: null, steps: [], view: -1, ctx: null, rng: null, timer: 0, waitingHero: false, adv: null, review: [], replay: false, over: false, pendingAI: null, lastRender: null, oddsTok: 0, paused: false, flash: null, gto: null, gtoAdv: null, waitAI: null };
 const LEVEL_ZH = { 1: '新手', 2: '普通', 3: '高手', 4: 'GTO' };
 const SPEED_ZH = { 1: '慢', 2: '中', 3: '快', 4: '超快' };
-const SPEED_NOTE = { 1: '電腦每個動作停久一點，適合邊看邊學。', 2: '一般速度。', 3: '電腦動作比較快。', 4: '電腦幾乎不停；你棄牌就直接發下一手（上一手的評分和檢討在牌桌上方）。實戰考核不受影響。' };
+const SPEED_NOTE = { 1: '電腦每個動作停久一點，適合邊看邊學。', 2: '一般速度。', 3: '電腦動作比較快。', 4: '電腦幾乎不停；你棄牌就直接跳到這一手結束，停在結果，由你決定要不要再來一手。實戰考核不受影響。' };
 
 /* 文字裡的 {c數字} 換成有顏色的牌 */
 function rich(s) { return esc(s).replace(/\{c(\d+)\}/g, (m, c) => cardSpan(+c)); }
@@ -66,7 +66,7 @@ function initHome() {
 /* kind：false 一般、true GTO 訓練、'tourney' 錦標賽、'exam' 實戰考核（examId＝哪一次考核） */
 function newGame(kind, examId) {
   clearTimeout(G.timer); clearTimeout(G.autoHero); clearTimeout(G.botT); clearTimeout(G.lockT);
-  gtoReset(); G.pendingAI = null; G.prevHand = null; G.ffNext = false;   // 上一桌沒做完的 GTO 電腦、代打、超快的上一手都清掉
+  gtoReset(); G.pendingAI = null;                                      // 上一桌沒做完的 GTO 電腦、代打都清掉
   G.rng = makeRng((Date.now() ^ (Math.random() * 1e9)) >>> 0);
   const train = kind === true, tour = kind === 'tourney', exam = kind === 'exam';
   GS.train = train; gsSave();
@@ -80,11 +80,9 @@ function newGame(kind, examId) {
   showView('table');
   nextHand();
 }
-/* prev：超快模式棄牌後直接開新的一手，帶著上一手（牌桌上方顯示評分、可以打開檢討） */
-function nextHand(prev) {
+function nextHand() {
   clearTimeout(G.timer); clearTimeout(G.autoHero); clearTimeout(G.botT); clearTimeout(G.lockT);
   if (G.tEnd || (G.exam && G.exam.done)) return;
-  G.prevHand = prev || null; G.ffNext = false;
   gtoReset();
   if (G.exam) examPrep();
   G.H = newHand(G.T, G.rng);
@@ -198,7 +196,6 @@ function stepDelay(st) {
 }
 function scheduleAuto() {
   clearTimeout(G.timer);
-  if (G.ffNext && G.over && atHead() && !G.replay && !$('vTable').hidden) { ffFinish(); return; }
   if (!isRunning() || $('vTable').hidden) return;
   if (G.waitAI) { botPoll(); return; }                                 // GTO 電腦在等解：過一下再問（離開牌桌再回來也接得上）
   G.timer = setTimeout(() => { forward(); }, stepDelay(G.steps[G.view]));
@@ -212,38 +209,8 @@ function skipAhead() {
   renderCur(); scheduleAuto();
   if (G.waitAI && !G.waitAI.asking) afterBot();
 }
-/* 超快模式：你棄牌就不用看這一手剩下的，直接開下一手（考核不用：要看評分；逐步解說也不用） */
+/* 超快模式：你棄牌就不用看這一手剩下的，直接跳到結束（停在結果，由你按「再來一手」）。考核不用：要看評分；逐步解說也不用 */
 function fastFoldOn() { return GS.speed === 4 && GS.flow === 'auto' && !G.exam; }
-function fastFold() {
-  clearTimeout(G.timer);
-  let guard = 0;
-  while (!G.over && !G.waitingHero && !G.waitAI && guard++ < 600) produce();   // 一樣照規則跑完：統計、錦標賽名次都照算
-  G.view = G.steps.length - 1;
-  if (G.over) { ffFinish(); return; }
-  G.ffNext = true;                                                     // 還在等 GTO 電腦：跑完（scheduleAuto）再開下一手
-  renderCur(); scheduleAuto();
-  if (G.waitAI && !G.waitAI.asking) afterBot();
-}
-function ffFinish() {
-  G.ffNext = false;
-  if (G.tEnd) { renderCur(); return; }                                   // 錦標賽結束：停在結果
-  const H = G.H, rv = G.review.slice();
-  nextHand({ H, steps: G.steps, review: rv, net: H.result ? H.result.net[0] : 0, over: true });
-}
-/* 牌桌上方：上一手（超快棄牌）的評分；這一手你按了動作就收起來 */
-function ffInfoHTML() {
-  const P = G.prevHand;
-  if (!P || G.replay || G.over || G.review.length) return '';
-  const r = P.review[P.review.length - 1], net = P.net;
-  const res = net < 0 ? '輸 ' + (-net) : net > 0 ? '贏 ' + net : '沒輸沒贏';
-  const S = P.H, win = S.result ? S.players.filter((p) => S.result.won[p.seat] > 0 && p.seat !== 0).map((p) => p.name) : [];
-  let h = '<span>上一手（第 ' + S.no + ' 手）</span>・';
-  if (r) h += '<span class="ffmk ' + r.grade.mark + '">' + MK[r.grade.mark] + '</span> 你' + esc(STREET_NAME[r.street]) + '棄牌' + (r.grade.mark !== 'good' ? '<span>（建議：' + esc(r.adv) + '）</span>' : '');
-  else h += '<span>教練代打棄牌</span>';
-  h += '・<span>' + res + '</span>' + (win.length ? '・<span>' + esc(win.join('、')) + ' 贏</span>' : '');
-  if (P.review.length) h += '<button type="button" class="linkbtn" data-ff="review">檢討</button>';
-  return h;
-}
 /* 你按了動作 */
 function heroAct(a, auto) {
   if (!G.waitingHero || !atHead() || G.replay || (!auto && examLockBtns())) return;
@@ -261,7 +228,7 @@ function heroAct(a, auto) {
   G.view = G.steps.length - 1;
   G.flash = auto ? null : { mark: g.mark, text: g.text, adv: gg ? gg.adv : adv.label, view: G.view, src: g.src };
   G.sizerStep = -1;
-  if (ev.t === 'f' && fastFoldOn()) { fastFold(); return; }
+  if (ev.t === 'f' && fastFoldOn()) { skipAhead(); return; }        // 照規則跑完（統計、錦標賽名次照算），停在結果
   renderCur();
   scheduleAuto();
 }
@@ -353,8 +320,6 @@ function renderTable(st) {
   } else if (G.exam) { tb.hidden = false; tb.innerHTML = examBarHTML(); tb.title = ''; }
   else tb.hidden = true;
   tb.classList.toggle('exam', !!G.exam);
-  const ff = ffInfoHTML(), fb = $('ffInfo');
-  fb.hidden = !ff; if (fb.dataset.h !== ff) { fb.innerHTML = ff; fb.dataset.h = ff; }
   $('streetBar').innerHTML = STREETBAR.map((t, i) => '<li class="' + (i === si ? 'on' : i < si ? 'done' : '') + '">' + (i === 5 && S.result && S.result.uncontested ? '結束' : t) + '</li>').join('');
   G.lastRender = { view: G.view, board: S.board.length };
 }
@@ -509,6 +474,12 @@ function renderCtrl(st) {
   msg.innerHTML = m;
   btns.innerHTML = b;
   btns.hidden = !b;
+  const overNow = !G.replay && G.over && atHead();
+  if (overNow && !G.overShown) {                                       // 結果剛出現：0.45 秒內點不到（剛按完棄牌，連按不會直接開下一手）
+    btns.classList.add('arm'); clearTimeout(G.armT2);
+    G.armT2 = setTimeout(() => btns.classList.remove('arm'), 450);
+  }
+  G.overShown = overNow;
   if (heroTurn) renderActBtns(st);
   else $('sizer').hidden = true;
 }
@@ -678,7 +649,6 @@ function initGame() {
   $('sizeRange').addEventListener('input', sizerLabel);
   $('bBetGo').addEventListener('click', () => heroAct({ t: 'r', to: +$('sizeRange').value }));
   $('bBetCancel').addEventListener('click', () => { $('sizer').hidden = true; G.sizerStep = -1; });
-  $('ffInfo').addEventListener('click', (e) => { if (e.target.closest('[data-ff="review"]') && G.prevHand) openReview(G.prevHand); });   // 牌局照跑：輪到你會停著等
   $('spdChip').addEventListener('click', () => ctrlCmd('speed'));
   renderSpeedChip();
   $('cBody').addEventListener('click', (e) => {

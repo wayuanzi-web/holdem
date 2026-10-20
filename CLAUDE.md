@@ -15,7 +15,8 @@
 
 - 開 PR：`gh api repos/wayuanzi-web/holdem/pulls -f base=main -f head=<分支> -f title=... -F body=@body.md`
 - 看 CI：`gh api "repos/wayuanzi-web/holdem/commits/<sha>/check-runs" --jq '.check_runs[] | .name + " " + .status + " " + (.conclusion // "")'`
-- 合併：`gh api -X PUT repos/wayuanzi-web/holdem/pulls/<編號>/merge -f merge_method=merge`，再刪分支 `git push origin --delete <分支>`
+- 合併：`gh api -X PUT repos/wayuanzi-web/holdem/pulls/<編號>/merge -f merge_method=merge`
+- 雲端刪不了遠端分支（`git push --delete`、REST 都 403），合併後留著就好
 
 `main` 有 ruleset「main 需通過 CI」。有權限可以略過時也不要略過。
 

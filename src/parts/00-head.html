@@ -604,9 +604,7 @@ body.intable .brand p { display: none; }
 .acts2 button { transition: opacity .15s; }
 .acts2.arm { pointer-events: none; } .acts2.arm button { opacity: .55; }   /* 動作鈕剛出現：先點不到 */
 .presets button.allin, .sizerow .btn.allin { border-color: #c9462e; background: #4a1f18; color: #ffd9cf; }
-.ffinfo { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; }
-.ffinfo .ffmk { font-weight: 900; } .ffinfo .ffmk.good { color: #6fd08f; } .ffinfo .ffmk.ok { color: #f0c05a; } .ffinfo .ffmk.bad { color: #f08a7a; }
-.ffinfo .linkbtn { font-size: 12.5px; margin-left: 6px; }
+.ctrlbtns .btn { transition: opacity .15s; } .ctrlbtns.arm { pointer-events: none; } .ctrlbtns.arm .btn { opacity: .55; }   /* 一手剛結束：先點不到 */
 .spdchip { border: 1px solid #d9c99c; background: #efe3bf; color: #2b2410; border-radius: 999px; padding: 1px 10px; font-size: 13px; cursor: pointer; }
 .spdchip.on { background: #2b2410; color: #f0dca6; border-color: #2b2410; }
 .chip.on { border-color: var(--brass); color: var(--brass); }
@@ -882,7 +880,6 @@ body.noexplain .xp, body.noexplain .how { display: none; }
   <div class="tv">
     <div class="tleft">
       <div class="tinfo" id="tInfo" hidden></div>
-      <div class="tinfo ffinfo" id="ffInfo" hidden></div>
       <ol class="streetbar" id="streetBar" aria-label="這一手進行到哪裡"></ol>
       <div class="felt" id="felt"><div class="rail"></div><div id="seats"></div>
         <div class="center"><div class="pot num" id="potTxt"></div><div class="board" id="board"></div><div class="live" id="liveTxt"></div></div>
