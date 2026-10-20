@@ -141,7 +141,7 @@ function gtoBotWait(seat) {
   const H = G.H, pl = H.players[seat], g = G.gto;
   if (pl.style !== 'gto' || !g || g.lost || g.seats.indexOf(seat) < 0) return false;
   if (G.pendingAI && G.pendingAI.seat === seat) return false;
-  const cap = [0, 4000, 2500, 1500][GS.speed || 2];
+  const cap = [0, 4000, 2500, 1500, 1000][GS.speed || 2];
   if (!G.waitAI || G.waitAI.seat !== seat) G.waitAI = { seat, since: Date.now() };
   const W8 = G.waitAI;
   if (W8.asking) return true;

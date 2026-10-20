@@ -1,13 +1,13 @@
 /* ===== 53-review：一手結束的逐步檢討——每個決定當時猜的範圍、他實際的牌有沒有猜到、你的決定對在哪裡／錯在哪裡、該去看哪一課 ===== */
 const REV_ACT_ZH = { shove: '全下', open: '加注開局', reraise: '再加注', callRaise: '跟注加注', limp: '跛入', check: '過牌' };
 /* 這一手你做過的決定：每個「輪到你」的步驟和你按的那一步 */
-function reviewDecisions() {
+function reviewDecisions(steps) {
   const out = [];
-  for (let i = 0; i < G.steps.length; i++) {
-    const st = G.steps[i];
+  for (let i = 0; i < steps.length; i++) {
+    const st = steps[i];
     if (!st.grade || !st.ev) continue;
     let hs = null;
-    for (let j = i - 1; j >= 0; j--) { const x = G.steps[j]; if (x.kind === 'hero') { hs = x; break; } if (x.ev && x.ev.k === 'act' && x.ev.seat === 0) break; }
+    for (let j = i - 1; j >= 0; j--) { const x = steps[j]; if (x.kind === 'hero') { hs = x; break; } if (x.ev && x.ev.k === 'act' && x.ev.seat === 0) break; }
     if (!hs) continue;
     out.push({ st, hs });
   }
@@ -63,14 +63,16 @@ function reviewLesson(adv, street, hero) {
   }
   return ids.map((id) => lessonById(id)).filter((l) => l && l.ready).slice(0, 2);
 }
-function reviewHTML() {
-  const H = G.H, D = reviewDecisions();
-  if (!H || !G.over) return '<p class="note">這一手還沒結束。</p>';
+/* R：要檢討的那一手（預設＝現在這一手；超快模式棄牌後是上一手） */
+function reviewHTML(R) {
+  R = R || { H: G.H, steps: G.steps, over: G.over };
+  const H = R.H, D = reviewDecisions(R.steps);
+  if (!H || !R.over) return '<p class="note">這一手還沒結束。</p>';
   if (!D.length) return '<p class="note">這一手你沒有做決定。</p>';
   const net = H.result ? H.result.net[0] : 0, marks = D.map((x) => x.st.grade.mark);
   const good = marks.filter((m) => m === 'good').length, bad = marks.filter((m) => m === 'bad').length;
   let h = '<p class="revsum"><b>' + (net > 0 ? '贏了 ' + net : net < 0 ? '輸了 ' + (-net) : '沒輸沒贏') + '</b>・' + D.length + ' 個決定：✓ ' + good + '、△ ' + (D.length - good - bad) + '、✗ ' + bad + '。'
-    + (net < 0 && bad === 0 ? '決定都對還是輸：這很正常，對的決定是「長期」賺錢，單一手的輸贏大部分是牌運。' : net > 0 && bad > 0 ? '贏了但有決定是錯的：這種贏長期會還回去，檢討看決定，不看結果。' : '') + '</p>';
+    + (net < 0 && bad === 0 ? '沒有錯的決定還是輸：這很正常，對的決定是「長期」賺錢，單一手的輸贏大部分是牌運。' : net > 0 && bad > 0 ? '贏了但有決定是錯的：這種贏長期會還回去，檢討看決定，不看結果。' : '') + '</p>';
   let guessN = 0, guessHit = 0, idx = 0;
   const cards = [];
   for (const { st, hs } of D) {
@@ -107,8 +109,8 @@ function reviewHTML() {
   h += '<p class="note">「猜」＝教練照對手的位置、動作估的範圍（機率分布），不是猜一手牌；猜對的標準是他的牌在範圍裡。對手實際的牌是結束後才看得到（棄牌的也會顯示）。</p>';
   return h;
 }
-function openReview() {
-  $('revBody').innerHTML = reviewHTML();
+function openReview(R) {
+  $('revBody').innerHTML = reviewHTML(R);
   $('revModal').hidden = false; $('revClose').focus();
   $('revModal').querySelector('.mbox').scrollTop = 0;
 }

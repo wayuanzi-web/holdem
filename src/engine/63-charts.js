@@ -170,7 +170,7 @@ function chartSpot(H, seat) {
   if (!R) return null;
   const c = comboOf(p.cards[0], p.cards[1]);
   const raise = R.raise[c], call = R.call[c];
-  return { key, kind: key.split('/')[1], name, raise, call, fold: Math.max(0, 1 - raise - call), raisers: raisers.length };
+  return { key, kind: key.split('/')[1], name, raise, call, fold: Math.max(0, 1 - raise - call), raisers: raisers.length, cls: CLASS_OF[c] };
 }
 function POS_ZH_CHART(t, pos) { return t === '2' ? '按鈕（小盲）' : (POS_ZH[pos] || pos); }
 /* 圖表裡這個範圍整體占幾 %（畫面用） */

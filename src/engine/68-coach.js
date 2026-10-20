@@ -319,6 +319,7 @@ function gradeAction(adv, ev) {
     const word = af === 'a' ? '加注' : af === 'p' ? (ev.t === 'x' ? '過牌' : '跟注') : '棄牌';
     if (f >= 0.25) return { mark: 'good', text: '圖表裡這手牌有 ' + Math.round(f * 100) + '% 的時候' + word + '，打得對。', src: 'chart' };
     if (f >= 0.05) return { mark: 'ok', text: '圖表裡這手牌很少' + word + '（' + Math.round(f * 100) + '%），偶爾可以。', src: 'chart' };
+    if (af === 'f' && ch.cls !== undefined && PRE_PCT[ch.cls] <= 0.08) return { mark: 'bad', text: '棄掉了強牌：這手牌在前 ' + Math.max(1, Math.round(PRE_PCT[ch.cls] * 100)) + '%，圖表裡不會棄牌（建議：' + adv.label + '）。', src: 'chart' };   // 前 8%（77+、ATs+、KJs+、AJo+）棄掉＝大錯；其他照圖表該玩的牌棄掉＝保守
     return { mark: af === 'f' ? 'ok' : 'bad', text: '圖表裡這手牌不會' + word + '（建議：' + adv.label + '）。' + (af === 'f' ? '保守了。' : ''), src: 'chart' };
   }
   const eq = adv.eq || 0, need = adv.need || 0;
