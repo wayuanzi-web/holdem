@@ -275,9 +275,9 @@ function renderTable(st) {
   for (let k = 0; k < n; k++) {
     const p = S.players[k], hero = k === 0;
     const xy = seatXY(n, k, 1);
-    const open = hero || G.replay || (GS.peek && !G.exam) || (showdown && !p.folded);
+    const open = hero || G.replay || peekOn() || (showdown && !p.folded);
     let cards = '';
-    if (p.cards.length === 2 && !(p.folded && !hero && !G.replay)) {
+    if (p.cards.length === 2 && !(p.folded && !hero && !G.replay && !peekOn())) {      // 偷看打開：棄牌的人的牌也看得到
       const cls = hero ? 'heroc' : 'small';
       const cs = hero ? sortedCards(p.cards) : p.cards;
       cards = cs.map((c) => cardEl(open ? c : -1, cls, animDeal)).join('');
@@ -341,6 +341,8 @@ function renderCoach(st) {
     }
     const used = new Set();
     for (const l of st.lines) h += '<p>' + glossify(rich(l), used) + '</p>';
+    const pk = peekFoldHTML(st);
+    if (pk) h += '<div class="peek"><b>👀 偷看：他為什麼棄牌</b>' + pk + '</div>';
     if (st.tip) h += '<div class="tip"><b>第一次遇到，說明一下</b>' + glossify(rich(st.tip), used) + '</div>';
   }
   $('cBody').innerHTML = h;
@@ -367,6 +369,7 @@ function heroHTML(st, S) {
   const used = new Set();
   h += gtoBoxHTML();
   h += '<div class="adv"><div class="rec">' + (gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  h += outsBoxHTML(adv, S);
   if (adv.detail) {
     const d = adv.detail;
     const q = d.call > 0 ? '為什麼要 ' + Math.round(d.need * 100) + '%？你的勝率怎麼算的？' : '你的勝率 ' + Math.round(d.est * 100) + '% 怎麼算的？';
@@ -375,6 +378,69 @@ function heroHTML(st, S) {
   if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
   if (EXPLAIN.on && atHead() && !G.replay && !GS.seenTermHint) h += '<p class="note">底下有虛線的詞可以點，會跳出解釋；不需要的話，右上角「深入說明」可以關掉。</p>';
   h += '</div>';
+  return h;
+}
+/* ===== 出牌明細：每一張出牌、中了變成什麼、打不打折、機率、要不要賭 ===== */
+function outsBoxHTML(adv, S) {
+  const T = adv.info && adv.info.outsT;
+  if (!T || (G.exam && !G.over && !G.replay) || !(adv.eq < 0.7 && (adv.info.draws || adv.eq < 0.5))) return '';   // 有聽牌、或現在落後才列（已經大幅領先時「出牌」沒意義）
+  const p = S.players[0], L = legalSnapshot(S), er = (x) => Math.round(x * 10) / 10;
+  const opp = S.players.filter((q) => !q.folded && q.seat !== 0), oppStack = opp.length ? Math.max(...opp.map((q) => q.stack)) : 0;
+  let h = '<div class="outsbox"><b>出牌明細：' + T.total + ' 張' + (T.eff < T.total - 0.5 ? '（中了真的會領先的約 ' + er(T.eff) + ' 張）' : '') + '</b>';
+  h += '<table class="outst"><tr><th>中了變成</th><th>哪幾張</th><th class="r">張數</th></tr>';
+  for (const g of T.groups) {
+    const avg = g.n ? g.eff / g.n : 0;
+    const q = avg >= 0.8 ? '✓ 乾淨' : avg >= 0.5 ? '△ 要打折' : '✗ 中了也常輸';
+    h += '<tr><td><b>' + esc(g.name) + '</b><small>' + q + '（中了領先 ' + PCT0(avg) + (avg < 0.8 && g.beat.length ? '，會輸給' + g.beat.join('、') : '') + '）</small></td><td>'
+      + g.cards.map((x) => '<span class="oc ' + (x.share >= 0.8 ? 'ok' : x.share >= 0.5 ? 'half' : 'bad') + '" title="中了領先 ' + PCT0(x.share) + '">' + cardSpan(x.c) + '</span>').join('') + '</td><td class="r">' + g.n + '</td></tr>';
+  }
+  h += '</table>';
+  if (T.weak) h += '<p class="note">另外 ' + T.weak + ' 張只讓你變成比公牌小的對子，不算出牌。</p>';
+  h += '<ul>' + outsAdviceLines(T, { toCall: L.toCall, pot: potTotal(S), stack: p.stack, oppStack, label: adv.label, est: adv.eq }).map((x) => '<li>' + rich(x) + '</li>').join('') + '</ul>';
+  h += '<p class="note">「中了領先」＝這張牌發出來以後，你的牌比教練估的他的範圍大的比例。劃掉的牌中了也常輸；虛線底的要打折。</p></div>';
+  return h;
+}
+/* ===== 偷看（打開「偷看對手的牌」、不是考核）：棄牌的人拿什麼、為什麼棄 ===== */
+function peekOn() { return !!(GS.peek && !G.exam); }
+function foldWhy(S, seat) {
+  const p = S.players[seat], c = p.cards;
+  if (!c || c.length !== 2) return '';
+  const nm = '<b>' + esc(p.name) + '</b>（' + esc(styleZh(p.style)) + '・' + POS_ZH[p.pos] + '）', toCall = Math.max(0, S.curBet - p.bet);
+  const cards = rich(CARDS_TOK(sortedCards(c)));
+  if (!S.board.length) {
+    const g = heroCls(c), pct = PRE_PCT[g];
+    let why;
+    if (!preflopRaises(S)) { const thr = openThr(p.pos, (STYLES[p.style] || STYLES.tag).loose, S.n); why = pct < thr ? '在他平常會玩的範圍邊緣（約前 ' + PCT0(thr) + '），這次沒玩' : styleZh(p.style) + '在這個位置大約只玩前 ' + PCT0(thr) + ' 的牌，不在裡面'; }
+    else { const st = STYLES[p.style] || STYLES.tag; why = '面對加注到 ' + S.curBet + '（要再付 ' + toCall + '）：' + (pct > 0.2 ? '這手牌不夠強' : st.loose < 0.9 ? '牌其實可以玩，但' + st.zh + '打得緊，面對加注只玩更好的牌' : '牌其實可以玩，他這次選擇保守'); }
+    return nm + '：' + cards + '（' + esc(clsWords(g)) + '，起手牌前 ' + PCT0(pct) + '）——' + esc(why) + '。';
+  }
+  const need = toCall > 0 ? toCall / (potTotal(S) + toCall) : 0;
+  let h = nm + '：' + cards + ' → ' + esc(CATG[handCategory(c[0], c[1], S.board)]);
+  const o = S.board.length < 5 ? outsInfo(c, S.board) : null;
+  if (o && o.total) h += '（' + o.total + ' 張出牌）';
+  if (toCall > 0) h += '。面對下注要跟 ' + toCall + '，勝率要 ' + PCT0(need);
+  const hero = S.players[0];
+  if (!hero.folded && toCall > 0 && hero.cards.length === 2) {
+    const one = new Float32Array(NCOMBO); one[comboOf(hero.cards[0], hero.cards[1])] = 1;
+    const eq = exactHU(c, S.board, one).eq;
+    h += '；對你的牌他其實有 ' + PCT0(eq) + '：' + (eq >= need ? '棄得太早（被你嚇跑了）' : '棄對了');
+  }
+  return h + '。';
+}
+/* 這一步有人棄牌：他拿什麼、為什麼 */
+function peekFoldHTML(st) {
+  if (!peekOn() || !st.ev) return '';
+  const seats = st.ev.k === 'folds' ? st.ev.seats : st.ev.k === 'act' && st.ev.t === 'f' ? [st.ev.seat] : [];
+  const ss = seats.filter((s) => s !== 0);
+  if (!ss.length) return '';
+  if (!st.peekH) st.peekH = ss.map((s) => '<p>' + foldWhy(st.snap, s) + '</p>').join('');
+  return st.peekH;
+}
+/* 一手結束：所有棄牌的人 */
+function peekSummaryHTML() {
+  if (!peekOn()) return '';
+  let h = '';
+  for (const st of G.steps) { const x = peekFoldHTML(st); if (x) h += x.replace(/<p>/g, '<p>' + STREET_NAME[st.ev.street !== undefined ? st.ev.street : st.snap.street] + '・'); }
   return h;
 }
 function legalSnapshot(S) { const p = S.players[S.toAct]; return { toCall: Math.max(0, S.curBet - p.bet) }; }
@@ -386,6 +452,8 @@ function summaryHTML(S) {
   if (!r.uncontested) {
     for (const p of S.players) if (!p.folded) h += '<p>' + esc(p.seat === 0 ? '你' : p.name) + '：' + rich(CARDS_TOK(sortedCards(p.cards))) + ' → ' + esc(describeHand(evalCards(p.cards.concat(S.board)))) + '</p>';
   }
+  const pk = peekSummaryHTML();
+  if (pk) h += '<div class="peek"><b>👀 偷看：棄牌的人拿什麼</b>' + pk + '</div>';
   if (G.review.length) {
     h += '<p style="margin-top:10px"><b>這一手你的每個決定</b></p><ul class="review">';
     for (const x of G.review) {

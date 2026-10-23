@@ -96,6 +96,78 @@ function heroInfo(H, seat, rng, iters) {
   return info;
 }
 
+/* ===== 出牌明細（10/23）：每一張出牌是什麼、中了變成什麼、中了以後對他的範圍還領先多少 =====
+   ws：每個對手的範圍權重（教練估的）。中了也常常輸的出牌要「打折」：例如公牌已經有一對時配到你的牌只是小兩對。
+   回傳 groups：[{ cat, name, cards:[{ c, share }], n, eff, beat:[會輸給的牌型] }]；eff＝打折後相當於幾張乾淨的出牌 */
+function outsTable(hero, board, ws) {
+  const o = outsInfo(hero, board);
+  if (!o || !o.total) return null;
+  const dead = new Uint8Array(52);
+  for (const c of hero.concat(board)) dead[c] = 1;
+  const nb = board.length + 1, hb = new Array(nb + 2), ob = new Array(nb + 2);
+  const groups = [];
+  let eff = 0;
+  for (const g of o.groups) {
+    if (!g.strong) continue;
+    const out = { cat: g.cat, name: g.name, cards: [], n: 0, eff: 0, beat: [] };
+    const beat = new Float64Array(9);
+    for (const c of g.cards) {
+      hb[0] = hero[0]; hb[1] = hero[1];
+      for (let i = 0; i < board.length; i++) { hb[2 + i] = board[i]; ob[2 + i] = board[i]; }
+      hb[nb + 1] = c; ob[nb + 1] = c;
+      const hv = evalCards(hb, nb + 2);
+      let share = 1;
+      for (const w of ws || []) {
+        let tot = 0, win = 0;
+        const bt = new Float64Array(9);
+        for (let k = 0; k < NCOMBO; k++) {
+          const x = w[k];
+          if (!(x > 0)) continue;
+          const a = COMBO_A[k], b = COMBO_B[k];
+          if (dead[a] || dead[b] || a === c || b === c) continue;
+          ob[0] = a; ob[1] = b;
+          const ov = evalCards(ob, nb + 2);
+          tot += x;
+          if (hv > ov) win += x; else if (hv === ov) win += x / 2; else bt[handCat(ov)] += x;
+        }
+        if (tot > 0) { share *= win / tot; for (let i = 0; i < 9; i++) beat[i] += bt[i] / tot; }
+      }
+      out.cards.push({ c, share });
+      out.eff += share;
+    }
+    out.n = out.cards.length;
+    const bs = beat.reduce((s, x) => s + x, 0);
+    out.beat = [...beat.keys()].filter((i) => bs > 0 && beat[i] / bs >= 0.2).sort((i, j) => beat[j] - beat[i]).slice(0, 2).map((i) => CAT_NAMES[i]);
+    eff += out.eff;
+    groups.push(out);
+  }
+  const left = o.left, flop = board.length === 3;
+  const pr = (n) => flop ? 1 - ((left - n) / left) * ((left - 1 - n) / (left - 1)) : n / left;
+  return { total: o.total, weak: o.weak, left, flop, groups, eff, pNext: o.total / left, pRiver: pr(o.total), pNextEff: eff / left, pRiverEff: pr(eff) };
+}
+/* 出牌的機率和「要不要賭」：給教練框的明細用。ctx：{ toCall, pot, stack, oppStack, label, est } */
+function outsAdviceLines(T, ctx) {
+  const L = [], n = T.total, e = T.eff, dirty = e < n - 0.5;
+  const er = (x) => Math.round(x * 10) / 10;
+  L.push('下一張就中：' + n + '／' + T.left + '＝' + PCT0(T.pNext) + (dirty ? '；只算中了真的會領先的（約 ' + er(e) + ' 張）是 ' + PCT0(T.pNextEff) : '') + '。');
+  if (T.flop) L.push('轉牌、河牌兩張都看得到時，至少中一張：' + PCT0(T.pRiver) + (dirty ? '（可靠的 ' + PCT0(T.pRiverEff) + '）' : '') + '。');
+  L.push('好記的算法：出牌 × 2 ≈ 下一張中的機率（' + n + ' × 2 ＝ ' + n * 2 + '%）' + (T.flop ? '；翻牌時 × 4 ≈ 到河牌（' + n + ' × 4 ＝ ' + n * 4 + '%' + (n > 9 ? '，張數多時會高估一點' : '') + '）' : '') + '。');
+  const allin = ctx.toCall > 0 && ctx.toCall >= ctx.stack;
+  if (ctx.toCall > 0) {
+    const need = ctx.toCall / (ctx.pot + ctx.toCall), useRiver = allin && T.flop;
+    const p = useRiver ? T.pRiverEff : T.pNextEff;
+    const head = '要不要賭：跟 ' + ctx.toCall + '，勝率要 ' + PCT0(need) + '。' + (useRiver ? '跟了就是全下，兩張都看得到，用 ' + PCT0(p) : '他下一條街多半還會再下注，所以先只算下一張：' + PCT0(p));
+    if (p >= need) L.push(head + ' ≥ ' + PCT0(need) + '，只靠出牌就夠，跟注划算。');
+    else if (useRiver) L.push(head + ' < ' + PCT0(need) + '，只靠出牌不夠。');
+    else {
+      const F = Math.max(0, Math.ceil((1 - p) * ctx.toCall / Math.max(p, 0.01) - ctx.pot));
+      L.push(head + ' < ' + PCT0(need) + '，只靠出牌不夠：中了以後還要再從他那裡多贏 ' + F + ' 以上才不虧（隱含賠率）' + (ctx.oppStack > F * 1.5 ? '；他後面還有 ' + ctx.oppStack + '，有機會。' : '；他後面只剩 ' + ctx.oppStack + '，很難。'));
+    }
+  } else L.push('要不要賭：現在不用付錢。過牌＝免費看下一張（' + PCT0(T.pNextEff) + ' 會中）；下注＝半詐唬：他棄牌你直接贏，被跟還有 ' + PCT0(T.flop ? T.pRiverEff : T.pNextEff) + ' 會中。');
+  if (ctx.label) L.push('教練最後的建議「' + ctx.label + '」看的是整體勝率約 ' + PCT0(ctx.est) + '：連你沒中、他也沒中的時候都算進去，所以不一定跟只算出牌一樣。');
+  return L;
+}
+
 /* ===== 輪到你：建議和原因 =====
    回傳 { act: {t, to}, label, reasons: [...], more: [...], need, eq } */
 /* 教練的建議：翻牌前有圖表的情況照圖表（原本照勝率算的原因留在「更多說明」） */
@@ -254,6 +326,9 @@ function coachAdviceRule(H, rng) {
   const ta = nO > 1 ? '他們' : '他';
   const eqLine = '還有 ' + nO + ' 個對手；照' + ta + '的動作估，你的勝率約 ' + PCT0(I.est) + '（如果' + ta + '是隨機手牌，是 ' + PCT0(I.rand) + '）。';
   const o = I.outs, outsN = o ? o.total : 0;
+  const T = outsN ? outsTable(p.cards, H.board, I.ws) : null;          // 出牌明細：每一張是什麼、中了還領先多少（教練框列出來）
+  I.outsT = T;
+  const dirty = T && T.eff < outsN - 0.5;
   R.push(status);
   if (L.toCall === 0) {
     const mk0 = (a, l) => { const r = mk(a, l); r.detail = postDetail(H, I, L, pot, 0, I.est, [], 0, p); return r; };
@@ -266,12 +341,12 @@ function coachAdviceRule(H, rng) {
     }
     if (I.draws && outsN >= 8 && H.street < 3 && nO <= 2 && L.canRaise) {
       const to = sizeTo(H, L, 0.5);
-      R.push('你有 ' + outsN + ' 張出牌。下注叫「半詐唬」：對手棄牌你直接贏；被跟的話還有 ' + PCT0(o.pRiver) + ' 的機會成牌。');
+      R.push('你有 ' + outsN + ' 張出牌' + (dirty ? '（扣掉中了也常輸的，約 ' + Math.round(T.eff) + ' 張）' : '') + '。下注叫「半詐唬」：對手棄牌你直接贏；被跟的話還有 ' + PCT0(T ? T.pRiverEff : o.pRiver) + ' 的機會成牌（各是哪些牌，看下面的「出牌明細」）。');
       M.push('過牌也可以：免費看下一張。');
       return mk0({ t: 'r', to }, sizeLbl(to));
     }
     R.push(H.street === 3 ? '牌力不夠去下注：比你大的牌會跟，比你小的牌會棄。過牌，直接攤牌比大小。' : '勝率還不夠高去下注。過牌，免費看下一張牌。');
-    if (outsN) M.push('下一張有 ' + outsN + ' 張牌讓你明顯變強（' + PCT0(o.pNext) + '）。');
+    if (outsN) M.push('下一張有 ' + outsN + ' 張牌讓你明顯變強（' + PCT0(o.pNext) + (dirty ? '；扣掉中了也常輸的是 ' + PCT0(T.pNextEff) : '') + '）。');
     return mk0({ t: 'x' }, '過牌');
   }
   const implied = I.draws && H.street === 1 && p.stack > pot ? 0.05 : I.draws && H.street === 2 && p.stack > pot ? 0.03 : 0;

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1d19"><meta name="description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="德州軍師"><meta property="og:type" content="website"><meta property="og:title" content="德州軍師"><meta property="og:description" content="跟電腦打德州撲克（2 到 9 人），教練一步一步解說：現在發生什麼、你的牌多強、該怎麼做和為什麼，打完還會檢討每個決定。另有勝率計算機和 GTO 求解器。手機點開就能用。"><meta property="og:image" content="https://wayuanzi-web.github.io/holdem/og.png"><meta property="og:url" content="https://wayuanzi-web.github.io/holdem/"><meta name="twitter:card" content="summary_large_image"><title>德州軍師</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%9F%E4%B8%A6%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%98%E4%B9%9D%E4%B9%9F%E4%B9%BE%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%8B%E4%BB%8D%E4%BB%94%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A4%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BC%BC%E4%BD%86%E4%BD%88%E4%BD%8D%E4%BD%8E%E4%BD%8F%E4%BD%94%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%82%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%92%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%99%E5%82%B3%E5%82%BE%E5%83%8F%E5%83%B9%E5%84%AA%E5%84%B2%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AB%E5%85%AC%E5%85%AD%E5%85%B1%E5%85%B6%E5%85%B7%E5%85%B8%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%9B%E5%8A%9F%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%A2%E5%8B%BE%E5%8C%85%E5%8C%96%E5%8C%AF%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%9A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%83%E5%8F%88%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%A6%E5%90%AB%E5%91%8A%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%8F%E5%95%9F%E5%96%9C%E5%96%AE%E5%97%8E%E5%98%9B%E5%99%A8%E5%9A%87%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9B%BA%E5%9C%88%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9C%BE%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%83%E5%9E%8B%E5%9F%B7%E5%9F%BA%E5%A0%85%E5%A0%B1%E5%A0%B4%E5%A1%97%E5%A1%AB%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AB%8C%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AD%B8%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%9F%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%88%E5%B0%8A%E5%B0%8D%E5%B0%8E%E5%B0%8F%E5%B0%91%E5%B0%AC%E5%B0%B1%E5%B0%B7%E5%B0%BA%E5%B0%BE%E5%B1%80%E5%B1%95%E5%B1%A4%E5%B1%AC%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B7%B4%E5%B8%83%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%85%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%B4%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%A7%E5%BA%AB%E5%BB%A2%E5%BB%BA%E5%BC%84%E5%BC%88%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%A9%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8B%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%85%E5%BF%97%E5%BF%A0%E5%BF%AB%E5%BF%B5%E6%80%8E%E6%80%95%E6%80%9D%E6%80%A7%E6%83%85%E6%83%B3%E6%84%8F%E6%84%9B%E6%85%8B%E6%85%98%E6%85%A2%E6%85%A3%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%87%B2%E6%88%90%E6%88%91%E6%88%96%E6%88%B0%E6%88%B2%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%A3%E6%89%B9%E6%89%BE%E6%8A%8A%E6%8A%93%E6%8A%95%E6%8A%98%E6%8A%BD%E6%8B%96%E6%8B%AC%E6%8B%BF%E6%8C%81%E6%8C%87%E6%8C%89%E6%8C%91%E6%8C%96%E6%8D%A8%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A7%E6%8E%A8%E6%8F%90%E6%8F%9B%E6%90%8D%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%87%E6%93%8A%E6%93%8B%E6%93%9A%E6%93%A0%E6%93%AC%E6%93%BA%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BB%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%A2%E6%95%A3%E6%95%B4%E6%95%B8%E6%96%87%E6%96%99%E6%96%9C%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%96%BD%E6%97%A5%E6%97%A6%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%99%AF%E6%9A%97%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9B%B8%E6%9C%80%E6%9C%83%E6%9C%88%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%91%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9E%B6%E6%9F%90%E6%9F%A5%E6%A0%B8%E6%A0%B9%E6%A0%BC%E6%A1%86%E6%A1%88%E6%A1%8C%E6%A2%85%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%9A%E6%A5%AD%E6%A5%B5%E6%A6%82%E6%A6%9C%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A1%E6%AD%A3%E6%AD%A4%E6%AD%A5%E6%AE%B5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B0%A3%E6%B0%B8%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B2%BF%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B4%97%E6%B4%9E%E6%B5%81%E6%B6%88%E6%B7%B1%E6%B7%B7%E6%B7%BA%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E6%BB%BF%E6%BC%8F%E6%BF%95%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%86%9F%E7%87%A5%E7%88%9B%E7%88%BE%E7%89%87%E7%89%88%E7%89%8C%E7%89%B9%E7%8A%AF%E7%8C%9C%E7%8D%8E%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%A0%E7%8F%BE%E7%90%86%E7%94%9A%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%8C%E7%95%99%E7%95%A2%E7%95%A5%E7%95%AB%E7%95%B6%E7%96%91%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%A4%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%81%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%AD%E7%9F%B3%E7%A0%94%E7%A1%AC%E7%A2%BA%E7%A2%BC%E7%A4%8E%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A8%B1%E7%A9%8D%E7%A9%A9%E7%A9%B6%E7%A9%BA%E7%A9%BF%E7%AA%81%E7%AA%84%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%94%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B0%BF%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%80%E7%B4%84%E7%B4%85%E7%B4%94%E7%B4%9A%E7%B4%AF%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B5%B1%E7%B6%93%E7%B6%A0%E7%B6%AD%E7%B6%B2%E7%B7%8A%E7%B7%92%E7%B7%9A%E7%B7%A3%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B8%BE%E7%B9%9E%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BD%B0%E7%BE%85%E7%BE%8E%E7%BE%A4%E7%BF%92%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%8C%E8%83%BD%E8%84%86%E8%85%A6%E8%85%B3%E8%87%89%E8%87%AA%E8%87%B3%E8%88%87%E8%88%8A%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8C%B2%E8%8E%8A%E8%90%AC%E8%90%BD%E8%91%97%E8%91%AB%E8%92%99%E8%96%84%E8%98%86%E8%99%95%E8%99%9B%E8%99%A7%E8%99%B9%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A1%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%8B%E8%A6%8F%E8%A6%96%E8%A6%BD%E8%A7%80%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%93%E8%A8%98%E8%A8%A3%E8%A8%AD%E8%A8%B4%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A2%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%A9%B3%E8%AA%8D%E8%AA%A0%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AA%B2%E8%AA%BF%E8%AB%8B%E8%AB%96%E8%AC%9B%E8%AD%89%E8%AD%98%E8%AD%B0%E8%AD%B7%E8%AE%80%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%AA%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B6%95%E8%B6%A3%E8%B7%91%E8%B7%9B%E8%B7%9D%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8A%E9%81%8B%E9%81%8E%E9%81%93%E9%81%94%E9%81%A0%E9%81%A9%E9%81%AE%E9%81%B8%E9%81%BA%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%86%92%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%91%E9%87%9D%E9%88%95%E9%8C%84%E9%8C%A2%E9%8C%A6%E9%8C%AF%E9%8C%B6%E9%8D%B5%E9%8E%96%E9%90%98%E9%95%B7%E9%96%80%E9%96%89%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%B2%E9%98%BB%E9%98%BF%E9%99%84%E9%99%8D%E9%99%90%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%8E%E9%9A%94%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A2%E9%9B%A3%E9%9B%B6%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A0%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%88%E9%A0%90%E9%A0%92%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8C%E9%A1%8D%E9%A1%8F%E9%A1%98%E9%A1%9E%E9%A1%AF%E9%A2%A8%E9%A4%8A%E9%A6%96%E9%A6%AC%E9%A8%99%E9%A9%97%E9%A9%9F%E9%AA%A8%E9%AA%B0%E9%AB%92%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@900&display=swap&text=%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%B8%94%E4%B8%9F%E4%B8%A6%E4%B8%AD%E4%B8%BB%E4%B9%85%E4%B9%8B%E4%B9%8E%E4%B9%98%E4%B9%9D%E4%B9%9F%E4%B9%BE%E4%BA%82%E4%BA%86%E4%BA%8B%E4%BA%8C%E4%BA%94%E4%BA%9B%E4%BA%A4%E4%BA%AB%E4%BA%AE%E4%BA%BA%E4%BB%80%E4%BB%8B%E4%BB%8D%E4%BB%94%E4%BB%96%E4%BB%98%E4%BB%A3%E4%BB%A4%E4%BB%A5%E4%BB%B6%E4%BB%BB%E4%BB%BD%E4%BC%AF%E4%BC%B0%E4%BC%BC%E4%BD%86%E4%BD%88%E4%BD%8D%E4%BD%8E%E4%BD%8F%E4%BD%94%E4%BD%95%E4%BD%9C%E4%BD%A0%E4%BD%B3%E4%BD%B5%E4%BE%86%E4%BE%8B%E4%BE%BF%E4%BF%82%E4%BF%9D%E5%80%8B%E5%80%8D%E5%80%91%E5%80%92%E5%80%99%E5%80%BC%E5%81%87%E5%81%8F%E5%81%9A%E5%81%9C%E5%81%B6%E5%81%B7%E5%82%99%E5%82%B3%E5%82%BE%E5%83%8F%E5%83%B9%E5%84%AA%E5%84%B2%E5%85%88%E5%85%89%E5%85%8B%E5%85%8D%E5%85%A5%E5%85%A7%E5%85%A8%E5%85%A9%E5%85%AB%E5%85%AC%E5%85%AD%E5%85%B1%E5%85%B6%E5%85%B7%E5%85%B8%E5%86%8D%E5%86%92%E5%87%B6%E5%87%BA%E5%88%86%E5%88%87%E5%88%92%E5%88%97%E5%88%A4%E5%88%A5%E5%88%A9%E5%88%AA%E5%88%B0%E5%88%B6%E5%89%87%E5%89%8A%E5%89%8D%E5%89%9B%E5%89%9D%E5%89%A9%E5%8A%83%E5%8A%9B%E5%8A%9F%E5%8A%A0%E5%8A%AB%E5%8B%89%E5%8B%95%E5%8B%9D%E5%8B%A2%E5%8B%BE%E5%8C%85%E5%8C%96%E5%8C%AF%E5%8D%81%E5%8D%83%E5%8D%87%E5%8D%8A%E5%8D%9A%E5%8D%A0%E5%8D%A1%E5%8D%BB%E5%8E%9F%E5%8E%BB%E5%8F%83%E5%8F%88%E5%8F%8B%E5%8F%8D%E5%8F%96%E5%8F%97%E5%8F%A3%E5%8F%A6%E5%8F%AA%E5%8F%AB%E5%8F%AF%E5%8F%B0%E5%8F%B3%E5%90%83%E5%90%84%E5%90%88%E5%90%8C%E5%90%8D%E5%90%91%E5%90%A6%E5%90%AB%E5%91%8A%E5%92%8C%E5%93%AA%E5%94%AC%E5%95%8F%E5%95%9F%E5%96%9C%E5%96%AE%E5%97%8E%E5%98%9B%E5%99%A8%E5%9A%87%E5%9B%9B%E5%9B%9E%E5%9B%A0%E5%9B%BA%E5%9C%88%E5%9C%8D%E5%9C%96%E5%9C%A8%E5%9C%B0%E5%9C%BE%E5%9D%80%E5%9D%87%E5%9D%90%E5%9E%83%E5%9E%8B%E5%9F%B7%E5%9F%BA%E5%A0%85%E5%A0%B1%E5%A0%B4%E5%A1%97%E5%A1%AB%E5%A3%93%E5%A3%9E%E5%A4%96%E5%A4%9A%E5%A4%A0%E5%A4%A7%E5%A4%AA%E5%A4%B1%E5%A5%97%E5%A5%BD%E5%A6%82%E5%A7%8B%E5%AB%8C%E5%AC%8C%E5%AD%90%E5%AD%97%E5%AD%98%E5%AD%B8%E5%AE%83%E5%AE%88%E5%AE%89%E5%AE%8C%E5%AE%9A%E5%AE%9C%E5%AE%A4%E5%AE%B6%E5%AE%B9%E5%AF%9F%E5%AF%A6%E5%AF%AB%E5%AF%AC%E5%AF%B8%E5%B0%88%E5%B0%8A%E5%B0%8D%E5%B0%8E%E5%B0%8F%E5%B0%91%E5%B0%AC%E5%B0%B1%E5%B0%B7%E5%B0%BA%E5%B0%BE%E5%B1%80%E5%B1%95%E5%B1%A4%E5%B1%AC%E5%B2%A9%E5%B7%9E%E5%B7%A5%E5%B7%A6%E5%B7%AE%E5%B7%B1%E5%B7%B2%E5%B7%B4%E5%B8%83%E5%B8%AB%E5%B8%B6%E5%B8%B8%E5%B9%85%E5%B9%95%E5%B9%AB%E5%B9%B3%E5%B9%B4%E5%B9%BE%E5%BA%8F%E5%BA%95%E5%BA%A6%E5%BA%A7%E5%BA%AB%E5%BB%A2%E5%BB%BA%E5%BC%84%E5%BC%88%E5%BC%8F%E5%BC%B1%E5%BC%B5%E5%BC%B7%E5%BD%A9%E5%BD%B1%E5%BE%80%E5%BE%88%E5%BE%8B%E5%BE%8C%E5%BE%91%E5%BE%97%E5%BE%9E%E5%BE%B7%E5%BF%83%E5%BF%85%E5%BF%97%E5%BF%A0%E5%BF%AB%E5%BF%B5%E6%80%8E%E6%80%95%E6%80%9D%E6%80%A7%E6%83%85%E6%83%B3%E6%84%8F%E6%84%9B%E6%85%8B%E6%85%98%E6%85%A2%E6%85%A3%E6%85%AE%E6%86%B6%E6%87%82%E6%87%89%E6%87%B2%E6%88%90%E6%88%91%E6%88%96%E6%88%B0%E6%88%B2%E6%89%80%E6%89%8B%E6%89%8D%E6%89%93%E6%89%A3%E6%89%B9%E6%89%BE%E6%8A%8A%E6%8A%93%E6%8A%95%E6%8A%98%E6%8A%BD%E6%8B%96%E6%8B%AC%E6%8B%BF%E6%8C%81%E6%8C%87%E6%8C%89%E6%8C%91%E6%8C%96%E6%8D%A8%E6%8E%89%E6%8E%92%E6%8E%A5%E6%8E%A7%E6%8E%A8%E6%8F%90%E6%8F%9B%E6%90%8D%E6%90%B6%E6%92%9E%E6%92%B2%E6%93%87%E6%93%8A%E6%93%8B%E6%93%9A%E6%93%A0%E6%93%AC%E6%93%BA%E6%94%A4%E6%94%B6%E6%94%B9%E6%94%BB%E6%94%BE%E6%95%88%E6%95%97%E6%95%99%E6%95%A2%E6%95%A3%E6%95%B4%E6%95%B8%E6%96%87%E6%96%99%E6%96%9C%E6%96%B0%E6%96%B7%E6%96%B9%E6%96%BC%E6%96%BD%E6%97%A5%E6%97%A6%E6%97%A9%E6%98%8E%E6%98%93%E6%98%A5%E6%98%AF%E6%99%82%E6%99%9A%E6%99%AE%E6%99%AF%E6%9A%97%E6%9A%AB%E6%9B%B3%E6%9B%B4%E6%9B%B8%E6%9C%80%E6%9C%83%E6%9C%88%E6%9C%89%E6%9C%8B%E6%9C%9B%E6%9C%9F%E6%9C%AC%E6%9D%91%E6%9D%9F%E6%9D%B1%E6%9E%90%E6%9E%9C%E6%9E%B6%E6%9F%90%E6%9F%A5%E6%A0%B8%E6%A0%B9%E6%A0%BC%E6%A1%86%E6%A1%88%E6%A1%8C%E6%A2%85%E6%A2%9D%E6%A3%84%E6%A3%B5%E6%A5%9A%E6%A5%AD%E6%A5%B5%E6%A6%82%E6%A6%9C%E6%A7%8D%E6%A8%99%E6%A8%A1%E6%A8%A3%E6%A8%B9%E6%A9%9F%E6%AA%A2%E6%AC%84%E6%AC%8A%E6%AC%A1%E6%AD%A1%E6%AD%A3%E6%AD%A4%E6%AD%A5%E6%AE%B5%E6%AF%8F%E6%AF%94%E6%AF%AB%E6%B0%A3%E6%B0%B8%E6%B1%82%E6%B1%A0%E6%B1%BA%E6%B2%89%E6%B2%92%E6%B2%B3%E6%B2%BF%E6%B3%81%E6%B3%95%E6%B3%A8%E6%B4%97%E6%B4%9E%E6%B5%81%E6%B6%88%E6%B7%A8%E6%B7%B1%E6%B7%B7%E6%B7%BA%E6%B8%85%E6%B8%9B%E6%B8%AC%E6%B9%8A%E6%BA%96%E6%BB%BF%E6%BC%8F%E6%BF%95%E7%80%8F%E7%82%BA%E7%84%A1%E7%84%B6%E7%85%9E%E7%85%A7%E7%85%A9%E7%86%9F%E7%87%A5%E7%88%9B%E7%88%BE%E7%89%87%E7%89%88%E7%89%8C%E7%89%B9%E7%8A%AF%E7%8C%9C%E7%8D%8E%E7%8E%87%E7%8E%8B%E7%8E%A9%E7%8E%B2%E7%8F%A0%E7%8F%BE%E7%90%86%E7%94%9A%E7%94%9F%E7%94%A8%E7%94%B1%E7%95%8C%E7%95%99%E7%95%A2%E7%95%A5%E7%95%AB%E7%95%B6%E7%96%91%E7%98%8B%E7%99%BC%E7%99%BD%E7%99%BE%E7%9A%84%E7%9A%87%E7%9B%A4%E7%9B%AE%E7%9B%B2%E7%9B%B4%E7%9B%B8%E7%9C%81%E7%9C%8B%E7%9C%9F%E7%9F%A5%E7%9F%AD%E7%9F%B3%E7%A0%94%E7%A1%AC%E7%A2%BA%E7%A2%BC%E7%A4%8E%E7%A4%BA%E7%A7%92%E7%A7%BB%E7%A8%8B%E7%A8%AE%E7%A8%B1%E7%A9%8D%E7%A9%A9%E7%A9%B6%E7%A9%BA%E7%A9%BF%E7%AA%81%E7%AA%84%E7%AB%99%E7%AC%AC%E7%AD%86%E7%AD%89%E7%AD%94%E7%AD%96%E7%AE%97%E7%AE%A1%E7%AF%80%E7%AF%84%E7%B0%A1%E7%B0%BF%E7%B1%8C%E7%B2%97%E7%B2%BE%E7%B4%80%E7%B4%84%E7%B4%85%E7%B4%94%E7%B4%9A%E7%B4%AF%E7%B4%B0%E7%B5%84%E7%B5%90%E7%B5%95%E7%B5%A6%E7%B5%B1%E7%B6%93%E7%B6%A0%E7%B6%AD%E7%B6%B2%E7%B7%8A%E7%B7%92%E7%B7%9A%E7%B7%A3%E7%B7%A8%E7%B7%B4%E7%B8%AE%E7%B8%BD%E7%B8%BE%E7%B9%9E%E7%B9%BC%E7%BA%8C%E7%BC%BA%E7%BD%AE%E7%BD%B0%E7%BE%85%E7%BE%8E%E7%BE%A4%E7%BF%92%E7%BF%BB%E8%80%81%E8%80%83%E8%80%8C%E8%81%BD%E8%83%8C%E8%83%BD%E8%84%86%E8%85%A6%E8%85%B3%E8%87%89%E8%87%AA%E8%87%B3%E8%88%87%E8%88%8A%E8%88%AC%E8%89%B2%E8%8A%AC%E8%8A%B1%E8%8C%B2%E8%8E%8A%E8%90%AC%E8%90%BD%E8%91%97%E8%91%AB%E8%92%99%E8%96%84%E8%98%86%E8%99%95%E8%99%9B%E8%99%A7%E8%99%B9%E8%9E%A2%E8%A1%8C%E8%A1%97%E8%A1%A1%E8%A1%A8%E8%A2%8B%E8%A2%AB%E8%A3%9C%E8%A3%9D%E8%A3%A1%E8%A3%BD%E8%A4%87%E8%A5%BF%E8%A6%81%E8%A6%8B%E8%A6%8F%E8%A6%96%E8%A6%BD%E8%A7%80%E8%A7%92%E8%A7%A3%E8%A8%82%E8%A8%88%E8%A8%8A%E8%A8%8E%E8%A8%93%E8%A8%98%E8%A8%A3%E8%A8%AD%E8%A8%B4%E8%A9%90%E8%A9%95%E8%A9%9E%E8%A9%A2%E8%A9%A6%E8%A9%B1%E8%A9%B2%E8%A9%B3%E8%AA%8D%E8%AA%A0%E8%AA%A4%E8%AA%AA%E8%AA%B0%E8%AA%B2%E8%AA%BF%E8%AB%8B%E8%AB%96%E8%AC%9B%E8%AD%89%E8%AD%98%E8%AD%B0%E8%AD%B7%E8%AE%80%E8%AE%8A%E8%AE%93%E8%B2%B4%E8%B2%BB%E8%B2%BC%E8%B3%87%E8%B3%A0%E8%B3%AA%E8%B3%AD%E8%B3%BA%E8%B3%BD%E8%B4%8F%E8%B5%B0%E8%B5%B7%E8%B6%85%E8%B6%8A%E8%B6%95%E8%B6%A3%E8%B7%91%E8%B7%9B%E8%B7%9D%E8%B7%9F%E8%B7%AF%E8%B7%B3%E8%B8%A2%E8%BA%AB%E8%BB%8D%E8%BC%83%E8%BC%95%E8%BC%AA%E8%BC%AF%E8%BC%B8%E8%BD%89%E8%BE%A6%E8%BF%91%E8%BF%AD%E9%80%80%E9%80%8F%E9%80%90%E9%80%99%E9%80%9A%E9%80%9F%E9%80%A3%E9%80%B2%E9%80%BC%E9%81%87%E9%81%8A%E9%81%8B%E9%81%8E%E9%81%93%E9%81%94%E9%81%A0%E9%81%A9%E9%81%AE%E9%81%B8%E9%81%BA%E9%82%84%E9%82%8A%E9%82%8F%E9%82%A3%E9%83%A8%E9%83%BD%E9%85%8D%E9%86%92%E9%87%8B%E9%87%8D%E9%87%8F%E9%87%91%E9%87%9D%E9%88%95%E9%8C%84%E9%8C%A2%E9%8C%A6%E9%8C%AF%E9%8C%B6%E9%8D%B5%E9%8E%96%E9%90%98%E9%95%B7%E9%96%80%E9%96%89%E9%96%8B%E9%96%93%E9%97%9C%E9%98%B1%E9%98%B2%E9%98%BB%E9%98%BF%E9%99%84%E9%99%8D%E9%99%90%E9%99%A4%E9%99%B3%E9%99%B7%E9%99%B8%E9%9A%8E%E9%9A%94%E9%9A%9B%E9%9A%A8%E9%9A%AA%E9%9A%B1%E9%9B%96%E9%9B%99%E9%9B%A2%E9%9B%A3%E9%9B%B6%E9%9B%BB%E9%9C%80%E9%9C%B2%E9%9D%9E%E9%9D%A0%E9%9D%A2%E9%9F%BF%E9%A0%81%E9%A0%82%E9%A0%85%E9%A0%86%E9%A0%88%E9%A0%90%E9%A0%92%E9%A0%98%E9%A0%AD%E9%A0%BB%E9%A1%8C%E9%A1%8D%E9%A1%8F%E9%A1%98%E9%A1%9E%E9%A1%AF%E9%A2%A8%E9%A4%8A%E9%A6%96%E9%A6%AC%E9%A8%99%E9%A9%97%E9%A9%9F%E9%AA%A8%E9%AA%B0%E9%AB%92%E9%AB%94%E9%AB%98%E9%AC%86%E9%BA%BB%E9%BA%BC%E9%BB%83%E9%BB%9E0123456789AKQJT%25.%2C%2B-%E2%80%94%EF%BC%88%EF%BC%89%EF%BC%9A%E3%80%81%E2%99%A0%E2%99%A5%E2%99%A6%E2%99%A3" media="print" onload="this.media='all'">
 <style>
 :root {
   --ink: #0e1d19;        /* 牌桌陰影裡的深綠 */
@@ -698,6 +698,13 @@ body.noexplain .xp, body.noexplain .how { display: none; }
 .endbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .studiooffer { margin-top: 14px; border-top: 1px solid #e3d7b7; padding-top: 10px; }
 .studiooffer p { margin: 2px 0 0; }
+.outsbox { border: 1px solid #e3d7b7; border-radius: 10px; padding: 8px 10px; margin: 8px 0; background: #fffaf0; }
+.outst { width: 100%; border-collapse: collapse; font-size: 14px; margin: 6px 0; }
+.outst th, .outst td { border-top: 1px solid #eadfc2; padding: 4px; vertical-align: top; text-align: left; } .outst th { font-size: 12px; color: #7a6c48; font-weight: 600; } .outst .r { text-align: right; white-space: nowrap; }
+.outst td small { display: block; color: #7a6c48; font-size: 12px; font-weight: 400; }
+.outst .oc { display: inline-block; margin: 0 6px 2px 0; } .outst .oc.half { text-decoration: underline dotted; opacity: .8; } .outst .oc.bad { text-decoration: line-through; opacity: .5; }
+.outsbox ul { margin: 4px 0 2px; padding-left: 1.2em; } .outsbox li { margin: 3px 0; font-size: 14px; }
+.peek { background: #eef2f6; border-left: 3px solid #5a7fa8; border-radius: 6px; padding: 6px 10px; margin: 8px 0; font-size: 14px; } .peek p { margin: 4px 0 0; }
 .coach .ct.c0 { color: #1c2333; } .coach .ct.c1 { color: #b62d24; } .coach .ct.c2 { color: #1f58b8; } .coach .ct.c3 { color: #23773f; }
 .coach .btn { background: #efe3bf; border-color: #d9c99c; color: #2b2410; }
 .coach .btn.main { background: var(--brass); border-color: var(--brass); color: #1b1608; }
@@ -1552,14 +1559,15 @@ function outsInfo(hero, board) {
   if (board.length < 3 || board.length > 4) return null;
   const cur = handCat(evalCards(hero.concat(board)));
   const deck = deckWithout(hero.concat(board));
-  let topBoard = 0;
-  for (const c of board) topBoard = Math.max(topBoard, c >> 2);
+  let topBoard = 0, bRanks = 0;
+  for (const c of board) { topBoard = Math.max(topBoard, c >> 2); bRanks |= 1 << (c >> 2); }
   const groups = new Map();
   let total = 0, weak = 0;
   for (const c of deck) {
     const v = evalCards(hero.concat(board, [c]));
     const cat = handCat(v), bc = handCat(evalCards(board.concat([c])));
     if (!(cat > cur && cat > bc)) continue;
+    if (cat === 2 && (bRanks >> (c >> 2) & 1)) continue;                 // 公牌自己成對變成的兩對：大家都多一對，不算出牌
     const strong = cat >= 2 || (cat === 1 && TOPBIT[(v >> 13) & 8191] > topBoard);
     const key = cat * 2 + (strong ? 1 : 0);
     if (!groups.has(key)) groups.set(key, { cat, name: CAT_NAMES[cat], strong, cards: [] });
@@ -4064,6 +4072,78 @@ function heroInfo(H, seat, rng, iters) {
   return info;
 }
 
+/* ===== 出牌明細（10/23）：每一張出牌是什麼、中了變成什麼、中了以後對他的範圍還領先多少 =====
+   ws：每個對手的範圍權重（教練估的）。中了也常常輸的出牌要「打折」：例如公牌已經有一對時配到你的牌只是小兩對。
+   回傳 groups：[{ cat, name, cards:[{ c, share }], n, eff, beat:[會輸給的牌型] }]；eff＝打折後相當於幾張乾淨的出牌 */
+function outsTable(hero, board, ws) {
+  const o = outsInfo(hero, board);
+  if (!o || !o.total) return null;
+  const dead = new Uint8Array(52);
+  for (const c of hero.concat(board)) dead[c] = 1;
+  const nb = board.length + 1, hb = new Array(nb + 2), ob = new Array(nb + 2);
+  const groups = [];
+  let eff = 0;
+  for (const g of o.groups) {
+    if (!g.strong) continue;
+    const out = { cat: g.cat, name: g.name, cards: [], n: 0, eff: 0, beat: [] };
+    const beat = new Float64Array(9);
+    for (const c of g.cards) {
+      hb[0] = hero[0]; hb[1] = hero[1];
+      for (let i = 0; i < board.length; i++) { hb[2 + i] = board[i]; ob[2 + i] = board[i]; }
+      hb[nb + 1] = c; ob[nb + 1] = c;
+      const hv = evalCards(hb, nb + 2);
+      let share = 1;
+      for (const w of ws || []) {
+        let tot = 0, win = 0;
+        const bt = new Float64Array(9);
+        for (let k = 0; k < NCOMBO; k++) {
+          const x = w[k];
+          if (!(x > 0)) continue;
+          const a = COMBO_A[k], b = COMBO_B[k];
+          if (dead[a] || dead[b] || a === c || b === c) continue;
+          ob[0] = a; ob[1] = b;
+          const ov = evalCards(ob, nb + 2);
+          tot += x;
+          if (hv > ov) win += x; else if (hv === ov) win += x / 2; else bt[handCat(ov)] += x;
+        }
+        if (tot > 0) { share *= win / tot; for (let i = 0; i < 9; i++) beat[i] += bt[i] / tot; }
+      }
+      out.cards.push({ c, share });
+      out.eff += share;
+    }
+    out.n = out.cards.length;
+    const bs = beat.reduce((s, x) => s + x, 0);
+    out.beat = [...beat.keys()].filter((i) => bs > 0 && beat[i] / bs >= 0.2).sort((i, j) => beat[j] - beat[i]).slice(0, 2).map((i) => CAT_NAMES[i]);
+    eff += out.eff;
+    groups.push(out);
+  }
+  const left = o.left, flop = board.length === 3;
+  const pr = (n) => flop ? 1 - ((left - n) / left) * ((left - 1 - n) / (left - 1)) : n / left;
+  return { total: o.total, weak: o.weak, left, flop, groups, eff, pNext: o.total / left, pRiver: pr(o.total), pNextEff: eff / left, pRiverEff: pr(eff) };
+}
+/* 出牌的機率和「要不要賭」：給教練框的明細用。ctx：{ toCall, pot, stack, oppStack, label, est } */
+function outsAdviceLines(T, ctx) {
+  const L = [], n = T.total, e = T.eff, dirty = e < n - 0.5;
+  const er = (x) => Math.round(x * 10) / 10;
+  L.push('下一張就中：' + n + '／' + T.left + '＝' + PCT0(T.pNext) + (dirty ? '；只算中了真的會領先的（約 ' + er(e) + ' 張）是 ' + PCT0(T.pNextEff) : '') + '。');
+  if (T.flop) L.push('轉牌、河牌兩張都看得到時，至少中一張：' + PCT0(T.pRiver) + (dirty ? '（可靠的 ' + PCT0(T.pRiverEff) + '）' : '') + '。');
+  L.push('好記的算法：出牌 × 2 ≈ 下一張中的機率（' + n + ' × 2 ＝ ' + n * 2 + '%）' + (T.flop ? '；翻牌時 × 4 ≈ 到河牌（' + n + ' × 4 ＝ ' + n * 4 + '%' + (n > 9 ? '，張數多時會高估一點' : '') + '）' : '') + '。');
+  const allin = ctx.toCall > 0 && ctx.toCall >= ctx.stack;
+  if (ctx.toCall > 0) {
+    const need = ctx.toCall / (ctx.pot + ctx.toCall), useRiver = allin && T.flop;
+    const p = useRiver ? T.pRiverEff : T.pNextEff;
+    const head = '要不要賭：跟 ' + ctx.toCall + '，勝率要 ' + PCT0(need) + '。' + (useRiver ? '跟了就是全下，兩張都看得到，用 ' + PCT0(p) : '他下一條街多半還會再下注，所以先只算下一張：' + PCT0(p));
+    if (p >= need) L.push(head + ' ≥ ' + PCT0(need) + '，只靠出牌就夠，跟注划算。');
+    else if (useRiver) L.push(head + ' < ' + PCT0(need) + '，只靠出牌不夠。');
+    else {
+      const F = Math.max(0, Math.ceil((1 - p) * ctx.toCall / Math.max(p, 0.01) - ctx.pot));
+      L.push(head + ' < ' + PCT0(need) + '，只靠出牌不夠：中了以後還要再從他那裡多贏 ' + F + ' 以上才不虧（隱含賠率）' + (ctx.oppStack > F * 1.5 ? '；他後面還有 ' + ctx.oppStack + '，有機會。' : '；他後面只剩 ' + ctx.oppStack + '，很難。'));
+    }
+  } else L.push('要不要賭：現在不用付錢。過牌＝免費看下一張（' + PCT0(T.pNextEff) + ' 會中）；下注＝半詐唬：他棄牌你直接贏，被跟還有 ' + PCT0(T.flop ? T.pRiverEff : T.pNextEff) + ' 會中。');
+  if (ctx.label) L.push('教練最後的建議「' + ctx.label + '」看的是整體勝率約 ' + PCT0(ctx.est) + '：連你沒中、他也沒中的時候都算進去，所以不一定跟只算出牌一樣。');
+  return L;
+}
+
 /* ===== 輪到你：建議和原因 =====
    回傳 { act: {t, to}, label, reasons: [...], more: [...], need, eq } */
 /* 教練的建議：翻牌前有圖表的情況照圖表（原本照勝率算的原因留在「更多說明」） */
@@ -4222,6 +4302,9 @@ function coachAdviceRule(H, rng) {
   const ta = nO > 1 ? '他們' : '他';
   const eqLine = '還有 ' + nO + ' 個對手；照' + ta + '的動作估，你的勝率約 ' + PCT0(I.est) + '（如果' + ta + '是隨機手牌，是 ' + PCT0(I.rand) + '）。';
   const o = I.outs, outsN = o ? o.total : 0;
+  const T = outsN ? outsTable(p.cards, H.board, I.ws) : null;          // 出牌明細：每一張是什麼、中了還領先多少（教練框列出來）
+  I.outsT = T;
+  const dirty = T && T.eff < outsN - 0.5;
   R.push(status);
   if (L.toCall === 0) {
     const mk0 = (a, l) => { const r = mk(a, l); r.detail = postDetail(H, I, L, pot, 0, I.est, [], 0, p); return r; };
@@ -4234,12 +4317,12 @@ function coachAdviceRule(H, rng) {
     }
     if (I.draws && outsN >= 8 && H.street < 3 && nO <= 2 && L.canRaise) {
       const to = sizeTo(H, L, 0.5);
-      R.push('你有 ' + outsN + ' 張出牌。下注叫「半詐唬」：對手棄牌你直接贏；被跟的話還有 ' + PCT0(o.pRiver) + ' 的機會成牌。');
+      R.push('你有 ' + outsN + ' 張出牌' + (dirty ? '（扣掉中了也常輸的，約 ' + Math.round(T.eff) + ' 張）' : '') + '。下注叫「半詐唬」：對手棄牌你直接贏；被跟的話還有 ' + PCT0(T ? T.pRiverEff : o.pRiver) + ' 的機會成牌（各是哪些牌，看下面的「出牌明細」）。');
       M.push('過牌也可以：免費看下一張。');
       return mk0({ t: 'r', to }, sizeLbl(to));
     }
     R.push(H.street === 3 ? '牌力不夠去下注：比你大的牌會跟，比你小的牌會棄。過牌，直接攤牌比大小。' : '勝率還不夠高去下注。過牌，免費看下一張牌。');
-    if (outsN) M.push('下一張有 ' + outsN + ' 張牌讓你明顯變強（' + PCT0(o.pNext) + '）。');
+    if (outsN) M.push('下一張有 ' + outsN + ' 張牌讓你明顯變強（' + PCT0(o.pNext) + (dirty ? '；扣掉中了也常輸的是 ' + PCT0(T.pNextEff) : '') + '）。');
     return mk0({ t: 'x' }, '過牌');
   }
   const implied = I.draws && H.street === 1 && p.stack > pot ? 0.05 : I.draws && H.street === 2 && p.stack > pot ? 0.03 : 0;
@@ -8801,9 +8884,9 @@ function renderTable(st) {
   for (let k = 0; k < n; k++) {
     const p = S.players[k], hero = k === 0;
     const xy = seatXY(n, k, 1);
-    const open = hero || G.replay || (GS.peek && !G.exam) || (showdown && !p.folded);
+    const open = hero || G.replay || peekOn() || (showdown && !p.folded);
     let cards = '';
-    if (p.cards.length === 2 && !(p.folded && !hero && !G.replay)) {
+    if (p.cards.length === 2 && !(p.folded && !hero && !G.replay && !peekOn())) {      // 偷看打開：棄牌的人的牌也看得到
       const cls = hero ? 'heroc' : 'small';
       const cs = hero ? sortedCards(p.cards) : p.cards;
       cards = cs.map((c) => cardEl(open ? c : -1, cls, animDeal)).join('');
@@ -8867,6 +8950,8 @@ function renderCoach(st) {
     }
     const used = new Set();
     for (const l of st.lines) h += '<p>' + glossify(rich(l), used) + '</p>';
+    const pk = peekFoldHTML(st);
+    if (pk) h += '<div class="peek"><b>👀 偷看：他為什麼棄牌</b>' + pk + '</div>';
     if (st.tip) h += '<div class="tip"><b>第一次遇到，說明一下</b>' + glossify(rich(st.tip), used) + '</div>';
   }
   $('cBody').innerHTML = h;
@@ -8893,6 +8978,7 @@ function heroHTML(st, S) {
   const used = new Set();
   h += gtoBoxHTML();
   h += '<div class="adv"><div class="rec">' + (gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  h += outsBoxHTML(adv, S);
   if (adv.detail) {
     const d = adv.detail;
     const q = d.call > 0 ? '為什麼要 ' + Math.round(d.need * 100) + '%？你的勝率怎麼算的？' : '你的勝率 ' + Math.round(d.est * 100) + '% 怎麼算的？';
@@ -8901,6 +8987,69 @@ function heroHTML(st, S) {
   if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
   if (EXPLAIN.on && atHead() && !G.replay && !GS.seenTermHint) h += '<p class="note">底下有虛線的詞可以點，會跳出解釋；不需要的話，右上角「深入說明」可以關掉。</p>';
   h += '</div>';
+  return h;
+}
+/* ===== 出牌明細：每一張出牌、中了變成什麼、打不打折、機率、要不要賭 ===== */
+function outsBoxHTML(adv, S) {
+  const T = adv.info && adv.info.outsT;
+  if (!T || (G.exam && !G.over && !G.replay) || !(adv.eq < 0.7 && (adv.info.draws || adv.eq < 0.5))) return '';   // 有聽牌、或現在落後才列（已經大幅領先時「出牌」沒意義）
+  const p = S.players[0], L = legalSnapshot(S), er = (x) => Math.round(x * 10) / 10;
+  const opp = S.players.filter((q) => !q.folded && q.seat !== 0), oppStack = opp.length ? Math.max(...opp.map((q) => q.stack)) : 0;
+  let h = '<div class="outsbox"><b>出牌明細：' + T.total + ' 張' + (T.eff < T.total - 0.5 ? '（中了真的會領先的約 ' + er(T.eff) + ' 張）' : '') + '</b>';
+  h += '<table class="outst"><tr><th>中了變成</th><th>哪幾張</th><th class="r">張數</th></tr>';
+  for (const g of T.groups) {
+    const avg = g.n ? g.eff / g.n : 0;
+    const q = avg >= 0.8 ? '✓ 乾淨' : avg >= 0.5 ? '△ 要打折' : '✗ 中了也常輸';
+    h += '<tr><td><b>' + esc(g.name) + '</b><small>' + q + '（中了領先 ' + PCT0(avg) + (avg < 0.8 && g.beat.length ? '，會輸給' + g.beat.join('、') : '') + '）</small></td><td>'
+      + g.cards.map((x) => '<span class="oc ' + (x.share >= 0.8 ? 'ok' : x.share >= 0.5 ? 'half' : 'bad') + '" title="中了領先 ' + PCT0(x.share) + '">' + cardSpan(x.c) + '</span>').join('') + '</td><td class="r">' + g.n + '</td></tr>';
+  }
+  h += '</table>';
+  if (T.weak) h += '<p class="note">另外 ' + T.weak + ' 張只讓你變成比公牌小的對子，不算出牌。</p>';
+  h += '<ul>' + outsAdviceLines(T, { toCall: L.toCall, pot: potTotal(S), stack: p.stack, oppStack, label: adv.label, est: adv.eq }).map((x) => '<li>' + rich(x) + '</li>').join('') + '</ul>';
+  h += '<p class="note">「中了領先」＝這張牌發出來以後，你的牌比教練估的他的範圍大的比例。劃掉的牌中了也常輸；虛線底的要打折。</p></div>';
+  return h;
+}
+/* ===== 偷看（打開「偷看對手的牌」、不是考核）：棄牌的人拿什麼、為什麼棄 ===== */
+function peekOn() { return !!(GS.peek && !G.exam); }
+function foldWhy(S, seat) {
+  const p = S.players[seat], c = p.cards;
+  if (!c || c.length !== 2) return '';
+  const nm = '<b>' + esc(p.name) + '</b>（' + esc(styleZh(p.style)) + '・' + POS_ZH[p.pos] + '）', toCall = Math.max(0, S.curBet - p.bet);
+  const cards = rich(CARDS_TOK(sortedCards(c)));
+  if (!S.board.length) {
+    const g = heroCls(c), pct = PRE_PCT[g];
+    let why;
+    if (!preflopRaises(S)) { const thr = openThr(p.pos, (STYLES[p.style] || STYLES.tag).loose, S.n); why = pct < thr ? '在他平常會玩的範圍邊緣（約前 ' + PCT0(thr) + '），這次沒玩' : styleZh(p.style) + '在這個位置大約只玩前 ' + PCT0(thr) + ' 的牌，不在裡面'; }
+    else { const st = STYLES[p.style] || STYLES.tag; why = '面對加注到 ' + S.curBet + '（要再付 ' + toCall + '）：' + (pct > 0.2 ? '這手牌不夠強' : st.loose < 0.9 ? '牌其實可以玩，但' + st.zh + '打得緊，面對加注只玩更好的牌' : '牌其實可以玩，他這次選擇保守'); }
+    return nm + '：' + cards + '（' + esc(clsWords(g)) + '，起手牌前 ' + PCT0(pct) + '）——' + esc(why) + '。';
+  }
+  const need = toCall > 0 ? toCall / (potTotal(S) + toCall) : 0;
+  let h = nm + '：' + cards + ' → ' + esc(CATG[handCategory(c[0], c[1], S.board)]);
+  const o = S.board.length < 5 ? outsInfo(c, S.board) : null;
+  if (o && o.total) h += '（' + o.total + ' 張出牌）';
+  if (toCall > 0) h += '。面對下注要跟 ' + toCall + '，勝率要 ' + PCT0(need);
+  const hero = S.players[0];
+  if (!hero.folded && toCall > 0 && hero.cards.length === 2) {
+    const one = new Float32Array(NCOMBO); one[comboOf(hero.cards[0], hero.cards[1])] = 1;
+    const eq = exactHU(c, S.board, one).eq;
+    h += '；對你的牌他其實有 ' + PCT0(eq) + '：' + (eq >= need ? '棄得太早（被你嚇跑了）' : '棄對了');
+  }
+  return h + '。';
+}
+/* 這一步有人棄牌：他拿什麼、為什麼 */
+function peekFoldHTML(st) {
+  if (!peekOn() || !st.ev) return '';
+  const seats = st.ev.k === 'folds' ? st.ev.seats : st.ev.k === 'act' && st.ev.t === 'f' ? [st.ev.seat] : [];
+  const ss = seats.filter((s) => s !== 0);
+  if (!ss.length) return '';
+  if (!st.peekH) st.peekH = ss.map((s) => '<p>' + foldWhy(st.snap, s) + '</p>').join('');
+  return st.peekH;
+}
+/* 一手結束：所有棄牌的人 */
+function peekSummaryHTML() {
+  if (!peekOn()) return '';
+  let h = '';
+  for (const st of G.steps) { const x = peekFoldHTML(st); if (x) h += x.replace(/<p>/g, '<p>' + STREET_NAME[st.ev.street !== undefined ? st.ev.street : st.snap.street] + '・'); }
   return h;
 }
 function legalSnapshot(S) { const p = S.players[S.toAct]; return { toCall: Math.max(0, S.curBet - p.bet) }; }
@@ -8912,6 +9061,8 @@ function summaryHTML(S) {
   if (!r.uncontested) {
     for (const p of S.players) if (!p.folded) h += '<p>' + esc(p.seat === 0 ? '你' : p.name) + '：' + rich(CARDS_TOK(sortedCards(p.cards))) + ' → ' + esc(describeHand(evalCards(p.cards.concat(S.board)))) + '</p>';
   }
+  const pk = peekSummaryHTML();
+  if (pk) h += '<div class="peek"><b>👀 偷看：棄牌的人拿什麼</b>' + pk + '</div>';
   if (G.review.length) {
     h += '<p style="margin-top:10px"><b>這一手你的每個決定</b></p><ul class="review">';
     for (const x of G.review) {
