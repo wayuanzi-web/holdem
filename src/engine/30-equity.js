@@ -104,14 +104,15 @@ function outsInfo(hero, board) {
   if (board.length < 3 || board.length > 4) return null;
   const cur = handCat(evalCards(hero.concat(board)));
   const deck = deckWithout(hero.concat(board));
-  let topBoard = 0;
-  for (const c of board) topBoard = Math.max(topBoard, c >> 2);
+  let topBoard = 0, bRanks = 0;
+  for (const c of board) { topBoard = Math.max(topBoard, c >> 2); bRanks |= 1 << (c >> 2); }
   const groups = new Map();
   let total = 0, weak = 0;
   for (const c of deck) {
     const v = evalCards(hero.concat(board, [c]));
     const cat = handCat(v), bc = handCat(evalCards(board.concat([c])));
     if (!(cat > cur && cat > bc)) continue;
+    if (cat === 2 && (bRanks >> (c >> 2) & 1)) continue;                 // 公牌自己成對變成的兩對：大家都多一對，不算出牌
     const strong = cat >= 2 || (cat === 1 && TOPBIT[(v >> 13) & 8191] > topBoard);
     const key = cat * 2 + (strong ? 1 : 0);
     if (!groups.has(key)) groups.set(key, { cat, name: CAT_NAMES[cat], strong, cards: [] });

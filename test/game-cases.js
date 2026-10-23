@@ -59,4 +59,22 @@ function start(T) { const H = E.newHand(T, E.makeRng(5)); E.gameStep(H); E.gameS
   while (H.phase !== 'done') { const r = E.gameStep(H); if (r.need !== undefined) E.applyAction(H, { t: 'x' }); }
   ok(H.result.won.join('/') === '2/2/2', '公牌是 A 高順子，三個人平分 6（實際 ' + H.result.won.join('/') + '）');
 }
+{ // 出牌明細（10/23）：公牌自己成對變成的兩對不算出牌；配到手牌的兩對在有對子的公牌上要打折
+  const P = E.parseCards;
+  const kk = E.outsInfo(P('KhKd'), P('3d7cTs'));
+  ok(kk.total === 2 && kk.groups.filter((g) => g.strong).every((g) => g.cat === 3), 'KK 在 3-7-10：出牌只有 2 張 K（公牌成對的兩對不算），實際 ' + kk.total);
+  const ak = E.outsInfo(P('AsKc'), P('Kd7h2c'));
+  ok(ak.total === 5, 'AK 在 K-7-2：出牌 5 張（2 張 K 三條、3 張 A 兩對），實際 ' + ak.total);
+  const w = new Float32Array(E.NCOMBO);
+  for (let k = 0; k < E.NCOMBO; k++) w[k] = E.PRE_PCT[E.CLASS_OF[k]] < 0.25 ? 1 : 0;
+  const T = E.outsTable(P('7s6s'), P('8h8d5c'), [w, w]);             // 兩個對手：都要贏
+  const st = T.groups.find((g) => g.cat === 4), tp = T.groups.find((g) => g.cat === 2);
+  ok(T.total === 14 && st.n === 8 && tp.n === 6, '76 在 8-8-5：順子 8 張＋兩對 6 張');
+  ok(st.eff / st.n > 0.85 && tp.eff / tp.n < 0.72 && T.eff < 12, '順子乾淨、兩對要打折（' + (st.eff / st.n).toFixed(2) + '、' + (tp.eff / tp.n).toFixed(2) + '），打折後 ' + T.eff.toFixed(1) + ' 張');
+  ok(Math.abs(T.pNext - 14 / 47) < 1e-9 && Math.abs(T.pRiver - (1 - 33 / 47 * 32 / 46)) < 1e-9, '下一張 14/47、到河牌 1 − 33/47 × 32/46');
+  const L1 = E.outsAdviceLines(T, { toCall: 8, pot: 20, stack: 180, oppStack: 190, label: '跟注 8', est: 0.32 });
+  ok(L1.some((x) => /勝率要 29%/.test(x) && /隱含賠率/.test(x)), '要跟 8、底池 20：要 29%，只靠出牌不夠時講隱含賠率');
+  const L2 = E.outsAdviceLines(T, { toCall: 180, pot: 200, stack: 180, oppStack: 190, label: '跟注 180', est: 0.4 });
+  ok(L2.some((x) => /全下，兩張都看得到/.test(x)), '翻牌全下：用到河牌的機率');
+}
 process.exit(bad ? 1 : 0);
