@@ -387,6 +387,7 @@ function lastAggressorSeat(H) {
 /* ===== 你按完以後的評分 ===== */
 function actFamily(t) { return t === 'f' ? 'f' : (t === 'x' || t === 'c') ? 'p' : 'a'; }
 function gradeAction(adv, ev) {
+  if (adv.champ && adv.champ.options && adv.champ.options.length && typeof champGrade === 'function') return champGrade(adv, ev);   // 冠軍教練：照平均賺賠評
   const rf = actFamily(adv.act.t), af = actFamily(ev.t === 'a' ? (ev.to !== undefined && !ev.callAll ? 'r' : 'c') : ev.t);
   if (adv.chart) {                                     // 翻牌前照圖表評：這個動作在圖表裡的比例
     const ch = adv.chart, rz = ch.canRaise === false ? ch.raise : 0;

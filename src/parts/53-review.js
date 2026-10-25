@@ -81,7 +81,8 @@ function reviewHTML(R) {
     const g = st.grade, mk = MK[g.mark];
     h += '<div class="revd ' + g.mark + '"><div class="revh"><span class="mk">' + mk + '</span><b>第 ' + idx + ' 個決定・' + STREET_NAME[st.ev.street] + '</b><span class="note">底池 ' + pot + (L.toCall > 0 ? '・要跟 ' + L.toCall : '') + '</span></div>';
     h += '<div class="revrow"><span class="lbl">你的牌</span>' + sortedCards(hero).map((c) => cardHTML(c, 'sm')).join('') + (board.length ? '<span class="lbl">公牌</span>' + board.map((c) => cardHTML(c, 'sm')).join('') : '') + '</div>';
-    h += '<p><b>你：' + esc(actWord(st.ev, H).replace(/^你/, '')) + '</b>　教練建議：' + esc(adv.label) + (g.src === 'GTO' ? '　<span class="srcg">GTO 評分</span>' : '') + '<br><span class="' + (g.mark === 'good' ? 'ok' : 'no') + '">' + esc(g.text) + '</span></p>';
+    const CH = adv.champ && adv.champ.options && adv.champ.options.length ? adv.champ : null;
+    h += '<p><b>你：' + esc(actWord(st.ev, H).replace(/^你/, '')) + '</b>　' + (CH ? '冠軍教練：' : '教練建議：') + esc(adv.label) + (g.src === 'GTO' ? '　<span class="srcg">GTO 評分</span>' : '') + '<br><span class="' + (g.mark === 'good' ? 'ok' : 'no') + '">' + esc(g.text) + '</span></p>';
     // 當時猜的範圍 vs 他實際的牌
     const opps = adv.detail && adv.detail.opps ? adv.detail.opps : [];
     if (opps.length) {
@@ -99,7 +100,7 @@ function reviewHTML(R) {
       h += '</div>';
     } else if (adv.chart) h += '<p class="note">翻牌前照圖表（' + esc(adv.chart.name) + '）決定，不用猜對手的牌。</p>';
     // 為什麼
-    h += '<details class="revwhy"><summary>為什麼建議「' + esc(adv.label) + '」</summary><ol>' + adv.reasons.map((x) => '<li>' + rich(x) + '</li>').join('') + '</ol>' + (adv.more && adv.more.length ? adv.more.map((x) => '<p class="note">' + rich(x) + '</p>').join('') : '') + '</details>';
+    h += '<details class="revwhy"><summary>為什麼建議「' + esc(adv.label) + '」' + (CH ? '（每個選項的成功率）' : '') + '</summary><ol>' + adv.reasons.map((x) => '<li>' + rich(x) + '</li>').join('') + '</ol>' + (CH ? champTableHTML(CH) : '') + (adv.more && adv.more.length ? adv.more.map((x) => '<p class="note">' + rich(x) + '</p>').join('') : '') + '</details>';
     const ls = reviewLesson(adv, st.ev.street, hero);
     if (ls.length) h += '<p class="revls">相關的課：' + ls.map((l) => '<button type="button" class="linkbtn" data-rev-lesson="' + l.id + '">' + esc(l.id + ' ' + l.title) + '</button>').join('　') + '</p>';
     h += '</div>';
