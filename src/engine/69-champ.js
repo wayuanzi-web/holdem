@@ -390,3 +390,123 @@ function champGrade(adv, ev) {
   if (loss <= Math.max(1.5 * bb, 0.15 * pot)) return { mark: 'ok', text: '可以，但平均少賺 ' + lbb + ' 個大盲（成功率 ' + PCT0(m.win) + '，冠軍的打法 ' + PCT0(best.win) + '）。', src: 'champ' };
   return { mark: 'bad', text: '平均少賺 ' + lbb + ' 個大盲：成功率 ' + PCT0(m.win) + '，冠軍的打法「' + best.label + '」' + PCT0(best.win) + '。', src: 'champ' };
 }
+
+/* ===== 整手模擬（10/25 升級）：每個選項把這一手打完很多次 =====
+   對手的牌照他的範圍抽、之後的公牌照剩下的牌抽（每個選項用同一批「世界」，比較才準）；
+   之後每個人（包括你）都照電腦的出牌規則打完。平均賺賠＝你這一手最後的輸贏，扣掉現在棄牌會輸的。
+   棄牌的人的牌、還沒發的牌：你看不到，一律重抽（不偷看）。 */
+function champLevelFast(level) {
+  const k = 'r' + (level || 2);
+  if (!AI_LEVEL[k]) {                                                  // 模擬裡電腦算勝率用比較少次（快），雜訊扣掉這一部分，總雜訊跟原本差不多
+    const b = AI_LEVEL[level || 2] || AI_LEVEL[2];
+    AI_LEVEL[k] = { noise: Math.sqrt(Math.max(0, b.noise * b.noise - 0.04 * 0.04)), iters: 150, mistake: b.mistake };
+  }
+  return k;
+}
+function champWorlds(H, seat, N, rng) {
+  const opps = H.players.filter((q) => q.seat !== seat && !q.folded);
+  const ws = opps.map((q) => rangeWeights(H, q.seat, CHAMP.styleRanges ? q.style : 'tag'));
+  const known = new Uint8Array(52);
+  for (const c of H.players[seat].cards.concat(H.board)) known[c] = 1;
+  const cdfs = ws.map((w) => { const cdf = new Float64Array(NCOMBO); let s = 0; for (let k = 0; k < NCOMBO; k++) { if (!known[COMBO_A[k]] && !known[COMBO_B[k]]) s += w[k]; cdf[k] = s; } return cdf; });
+  const out = [];
+  for (let i = 0; i < N; i++) {
+    const used = Uint8Array.from(known), cards = {};
+    opps.forEach((q, j) => {
+      const cdf = cdfs[j], tot = cdf[NCOMBO - 1];
+      let k = -1;
+      for (let t = 0; t < 60 && tot > 0; t++) {
+        const u = rng() * tot;
+        let lo = 0, hi = NCOMBO - 1;
+        while (lo < hi) { const mid = (lo + hi) >> 1; if (cdf[mid] > u) hi = mid; else lo = mid + 1; }
+        if (!used[COMBO_A[lo]] && !used[COMBO_B[lo]]) { k = lo; break; }
+      }
+      if (k < 0) { for (let t = 0; t < 400; t++) { const x = (rng() * NCOMBO) | 0; if (!used[COMBO_A[x]] && !used[COMBO_B[x]]) { k = x; break; } } }
+      cards[q.seat] = [COMBO_A[k], COMBO_B[k]]; used[COMBO_A[k]] = 1; used[COMBO_B[k]] = 1;
+    });
+    const deck = [];
+    for (let c = 0; c < 52; c++) if (!used[c]) deck.push(c);
+    for (let x = deck.length - 1; x > 0; x--) { const y = (rng() * (x + 1)) | 0; const t = deck[x]; deck[x] = deck[y]; deck[y] = t; }
+    out.push({ cards, deck, seed: (rng() * 4294967296) >>> 0 });
+  }
+  return out;
+}
+function champPlay(H, seat, act, world, lvF) {
+  const H1 = champClone(H);
+  for (const q of H1.players) if (q.seat !== seat) q.cards = world.cards[q.seat] || [];
+  H1.deck = world.deck; H1.dp = 0;
+  const rng = makeRng(world.seed), before = H.players[seat].total;
+  applyAction(H1, act);
+  let guard = 0;
+  while (H1.phase !== 'done' && guard++ < 300) {
+    const r = gameStep(H1);
+    if (r.need === undefined) continue;
+    applyAction(H1, aiDecide(H1, rng, lvF));
+  }
+  if (!H1.result) return { ev: 0, won: false };
+  return { ev: H1.result.net[seat] + before, won: H1.result.won[seat] > 0 };
+}
+/* cands：[{ act, label }]；回傳每個選項的平均賺賠、成功率、標準誤，和每個世界的結果（配對比較用） */
+function champRollout(H, seat, level, cands, opt) {
+  opt = opt || {};
+  const N = opt.N || 200, budget = opt.budgetMs || 0, t0 = Date.now();
+  const rng = makeRng(opt.seed || (H.no * 7919 + H.log.length * 31 + 1));
+  const worlds = champWorlds(H, seat, N, rng), lvF = champLevelFast(level);
+  const res = cands.map((c) => ({ act: c.act, label: c.label, xs: [], wins: 0 }));
+  let n = 0;
+  for (let i = 0; i < N; i++) {
+    for (const r of res) {
+      if (r.act.t === 'f') { r.xs.push(0); continue; }
+      const o = champPlay(H, seat, r.act, worlds[i], lvF);
+      r.xs.push(o.ev); if (o.won) r.wins++;
+    }
+    n++;
+    if (budget && n >= 40 && Date.now() - t0 > budget) break;
+  }
+  for (const r of res) {
+    const m = r.xs.reduce((a, b) => a + b, 0) / n;
+    r.ev = m; r.win = r.act.t === 'f' ? 0 : r.wins / n;
+    r.se = Math.sqrt(r.xs.reduce((s, x) => s + (x - m) * (x - m), 0) / Math.max(1, n - 1) / n);
+  }
+  return { n, ms: Date.now() - t0, res };
+}
+/* 這一步值不值得模擬：翻牌前明顯要棄（每個不棄的選項平均都 < −0.5 大盲）就不用 */
+function champNeedSim(adv) {
+  const C = adv.champ;
+  if (!C || !C.options || C.options.length < 2 || C.gto || C.short) return false;
+  return C.options.some((o) => o.act.t !== 'f' && o.ev > -0.5 * (C.bb || 2));
+}
+/* 要模擬的選項：棄／過、跟，加注最多 3 種大小（一步估算最好的那幾個） */
+function champSimCands(adv) {
+  const o = adv.champ.options, pas = o.filter((x) => x.act.t !== 'r'), ag = o.filter((x) => x.act.t === 'r').sort((a, b) => b.ev - a.ev).slice(0, 3);
+  return pas.concat(ag).map((x) => ({ act: x.act, label: x.label }));
+}
+/* 模擬的結果併回建議：選項的平均和成功率換成模擬的，重新挑最好的 */
+function champMerge(adv, sim, H) {
+  const C = adv.champ, bb = C.bb || 2;
+  const key = (a) => a.t + ':' + (a.to || 0);
+  const by = new Map(sim.res.map((r) => [key(r.act), r]));
+  const opts = C.options.filter((o) => by.has(key(o.act))).map((o) => { const r = by.get(key(o.act)); return Object.assign({}, o, { ev1: o.ev, win1: o.win, ev: r.ev, win: r.win, se: r.se, xs: r.xs }); });
+  if (!opts.length) return adv;
+  // 先照一步估算的選擇；模擬（同一批世界配對比較）明顯更好的才換：多賺要超過門檻，也要超過 1 個標準誤（模擬次數有限，有雜訊）
+  let best = opts.find((o) => key(o.act) === key(C.best.act)) || opts[0];
+  let bestD = 0;
+  for (const o of opts) {
+    if (o === best) continue;
+    const n = Math.min(o.xs.length, best.xs.length);
+    let s = 0, s2 = 0;
+    for (let i = 0; i < n; i++) { const d = o.xs[i] - best.xs[i]; s += d; s2 += d * d; }
+    const m = s / n, se = Math.sqrt(Math.max(0, s2 / n - m * m) / Math.max(1, n - 1));
+    const need = (o.act.t === 'r' && best.act.t !== 'r' ? (H.street ? CHAMP.margin : CHAMP.marginPre) : 0.1) * bb;
+    if (m > need && m > se && m > bestD) { bestD = m; o.dSe = se; o.d = m; best.swapTo = o; }
+  }
+  if (best.swapTo) { const x = best.swapTo; delete best.swapTo; best = x; }
+  if (best.act.t === 'c' && best.ev < 0) best = opts.find((o) => o.act.t === 'f') || best;
+  for (const o of opts) { o.bb = o.ev / bb; delete o.xs; }
+  const out = Object.assign({}, adv);
+  out.act = best.act; out.label = best.label;
+  out.champ = Object.assign({}, C, { options: opts.sort((a, b) => b.ev - a.ev), best, sim: { n: sim.n, ms: sim.ms }, same: best.act.t === C.base.act.t, oneStep: { label: C.best.label } });
+  out.reasons = champReasons(H, H.toAct, best, opts, C.read, { reasons: adv.reasons.slice(0, 1), act: C.base.act, label: C.base.label });
+  out.reasons.splice(1 + Math.min(2, C.read.length), 0, '整手模擬 ' + sim.n + ' 次：每個選項都照每個人的出牌習慣把這一手打完（對手的牌照他的範圍抽），看最後平均輸贏。');
+  return out;
+}

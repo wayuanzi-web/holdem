@@ -1,5 +1,5 @@
 /* 冠軍教練 vs 穩健教練 vs 電腦：同樣的發牌、同樣的電腦亂數（每一手各自的種子），比每百手贏幾個大盲
-   用法：node test/champ-sim.js 手數 種子 等級 [模式...]（模式：coach、champ、ai）；CHAMP_OPTS='{"runs":16}' 調參數
+   用法：node test/champ-sim.js 手數 種子 等級 [模式...]（模式：coach、champ、champ2（加整手模擬）、ai）；CHAMP_OPTS='{"runs":16}' 調參數；SIM_N 模擬次數
    兩個模式時另外印：兩邊第一個不一樣的決定（街・穩健→冠軍）分類的差 */
 const E = require('./engine');
 const HANDS = +(process.argv[2] || 400), SEED = +(process.argv[3] || 7), LEVEL = +(process.argv[4] || 2);
@@ -25,6 +25,11 @@ function run(mode) {
         const t0 = Date.now();
         if (mode === 'ai') a = E.aiDecide(H, rng, 3);
         else if (mode === 'champ') a = E.champAdvice(H, rng, LEVEL).act;
+        else if (mode === 'champ2') {                                   // 冠軍＋整手模擬
+          const adv = E.champAdvice(H, rng, LEVEL);
+          a = adv.act;
+          if (E.champNeedSim(adv)) a = E.champMerge(adv, E.champRollout(H, 0, LEVEL, E.champSimCands(adv), { N: +(process.env.SIM_N || 150) }), H).act;
+        }
         else a = E.coachAdvice(H, rng).act;
         ms += Date.now() - t0; nAdv++;
         const t = a.t === 'r' ? 'r' : a.t;

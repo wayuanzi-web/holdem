@@ -16,7 +16,40 @@ const G = { T: null, H: null, steps: [], view: -1, ctx: null, rng: null, timer: 
 const LEVEL_ZH = { 1: '新手', 2: '普通', 3: '高手', 4: 'GTO' };
 const SPEED_ZH = { 1: '慢', 2: '中', 3: '快', 4: '超快' };
 const COACH_ZH = { champ: '冠軍', solid: '穩健' };
-const COACH_NOTE = { champ: '冠軍教練：看人打。每個動作都算「成功率」（他棄牌＋被跟時你贏）和平均賺賠，選賺最多的；會偷盲、詐唬岩石、對跟注站只拿好牌收錢、對瘋子跟到底。模擬同樣的牌：普通桌每 100 手比穩健教練多贏約 35 個大盲（新手桌約 58、高手桌約 24）；GTO 電腦沒有漏洞可抓，冠軍教練改照書打。', solid: '穩健教練：照書打（翻牌前照圖表、翻牌後照勝率和賠率），偏緊、不容易出錯，適合剛學。實戰考核、大師之路一律照課程評分。' };
+const COACH_NOTE = { champ: '冠軍教練：看人打。每個動作都算「成功率」（他棄牌＋被跟時你贏）和平均賺賠，選賺最多的；會偷盲、詐唬岩石、對跟注站只拿好牌收錢、對瘋子跟到底。輪到你時先給一步估算，約 1.5 秒內再用「整手模擬」（每個選項照每個人的出牌習慣把這一手打完幾百次）更新。模擬同樣的牌：普通桌每 100 手比穩健教練多贏約 85 個大盲、高手桌約 80；GTO 電腦沒有漏洞可抓，冠軍教練改照書打。', solid: '穩健教練：照書打（翻牌前照圖表、翻牌後照勝率和賠率），偏緊、不容易出錯，適合剛學。實戰考核、大師之路一律照課程評分。' };
+/* 冠軍教練的整手模擬：在自己的背景執行緒跑（約 1.5 秒），算好就換掉一步估算的數字和建議 */
+let CW_ = null;
+function CW() {
+  if (CW_) return CW_;
+  const src = $('engine').textContent + '\n' + $('workersrc').textContent;
+  const w = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  w.onmessage = (e) => { if (e.data.cmd === 'champ-ans') champSimAns(e.data); };
+  w.onerror = (e) => { console.error(e); };
+  CW_ = { send(m) { w.postMessage(m); } };
+  return CW_;
+}
+function champSimStart() {
+  const adv = G.adv;
+  G.champJob = null;
+  if (!adv || !adv.champ || G.exam || !champNeedSim(adv)) return;
+  const H = JSON.parse(JSON.stringify(G.H));
+  for (const q of H.players) if (q.seat !== 0) q.cards = [];           // 不偷看：對手（含棄牌的人）的牌、還沒發的牌，模擬裡都重抽
+  H.deck = [];
+  const tok = (G.champTok || 0) + 1;
+  G.champTok = tok; G.champJob = { tok, adv };
+  try { CW().send({ cmd: 'champ-roll', token: tok, H, seat: 0, level: G.T.level, cands: champSimCands(adv), N: 800, budgetMs: 1500 }); } catch (e) { G.champJob = null; }
+}
+function champSimAns(m) {
+  const J = G.champJob;
+  if (!J || m.token !== J.tok) return;
+  G.champJob = null;
+  if (m.error || !m.sim || G.adv !== J.adv || !G.waitingHero) return;   // 已經按了：這一步照一步估算評分
+  const nw = champMerge(J.adv, m.sim, G.H);
+  const st = G.steps[G.steps.length - 1];
+  G.adv = nw;
+  if (st && st.kind === 'hero' && st.adv === J.adv) st.adv = nw;
+  if (!$('vTable').hidden && atHead() && !G.replay) renderCur();
+}
 /* 輪到你：照你選的教練（考核一律用課程的教練） */
 function advise(H) { return GS.coach === 'champ' && !G.exam ? champAdvice(H, G.rng, G.T.level) : coachAdvice(H, G.rng); }
 const SPEED_NOTE = { 1: '電腦每個動作停久一點，適合邊看邊學。', 2: '一般速度。', 3: '電腦動作比較快。', 4: '電腦幾乎不停；你棄牌就直接跳到這一手結束，停在結果，由你決定要不要再來一手。實戰考核不受影響。' };
@@ -145,6 +178,7 @@ function produce() {
     G.waitingHero = true; G.gtoAdv = null;
     pushStep({ kind: 'hero', adv: G.adv, title: '輪到你', lines: [] });
     gtoHeroTurn(false);
+    champSimStart();
     armAutoHero();
     return;
   }
@@ -377,7 +411,7 @@ function heroHTML(st, S) {
   const used = new Set();
   h += gtoBoxHTML();
   const C = adv.champ && adv.champ.options && adv.champ.options.length ? adv.champ : null;
-  h += '<div class="adv"><div class="rec">' + (C ? '🏆 冠軍教練：' : gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + (C ? '<span class="champsub">成功率 ' + PCT0(C.best.win) + '・平均 ' + champBBtxt(C.best.ev, C.bb) + '</span>' : '') + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  h += '<div class="adv"><div class="rec">' + (C ? '🏆 冠軍教練：' : gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + (C ? '<span class="champsub">成功率 ' + PCT0(C.best.win) + '・平均 ' + champBBtxt(C.best.ev, C.bb) + (C.sim ? '・整手模擬 ' + C.sim.n + ' 次' : G.champJob && G.champJob.adv === adv ? '・<span class="thinking">整手模擬中…</span>' : '') + '</span>' : '') + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
   if (C) h += champTableHTML(C);
   h += outsBoxHTML(adv, S);
   if (adv.detail) {
@@ -540,7 +574,7 @@ function renderCtrl(st) {
     else if (examHiding() && examWaitGto()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">GTO 計算中…算好才能按（' + (G.gto.ready && G.gto.pct < 900 ? '可剝削度 ' + fmt(G.gto.pct, 1) + '%，要 3% 以下' : '準備中') + '）</span>';
     else if (examHiding()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">考核中：自己決定，按完評分（已評 ' + G.exam.grades.length + '／' + G.exam.need + '）</span>';
     else if (gtoAdvUsable()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<b class="rec">GTO</b> ' + gtoLine() + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
-    else if (adv.champ && adv.champ.best) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　🏆 <b class="rec">' + esc(adv.label) + '</b><span class="why">（成功率 ' + PCT0(adv.champ.best.win) + '，平均 ' + champBBtxt(adv.champ.best.ev, adv.champ.bb) + '）</span>'
+    else if (adv.champ && adv.champ.best) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　🏆 <b class="rec">' + esc(adv.label) + '</b><span class="why">（成功率 ' + PCT0(adv.champ.best.win) + '，平均 ' + champBBtxt(adv.champ.best.ev, adv.champ.bb) + (G.champJob && G.champJob.adv === adv ? '；整手模擬中…' : '') + '）</span>'
       + (G.gto && !G.gto.lost && G.gto.seats.indexOf(0) >= 0 && GS.gtoCoach ? '<span class="why">　GTO 計算中…</span>' : '') + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
     else m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　建議 <b class="rec">' + esc(adv.label) + '</b><span class="why">（' + why + '）</span>'
       + (G.gto && !G.gto.lost && G.gto.seats.indexOf(0) >= 0 && GS.gtoCoach ? '<span class="why">　GTO 計算中…</span>' : '') + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
@@ -626,7 +660,7 @@ function ctrlCmd(c) {
   else if (c === 'speed') { GS.speed = GS.speed % 4 + 1; gsSave(); renderSpeedChip(); if (isRunning()) scheduleAuto(); }
   else if (c === 'coach') {                                             // 換教練：輪到你的話，這一步的建議馬上重算
     GS.coach = GS.coach === 'champ' ? 'solid' : 'champ'; gsSave(); renderSpeedChip();
-    if (G.waitingHero && atHead() && !G.replay && G.H && !G.exam) { const st = G.steps[G.view]; G.adv = advise(G.H); if (st && st.kind === 'hero') st.adv = G.adv; renderCur(); }
+    if (G.waitingHero && atHead() && !G.replay && G.H && !G.exam) { const st = G.steps[G.view]; G.adv = advise(G.H); if (st && st.kind === 'hero') st.adv = G.adv; champSimStart(); renderCur(); }
   }
   else if (c === 'home') showView('home');
   else if (c === 'replay') { G.replay = true; G.view = 0; G.lastRender = null; clearTimeout(G.timer); renderCur(); }
