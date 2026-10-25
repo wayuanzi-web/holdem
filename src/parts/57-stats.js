@@ -42,7 +42,10 @@ function statsHand(H, review) {
   const pz = POS_ZH[me.pos] || me.pos;
   const P = S.pos[pz] || (S.pos[pz] = { hands: 0, net: 0 });
   P.hands++; P.net += net / H.bb;
-  for (const x of review || []) { const k = x.grade.src === 'GTO' ? 'GTO' : x.grade.src === 'chart' ? 'chart' : 'rule'; S.marks[k][{ good: 0, ok: 1, bad: 2 }[x.grade.mark]]++; }
+  if (!S.marks.champ) S.marks.champ = [0, 0, 0];
+  for (const x of review || []) { const k = x.grade.src === 'GTO' ? 'GTO' : x.grade.src === 'chart' ? 'chart' : x.grade.src === 'champ' ? 'champ' : 'rule'; S.marks[k][{ good: 0, ok: 1, bad: 2 }[x.grade.mark]]++; }
+  const cm = (review || []).filter((x) => x.grade.src === 'champ');           // 有照冠軍教練打的手、沒照的手，各自輸贏多少
+  if (cm.length) { const k = cm.every((x) => x.grade.mark === 'good') ? 'yes' : 'no', Fw = S.follow || (S.follow = { yes: [0, 0], no: [0, 0] }); Fw[k][0]++; Fw[k][1] += net / H.bb; }
   S.hist.push(Math.round(S.net * 10) / 10);
   if (S.hist.length > 1000) S.hist.splice(0, S.hist.length - 1000);
   statsSave();
@@ -71,7 +74,15 @@ function statsHTML() {
   h += '<h3 class="sth" style="margin-top:14px">各位置的輸贏（大盲）</h3><table class="stt">' + ps.map((k) => { const P = S.pos[k]; return '<tr><td>' + k + '</td><td class="r num">' + P.hands + ' 手</td><td class="r num"><b>' + (P.net >= 0 ? '+' : '') + fmt(P.net, 1) + '</b></td></tr>'; }).join('') + '</table>';
   const M = S.marks, mt = (a) => a[0] + a[1] + a[2];
   h += '<h3 class="sth" style="margin-top:14px">你的決定</h3><table class="stt">'
-    + [['教練（規則）', M.rule], ['翻牌前圖表', M.chart], ['GTO 求解', M.GTO]].filter((x) => mt(x[1])).map(([k, a]) => '<tr><td>' + k + '評的</td><td class="r num">' + mt(a) + ' 次</td><td>✓ ' + a[0] + '　△ ' + a[1] + '　✗ ' + a[2] + '（✓ ' + pct(a[0] / mt(a), 0) + '%）</td></tr>').join('') + '</table>';
+    + [['冠軍教練', M.champ || [0, 0, 0]], ['教練（規則）', M.rule], ['翻牌前圖表', M.chart], ['GTO 求解', M.GTO]].filter((x) => mt(x[1])).map(([k, a]) => '<tr><td>' + k + '評的</td><td class="r num">' + mt(a) + ' 次</td><td>✓ ' + a[0] + '　△ ' + a[1] + '　✗ ' + a[2] + '（✓ ' + pct(a[0] / mt(a), 0) + '%）</td></tr>').join('') + '</table>';
+  const Fw = S.follow;
+  if (Fw && Fw.yes[0] + Fw.no[0]) {
+    const avg = (a) => (a[0] ? (a[1] / a[0] >= 0 ? '+' : '') + fmt(a[1] / a[0], 2) + ' 大盲／手' : '—');
+    h += '<h3 class="sth" style="margin-top:14px">照冠軍教練打的成績</h3><table class="stt">'
+      + '<tr><td>每個決定都照冠軍打的手</td><td class="r num">' + Fw.yes[0] + ' 手</td><td class="r num"><b>' + avg(Fw.yes) + '</b></td></tr>'
+      + '<tr><td>有沒照的手</td><td class="r num">' + Fw.no[0] + ' 手</td><td class="r num"><b>' + avg(Fw.no) + '</b></td></tr></table>'
+      + '<p class="note">只算冠軍教練有給建議的手。手數少時運氣影響很大，幾百手以後比較準。</p>';
+  }
   h += '<h3 class="sth" style="margin-top:14px">累計輸贏（大盲，最近 ' + S.hist.length + ' 手）</h3>' + statsChart(S.hist);
   return h;
 }

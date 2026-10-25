@@ -1,11 +1,12 @@
 /* ===== 50-game：牌局（首頁、牌桌、教練框、上一步／下一步、動作列、一手結束的檢討與重看） ===== */
 const SAVE_KEY = 'dezhou-game-1';
 /* flow：auto 電腦自己出牌、輪到你才停（預設）；step 每一件事都停，按「下一步」。speed：1 慢、2 中、3 快、4 超快（電腦幾乎不停；你棄牌就直接跳到這一手結束，停在結果讓你決定要不要再來一手） */
-const GS = { n: 6, flow: 'auto', speed: 2, level: 2, peek: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false, gtoCoach: true, train: false, autoPre: false, trainStats: null };
+const GS = { n: 6, flow: 'auto', speed: 2, coach: 'champ', level: 2, peek: false, seen: [], hands: 0, net: 0, won: 0, seenTermHint: false, gtoCoach: true, train: false, autoPre: false, trainStats: null };
 function gsLoad() {
   try { Object.assign(GS, JSON.parse(localStorage.getItem(SAVE_KEY) || '{}')); } catch (e) { /* 沒有存檔 */ }
   if (GS.flow !== 'auto' && GS.flow !== 'step') GS.flow = 'auto';     // 舊版的 teach／play 都改成自動
   if (!(GS.speed >= 1 && GS.speed <= 4)) GS.speed = 2;
+  if (GS.coach !== 'champ' && GS.coach !== 'solid') GS.coach = 'champ';
 }
 function gsSave() {
   if (G.ctx) GS.seen = [...G.ctx.seen];
@@ -14,6 +15,10 @@ function gsSave() {
 const G = { T: null, H: null, steps: [], view: -1, ctx: null, rng: null, timer: 0, waitingHero: false, adv: null, review: [], replay: false, over: false, pendingAI: null, lastRender: null, oddsTok: 0, paused: false, flash: null, gto: null, gtoAdv: null, waitAI: null };
 const LEVEL_ZH = { 1: '新手', 2: '普通', 3: '高手', 4: 'GTO' };
 const SPEED_ZH = { 1: '慢', 2: '中', 3: '快', 4: '超快' };
+const COACH_ZH = { champ: '冠軍', solid: '穩健' };
+const COACH_NOTE = { champ: '冠軍教練：看人打。每個動作都算「成功率」（他棄牌＋被跟時你贏）和平均賺賠，選賺最多的；會偷盲、詐唬岩石、對跟注站只拿好牌收錢、對瘋子跟到底。模擬同樣的牌：普通桌每 100 手比穩健教練多贏約 35 個大盲（新手桌約 58、高手桌約 24）；GTO 電腦沒有漏洞可抓，冠軍教練改照書打。', solid: '穩健教練：照書打（翻牌前照圖表、翻牌後照勝率和賠率），偏緊、不容易出錯，適合剛學。實戰考核、大師之路一律照課程評分。' };
+/* 輪到你：照你選的教練（考核一律用課程的教練） */
+function advise(H) { return GS.coach === 'champ' && !G.exam ? champAdvice(H, G.rng, G.T.level) : coachAdvice(H, G.rng); }
 const SPEED_NOTE = { 1: '電腦每個動作停久一點，適合邊看邊學。', 2: '一般速度。', 3: '電腦動作比較快。', 4: '電腦幾乎不停；你棄牌就直接跳到這一手結束，停在結果，由你決定要不要再來一手。實戰考核不受影響。' };
 
 /* 文字裡的 {c數字} 換成有顏色的牌 */
@@ -42,6 +47,8 @@ function renderHome() {
   $('hMode').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === GS.flow)));
   $('hS').innerHTML = [1, 2, 3, 4].map((k) => '<button type="button" data-s="' + k + '" aria-pressed="' + (k === GS.speed) + '">' + SPEED_ZH[k] + '</button>').join('');
   $('hSNote').textContent = SPEED_NOTE[GS.speed]; renderSpeedChip();
+  $('hC').innerHTML = ['champ', 'solid'].map((k) => '<button type="button" data-coach="' + k + '" aria-pressed="' + (k === GS.coach) + '">' + COACH_ZH[k] + '教練</button>').join('');
+  $('hCNote').textContent = COACH_NOTE[GS.coach];
   $('bResume').hidden = !G.H;
   $('hGto').checked = GS.gtoCoach; $('hAutoPre').checked = GS.autoPre;
   $('trainStats').textContent = trainStatsText();
@@ -53,6 +60,7 @@ function initHome() {
   $('hL').addEventListener('click', (e) => { const b = e.target.closest('button[data-l]'); if (!b) return; GS.level = +b.dataset.l; gsSave(); renderHome(); });
   $('hMode').addEventListener('click', (e) => { const b = e.target.closest('button[data-m]'); if (!b) return; GS.flow = b.dataset.m; gsSave(); renderHome(); });
   $('hS').addEventListener('click', (e) => { const b = e.target.closest('button[data-s]'); if (!b) return; GS.speed = +b.dataset.s; gsSave(); renderHome(); });
+  $('hC').addEventListener('click', (e) => { const b = e.target.closest('button[data-coach]'); if (!b) return; GS.coach = b.dataset.coach; gsSave(); renderHome(); });
   $('bStart').addEventListener('click', () => newGame(false));
   $('bTrain').addEventListener('click', () => newGame(true));
   $('bTour').addEventListener('click', () => newGame('tourney'));
@@ -133,7 +141,7 @@ function produce() {
     return;
   }
   if (r.need === 0) {
-    G.adv = coachAdvice(H, G.rng);
+    G.adv = advise(H);
     G.waitingHero = true; G.gtoAdv = null;
     pushStep({ kind: 'hero', adv: G.adv, title: '輪到你', lines: [] });
     gtoHeroTurn(false);
@@ -368,7 +376,9 @@ function heroHTML(st, S) {
   let h = '<h3>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '：可以過牌') + '</h3>';
   const used = new Set();
   h += gtoBoxHTML();
-  h += '<div class="adv"><div class="rec">' + (gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  const C = adv.champ && adv.champ.options && adv.champ.options.length ? adv.champ : null;
+  h += '<div class="adv"><div class="rec">' + (C ? '🏆 冠軍教練：' : gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + (C ? '<span class="champsub">成功率 ' + PCT0(C.best.win) + '・平均 ' + champBBtxt(C.best.ev, C.bb) + '</span>' : '') + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
+  if (C) h += champTableHTML(C);
   h += outsBoxHTML(adv, S);
   if (adv.detail) {
     const d = adv.detail;
@@ -378,6 +388,21 @@ function heroHTML(st, S) {
   if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
   if (EXPLAIN.on && atHead() && !G.replay && !GS.seenTermHint) h += '<p class="note">底下有虛線的詞可以點，會跳出解釋；不需要的話，右上角「深入說明」可以關掉。</p>';
   h += '</div>';
+  return h;
+}
+/* ===== 冠軍教練：每個選項的成功率、平均賺賠、他會怎麼回應 ===== */
+function champBBtxt(ev, bb) { const x = ev / (bb || 2); return (x >= 0.05 ? '+' : x <= -0.05 ? '−' : '') + fmt(Math.abs(x), 1) + ' 大盲'; }
+function champTableHTML(C) {
+  let h = '<table class="champt"><tr><th>動作</th><th class="r">成功率</th><th class="r">平均</th><th>他們會</th></tr>';
+  for (const o of C.options) {
+    let who = '';
+    if (o.resp && o.resp.length === 1) { const x = o.resp[0]; who = '棄 ' + PCT0(x.f) + '・跟 ' + PCT0(x.c) + (x.r >= 0.01 ? '・加注 ' + PCT0(x.r) : ''); }
+    else if (o.resp && o.resp.length) who = '大家都棄 ' + PCT0(o.foldAll);
+    else if (o.pBet !== undefined) who = '他下注 ' + PCT0(o.pBet) + (o.pBet > 0.05 ? (o.callVsBet ? '（你再跟）' : '（你就棄）') : '');
+    else if (o.sq !== undefined && o.sq > 0.03) who = '後面再加注 ' + PCT0(o.sq);
+    h += '<tr class="' + (o === C.best ? 'best' : '') + '"><td>' + (o === C.best ? '★ ' : '') + esc(o.label) + '</td><td class="r">' + PCT0(o.win) + '</td><td class="r ' + (o.ev >= 0 ? 'pos' : 'neg') + '">' + champBBtxt(o.ev, C.bb) + '</td><td><small>' + who + '</small></td></tr>';
+  }
+  h += '</table><p class="note">成功率＝贏下這個底池的機會（他棄牌，加上被跟時你贏）。平均＝長期每做一次賺賠幾個大盲（跟現在棄牌比）。照每個人的風格算他會怎麼回應。</p>';
   return h;
 }
 /* ===== 出牌明細：每一張出牌、中了變成什麼、打不打折、機率、要不要賭 ===== */
@@ -515,6 +540,8 @@ function renderCtrl(st) {
     else if (examHiding() && examWaitGto()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">GTO 計算中…算好才能按（' + (G.gto.ready && G.gto.pct < 900 ? '可剝削度 ' + fmt(G.gto.pct, 1) + '%，要 3% 以下' : '準備中') + '）</span>';
     else if (examHiding()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<span class="why">考核中：自己決定，按完評分（已評 ' + G.exam.grades.length + '／' + G.exam.need + '）</span>';
     else if (gtoAdvUsable()) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　<b class="rec">GTO</b> ' + gtoLine() + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
+    else if (adv.champ && adv.champ.best) m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　🏆 <b class="rec">' + esc(adv.label) + '</b><span class="why">（成功率 ' + PCT0(adv.champ.best.win) + '，平均 ' + champBBtxt(adv.champ.best.ev, adv.champ.bb) + '）</span>'
+      + (G.gto && !G.gto.lost && G.gto.seats.indexOf(0) >= 0 && GS.gtoCoach ? '<span class="why">　GTO 計算中…</span>' : '') + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
     else m = '<b>輪到你' + (L.toCall > 0 ? '：要跟 ' + L.toCall : '') + '</b>　建議 <b class="rec">' + esc(adv.label) + '</b><span class="why">（' + why + '）</span>'
       + (G.gto && !G.gto.lost && G.gto.seats.indexOf(0) >= 0 && GS.gtoCoach ? '<span class="why">　GTO 計算中…</span>' : '') + '<button type="button" class="linkbtn" data-c="why">為什麼？</button>';
   } else if (G.over && atHead()) {
@@ -597,6 +624,10 @@ function ctrlCmd(c) {
   else if (c === 'cert') openLearn('cert');
   else if (c === 'review') { if (G.over) openReview(); }
   else if (c === 'speed') { GS.speed = GS.speed % 4 + 1; gsSave(); renderSpeedChip(); if (isRunning()) scheduleAuto(); }
+  else if (c === 'coach') {                                             // 換教練：輪到你的話，這一步的建議馬上重算
+    GS.coach = GS.coach === 'champ' ? 'solid' : 'champ'; gsSave(); renderSpeedChip();
+    if (G.waitingHero && atHead() && !G.replay && G.H && !G.exam) { const st = G.steps[G.view]; G.adv = advise(G.H); if (st && st.kind === 'hero') st.adv = G.adv; renderCur(); }
+  }
   else if (c === 'home') showView('home');
   else if (c === 'replay') { G.replay = true; G.view = 0; G.lastRender = null; clearTimeout(G.timer); renderCur(); }
   else if (c === 'endreplay') { G.replay = false; G.view = G.steps.length - 1; G.lastRender = null; renderCur(); }
@@ -686,7 +717,10 @@ function renderRanks() {
 }
 
 /* 牌桌上的速度鈕：按一下換下一檔（慢→中→快→超快） */
-function renderSpeedChip() { const b = $('spdChip'); b.textContent = '速度：' + SPEED_ZH[GS.speed]; b.title = SPEED_NOTE[GS.speed] + '（按一下換速度）'; b.classList.toggle('on', GS.speed === 4); }
+function renderSpeedChip() {
+  const b = $('spdChip'); b.textContent = '速度：' + SPEED_ZH[GS.speed]; b.title = SPEED_NOTE[GS.speed] + '（按一下換速度）'; b.classList.toggle('on', GS.speed === 4);
+  const c = $('coachChip'); c.textContent = '教練：' + COACH_ZH[GS.coach]; c.title = COACH_NOTE[GS.coach] + '（按一下換教練）'; c.classList.toggle('on', GS.coach === 'champ');
+}
 function initGame() {
   gsLoad();
   initHome();
@@ -718,6 +752,7 @@ function initGame() {
   $('bBetGo').addEventListener('click', () => heroAct({ t: 'r', to: +$('sizeRange').value }));
   $('bBetCancel').addEventListener('click', () => { $('sizer').hidden = true; G.sizerStep = -1; });
   $('spdChip').addEventListener('click', () => ctrlCmd('speed'));
+  $('coachChip').addEventListener('click', () => ctrlCmd('coach'));
   renderSpeedChip();
   $('cBody').addEventListener('click', (e) => {
     const sb = e.target.closest('button[data-studio]');
