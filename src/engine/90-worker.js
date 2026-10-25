@@ -260,6 +260,10 @@ onmessage = (e) => {
     else if (m.cmd === 'ports') setPorts(m.ports);
     else if (m.cmd === 'helper') beHelper(m.port);
     else if (m.cmd === 'bench') doBench(m);
+    else if (m.cmd === 'champ-roll') {                                     // 冠軍教練的整手模擬
+      try { const sim = champRollout(m.H, m.seat, m.level, m.cands, { N: m.N, budgetMs: m.budgetMs }); postMessage({ cmd: 'champ-ans', token: m.token, sim }); }
+      catch (err) { postMessage({ cmd: 'champ-ans', token: m.token, error: String((err && err.message) || err) }); }
+    }
   } catch (err) { postMessage({ cmd: 'error', req: m.req, of: m.cmd, msg: String((err && err.message) || err) }); }
 };
 postMessage({ cmd: 'ready' });
