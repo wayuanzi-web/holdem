@@ -430,13 +430,23 @@ function champTableHTML(C) {
   let h = '<table class="champt"><tr><th>動作</th><th class="r">成功率</th><th class="r">平均</th><th>他們會</th></tr>';
   for (const o of C.options) {
     let who = '';
-    if (o.resp && o.resp.length === 1) { const x = o.resp[0]; who = '棄 ' + PCT0(x.f) + '・跟 ' + PCT0(x.c) + (x.r >= 0.01 ? '・加注 ' + PCT0(x.r) : ''); }
+    const one = C.read.length <= 1, he = one ? '他' : '下一個人';
+    if (o.nx && o.act.t !== 'f') {                                       // 整手模擬算出來的：你這樣做之後，對手的第一個動作
+      const x = o.nx;
+      if (o.act.t === 'r') who = one ? '棄 ' + PCT0(x.f) + '・跟 ' + PCT0(x.c) + (x.r >= 0.01 ? '・加注 ' + PCT0(x.r) : '') : '大家都棄 ' + PCT0(x.allFold);
+      else if (x.n >= 5) who = (x.next > 0.5 ? '下一條街' + he : he) + '下注 ' + PCT0(x.r) + '・過牌 ' + PCT0(x.x) + (x.f >= 0.02 ? '・棄 ' + PCT0(x.f) : '') + (x.c >= 0.02 ? '・跟 ' + PCT0(x.c) : '');
+      else who = '直接攤牌比大小';
+    }
+    else if (o.resp && o.resp.length === 1) { const x = o.resp[0]; who = '棄 ' + PCT0(x.f) + '・跟 ' + PCT0(x.c) + (x.r >= 0.01 ? '・加注 ' + PCT0(x.r) : ''); }
     else if (o.resp && o.resp.length) who = '大家都棄 ' + PCT0(o.foldAll);
     else if (o.pBet !== undefined) who = '他下注 ' + PCT0(o.pBet) + (o.pBet > 0.05 ? (o.callVsBet ? '（你再跟）' : '（你就棄）') : '');
+    else if (o.closes) who = o.river ? '直接攤牌比大小' : (one ? '他' : '大家') + '已經過牌：這條街結束，免費看下一張';
+    else if (o.nAfter) who = '後面還有 ' + o.nAfter + ' 人會說話';
     else if (o.sq !== undefined && o.sq > 0.03) who = '後面再加注 ' + PCT0(o.sq);
     h += '<tr class="' + (o === C.best ? 'best' : '') + '"><td>' + (o === C.best ? '★ ' : '') + esc(o.label) + '</td><td class="r">' + PCT0(o.win) + '</td><td class="r ' + (o.ev >= 0 ? 'pos' : 'neg') + '">' + champBBtxt(o.ev, C.bb) + '</td><td><small>' + who + '</small></td></tr>';
   }
-  h += '</table><p class="note">成功率＝贏下這個底池的機會（他棄牌，加上被跟時你贏）。平均＝長期每做一次賺賠幾個大盲（跟現在棄牌比）。照每個人的風格算他會怎麼回應。</p>';
+  h += '</table><p class="note">成功率＝贏下這個底池的機會（他棄牌，加上被跟時你贏）。平均＝長期每做一次賺賠幾個大盲（跟現在棄牌比）。「他們會」＝你這樣做之後對手的下一個動作' + (C.sim ? '（整手模擬裡實際發生的比例）' : '（照每個人的風格估）') + '。'
+    + (C.options[0] !== C.best ? (C.sim ? '★ 不是平均最高的那一個：差距還在模擬的誤差內（每次模擬結果會有一點不同），冠軍維持原來的判斷。' : '★ 不是平均最高的那一個：主動下注、加注要多賺一點（0.25 個大盲以上）才值得冒險，只差一點點就選比較穩的。') : '') + '</p>';
   return h;
 }
 /* ===== 出牌明細：每一張出牌、中了變成什麼、打不打折、機率、要不要賭 ===== */
