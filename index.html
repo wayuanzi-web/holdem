@@ -4729,7 +4729,7 @@ function champOptionsPost(H, level, I, rng) {
       const callEV = eqVB * champReal(H, false, eqVB, false) * (pot0 + 2 * b) - b;
       const ev = PB * Math.max(0, callEV) + (1 - PB) * eqVK * champReal(H, true, eqVK, false) * pot0;
       opts.push({ act: { t: 'x' }, label: '過牌', ev, win: PB * (callEV > 0 ? eqVB : 0) + (1 - PB) * eqVK, eq: est, pBet: PB, callVsBet: callEV > 0 });
-    } else opts.push({ act: { t: 'x' }, label: '過牌', ev: est * champReal(H, ip, est, opps.length > 1) * pot0, win: est, eq: est });
+    } else opts.push({ act: { t: 'x' }, label: '過牌', ev: est * champReal(H, ip, est, opps.length > 1) * pot0, win: est, eq: est, closes: !nxt.length, nAfter: nxt.length, river });
   }
   else {
     opts.push({ act: { t: 'f' }, label: '棄牌', ev: 0, win: 0 });
@@ -4877,6 +4877,13 @@ function champReasons(H, seat, best, opts, read, base) {
     const x = best.resp[0];
     R.push(x.f >= 0.45 ? '他有 ' + PCT0(x.f) + ' 的時候會棄牌：就算你沒有最好的牌，下注也賺。' : '他多半會跟（' + PCT0(x.c) + '），但你對他會跟的牌勝率 ' + PCT0(x.eqC) + '：下注是收錢（價值下注）。');
   }
+  if ((best.act.t === 'x' || best.act.t === 'c') && best.nx && best.nx.n >= 10) {
+    const x = best.nx, who = read.length > 1 ? '下一個人' : '他', when = x.next > 0.5 ? '下一條街' : '接著';
+    R.push('你' + (best.act.t === 'x' ? '過牌' : '跟注') + '以後，' + who + when + '下注 ' + PCT0(x.r) + '、過牌 ' + PCT0(x.x) + (x.f >= 0.02 ? '、棄牌 ' + PCT0(x.f) : '') + '：'
+      + (x.r >= 0.4 ? '讓他自己下注（他的牌有不少是在詐唬或拿差一點的牌下注），你再跟比你先下注賺得多。'
+        : x.r < 0.25 ? (best.act.t === 'x' ? '他多半也不下注：便宜看下一張、控制底池，不讓比你大的牌加注把你趕走。' : '跟了之後他常常不再下注，你可以便宜看牌。')
+        : '他有時會下注：你先過牌，被下注時再看賠率決定；你自己下注反而會趕走比你差的牌、只被比你好的牌跟。'));
+  }
   const main = read[0];
   if (main && CHAMP_STYLE_TIP[main.style]) R.push(CHAMP_STYLE_TIP[main.style] + '。');
   if (best.act.t !== base.act.t) R.push('穩健教練會說「' + base.label + '」——照書打不會錯，但對這桌的人太' + (best.act.t === 'f' || best.act.t === 'x' ? '冒險' : '保守') + '。');
@@ -4941,16 +4948,17 @@ function champPlay(H, seat, act, world, lvF) {
   const H1 = champClone(H);
   for (const q of H1.players) if (q.seat !== seat) q.cards = world.cards[q.seat] || [];
   H1.deck = world.deck; H1.dp = 0;
-  const rng = makeRng(world.seed), before = H.players[seat].total;
+  const rng = makeRng(world.seed), before = H.players[seat].total, st0 = H1.street;
   applyAction(H1, act);
-  let guard = 0;
+  let guard = 0, first = null;
   while (H1.phase !== 'done' && guard++ < 300) {
     const r = gameStep(H1);
     if (r.need === undefined) continue;
-    applyAction(H1, aiDecide(H1, rng, lvF));
+    const ev = applyAction(H1, aiDecide(H1, rng, lvF));
+    if (!first && ev.seat !== seat) first = { t: ev.t === 'f' ? 'f' : ev.t === 'x' ? 'x' : ev.t === 'c' || (ev.t === 'a' && ev.callAll) ? 'c' : 'r', next: H1.street !== st0 };   // 你動作之後，對手的第一個動作
   }
-  if (!H1.result) return { ev: 0, won: false };
-  return { ev: H1.result.net[seat] + before, won: H1.result.won[seat] > 0 };
+  if (!H1.result) return { ev: 0, won: false, first: null, allFold: false };
+  return { ev: H1.result.net[seat] + before, won: H1.result.won[seat] > 0, first, allFold: H1.result.uncontested && H1.result.won[seat] > 0 && H1.street === st0 };
 }
 /* cands：[{ act, label }]；回傳每個選項的平均賺賠、成功率、標準誤，和每個世界的結果（配對比較用） */
 function champRollout(H, seat, level, cands, opt) {
@@ -4958,13 +4966,15 @@ function champRollout(H, seat, level, cands, opt) {
   const N = opt.N || 200, budget = opt.budgetMs || 0, t0 = Date.now();
   const rng = makeRng(opt.seed || (H.no * 7919 + H.log.length * 31 + 1));
   const worlds = champWorlds(H, seat, N, rng), lvF = champLevelFast(level);
-  const res = cands.map((c) => ({ act: c.act, label: c.label, xs: [], wins: 0 }));
+  const res = cands.map((c) => ({ act: c.act, label: c.label, xs: [], wins: 0, nx: { f: 0, x: 0, c: 0, r: 0, n: 0, next: 0, allFold: 0 } }));
   let n = 0;
   for (let i = 0; i < N; i++) {
     for (const r of res) {
       if (r.act.t === 'f') { r.xs.push(0); continue; }
       const o = champPlay(H, seat, r.act, worlds[i], lvF);
       r.xs.push(o.ev); if (o.won) r.wins++;
+      if (o.first) { r.nx[o.first.t]++; r.nx.n++; if (o.first.next) r.nx.next++; }
+      if (o.allFold) r.nx.allFold++;
     }
     n++;
     if (budget && n >= 40 && Date.now() - t0 > budget) break;
@@ -4973,6 +4983,8 @@ function champRollout(H, seat, level, cands, opt) {
     const m = r.xs.reduce((a, b) => a + b, 0) / n;
     r.ev = m; r.win = r.act.t === 'f' ? 0 : r.wins / n;
     r.se = Math.sqrt(r.xs.reduce((s, x) => s + (x - m) * (x - m), 0) / Math.max(1, n - 1) / n);
+    const X = r.nx, k = Math.max(1, X.n);                                // 對手接下來的動作（比例）：有動作的世界裡算；allFold 是全部世界裡算
+    r.nx = { f: X.f / k, x: X.x / k, c: X.c / k, r: X.r / k, n: X.n, acted: X.n / n, next: X.next / k, allFold: X.allFold / n };
   }
   return { n, ms: Date.now() - t0, res };
 }
@@ -4992,7 +5004,7 @@ function champMerge(adv, sim, H) {
   const C = adv.champ, bb = C.bb || 2;
   const key = (a) => a.t + ':' + (a.to || 0);
   const by = new Map(sim.res.map((r) => [key(r.act), r]));
-  const opts = C.options.filter((o) => by.has(key(o.act))).map((o) => { const r = by.get(key(o.act)); return Object.assign({}, o, { ev1: o.ev, win1: o.win, ev: r.ev, win: r.win, se: r.se, xs: r.xs }); });
+  const opts = C.options.filter((o) => by.has(key(o.act))).map((o) => { const r = by.get(key(o.act)); return Object.assign({}, o, { ev1: o.ev, win1: o.win, ev: r.ev, win: r.win, se: r.se, xs: r.xs, nx: r.nx }); });
   if (!opts.length) return adv;
   // 先照一步估算的選擇；模擬（同一批世界配對比較）明顯更好的才換：多賺要超過門檻，也要超過 1 個標準誤（模擬次數有限，有雜訊）
   let best = opts.find((o) => key(o.act) === key(C.best.act)) || opts[0];
@@ -9563,13 +9575,23 @@ function champTableHTML(C) {
   let h = '<table class="champt"><tr><th>動作</th><th class="r">成功率</th><th class="r">平均</th><th>他們會</th></tr>';
   for (const o of C.options) {
     let who = '';
-    if (o.resp && o.resp.length === 1) { const x = o.resp[0]; who = '棄 ' + PCT0(x.f) + '・跟 ' + PCT0(x.c) + (x.r >= 0.01 ? '・加注 ' + PCT0(x.r) : ''); }
+    const one = C.read.length <= 1, he = one ? '他' : '下一個人';
+    if (o.nx && o.act.t !== 'f') {                                       // 整手模擬算出來的：你這樣做之後，對手的第一個動作
+      const x = o.nx;
+      if (o.act.t === 'r') who = one ? '棄 ' + PCT0(x.f) + '・跟 ' + PCT0(x.c) + (x.r >= 0.01 ? '・加注 ' + PCT0(x.r) : '') : '大家都棄 ' + PCT0(x.allFold);
+      else if (x.n >= 5) who = (x.next > 0.5 ? '下一條街' + he : he) + '下注 ' + PCT0(x.r) + '・過牌 ' + PCT0(x.x) + (x.f >= 0.02 ? '・棄 ' + PCT0(x.f) : '') + (x.c >= 0.02 ? '・跟 ' + PCT0(x.c) : '');
+      else who = '直接攤牌比大小';
+    }
+    else if (o.resp && o.resp.length === 1) { const x = o.resp[0]; who = '棄 ' + PCT0(x.f) + '・跟 ' + PCT0(x.c) + (x.r >= 0.01 ? '・加注 ' + PCT0(x.r) : ''); }
     else if (o.resp && o.resp.length) who = '大家都棄 ' + PCT0(o.foldAll);
     else if (o.pBet !== undefined) who = '他下注 ' + PCT0(o.pBet) + (o.pBet > 0.05 ? (o.callVsBet ? '（你再跟）' : '（你就棄）') : '');
+    else if (o.closes) who = o.river ? '直接攤牌比大小' : (one ? '他' : '大家') + '已經過牌：這條街結束，免費看下一張';
+    else if (o.nAfter) who = '後面還有 ' + o.nAfter + ' 人會說話';
     else if (o.sq !== undefined && o.sq > 0.03) who = '後面再加注 ' + PCT0(o.sq);
     h += '<tr class="' + (o === C.best ? 'best' : '') + '"><td>' + (o === C.best ? '★ ' : '') + esc(o.label) + '</td><td class="r">' + PCT0(o.win) + '</td><td class="r ' + (o.ev >= 0 ? 'pos' : 'neg') + '">' + champBBtxt(o.ev, C.bb) + '</td><td><small>' + who + '</small></td></tr>';
   }
-  h += '</table><p class="note">成功率＝贏下這個底池的機會（他棄牌，加上被跟時你贏）。平均＝長期每做一次賺賠幾個大盲（跟現在棄牌比）。照每個人的風格算他會怎麼回應。</p>';
+  h += '</table><p class="note">成功率＝贏下這個底池的機會（他棄牌，加上被跟時你贏）。平均＝長期每做一次賺賠幾個大盲（跟現在棄牌比）。「他們會」＝你這樣做之後對手的下一個動作' + (C.sim ? '（整手模擬裡實際發生的比例）' : '（照每個人的風格估）') + '。'
+    + (C.options[0] !== C.best ? (C.sim ? '★ 不是平均最高的那一個：差距還在模擬的誤差內（每次模擬結果會有一點不同），冠軍維持原來的判斷。' : '★ 不是平均最高的那一個：主動下注、加注要多賺一點（0.25 個大盲以上）才值得冒險，只差一點點就選比較穩的。') : '') + '</p>';
   return h;
 }
 /* ===== 出牌明細：每一張出牌、中了變成什麼、打不打折、機率、要不要賭 ===== */
