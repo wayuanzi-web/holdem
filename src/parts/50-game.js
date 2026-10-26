@@ -791,6 +791,7 @@ function initGame() {
   $('cBody').addEventListener('click', (e) => {
     const sb = e.target.closest('button[data-studio]');
     if (sb) studioFromGame(+sb.dataset.studio);
+    if (e.target.closest('button[data-c="review"]')) ctrlCmd('review');    // 一手結束的總結裡那顆「逐步檢討」（原本只有控制列的那顆有作用）
     if (e.target.closest('button[data-deep="rvr"]')) { const st = G.steps[G.view]; if (st && st.adv) { clearTimeout(G.timer); deepToRvr(st.adv.detail); } }
     if (e.target.closest('button[data-deep="lens"]')) { const st = G.steps[G.view]; if (st && st.adv) { clearTimeout(G.timer); lensFromGame(st.adv.detail); } }
   });
