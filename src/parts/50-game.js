@@ -414,10 +414,12 @@ function heroHTML(st, S) {
   h += '<div class="adv"><div class="rec">' + (C ? '🏆 冠軍教練：' : gtoAdvUsable() ? '教練（規則）的建議：' : '建議：') + esc(adv.label) + (C ? '<span class="champsub">成功率 ' + PCT0(C.best.win) + '・平均 ' + champBBtxt(C.best.ev, C.bb) + (C.sim ? '・整手模擬 ' + C.sim.n + ' 次' : G.champJob && G.champJob.adv === adv ? '・<span class="thinking">整手模擬中…</span>' : '') + '</span>' : '') + '</div><ol>' + adv.reasons.map((r) => '<li>' + glossify(rich(r), used) + '</li>').join('') + '</ol>';
   if (C) h += champTableHTML(C);
   h += outsBoxHTML(adv, S);
+  if (C) h += '<details class="deep"' + (GS.deepOpen ? ' open' : '') + '><summary>📖 詳細解說：成功率 ' + PCT0(C.best.win) + '、平均 ' + champBBtxt(C.best.ev, C.bb) + ' 怎麼算的？勝率跟成功率差在哪？</summary><div class="deepbody">' + champDeepHTML(adv, C) + '</div></details>';
   if (adv.detail) {
     const d = adv.detail;
     const q = d.call > 0 ? '為什麼要 ' + Math.round(d.need * 100) + '%？你的勝率怎麼算的？' : '你的勝率 ' + Math.round(d.est * 100) + '% 怎麼算的？';
-    h += '<details class="deep"' + (GS.deepOpen ? ' open' : '') + '><summary>📖 詳細解說：' + q + '</summary><div class="deepbody">' + deepHTML(d) + '</div></details>';
+    h += C ? '<details class="deep2"><summary>📘 穩健教練的算法：' + q + '</summary><div class="deepbody">' + deepHTML(d) + '</div></details>'
+      : '<details class="deep"' + (GS.deepOpen ? ' open' : '') + '><summary>📖 詳細解說：' + q + '</summary><div class="deepbody">' + deepHTML(d) + '</div></details>';
   }
   if (adv.more && adv.more.length) h += '<details><summary>為什麼？更多說明</summary>' + adv.more.map((r) => '<p>' + glossify(rich(r), used) + '</p>').join('') + '</details>';
   if (EXPLAIN.on && atHead() && !G.replay && !GS.seenTermHint) h += '<p class="note">底下有虛線的詞可以點，會跳出解釋；不需要的話，右上角「深入說明」可以關掉。</p>';
@@ -447,6 +449,66 @@ function champTableHTML(C) {
   }
   h += '</table><p class="note">成功率＝贏下這個底池的機會（他棄牌，加上被跟時你贏）。平均＝長期每做一次賺賠幾個大盲（跟現在棄牌比）。「他們會」＝你這樣做之後對手的下一個動作' + (C.sim ? '（整手模擬裡實際發生的比例）' : '（照每個人的風格估）') + '。'
     + (C.options[0] !== C.best ? (C.sim ? '★ 不是平均最高的那一個：差距還在模擬的誤差內（每次模擬結果會有一點不同），冠軍維持原來的判斷。' : '★ 不是平均最高的那一個：主動下注、加注要多賺一點（0.25 個大盲以上）才值得冒險，只差一點點就選比較穩的。') : '') + '</p>';
+  return h;
+}
+/* ===== 冠軍教練的詳細解說：勝率、成功率、平均是什麼，每個選項怎麼算出來的 ===== */
+function champCalcHTML(o, bb) {
+  const c = o.calc;
+  if (!c) return '';
+  const B = (x) => champBBtxt(x, bb), P = PCT0, n = (x) => Math.round(x), n1 = (x) => (x < -0.05 ? '−' : '') + fmt(Math.abs(x), 1);
+  const R = (r) => '×' + r.toFixed(2);
+  if (c.k === 'fold') return '不再放錢。這一手已經放進去的拿不回來（那是「沉沒成本」，不影響現在的判斷），所以平均就是 0，成功率 0%。';
+  if (c.k === 'check') {
+    const lead = c.closes ? (c.river ? '大家都過牌就直接攤牌。' : '大家都過牌，這條街結束，免費看下一張。') : '不用再放錢，但後面的人還可以下注。';
+    return lead + '你的勝率 ' + P(c.eq) + '；' + (c.R < 0.999 ? '之後還有下注，沒中時常常得棄牌，實際拿得到約 ' + P(c.eq) + ' ' + R(c.R) + ' ≈ ' + P(c.eq * c.R) + '（實現率）。' : '')
+      + '平均 ≈ ' + P(c.eq * c.R) + ' × 底池 ' + n(c.pot) + ' ＝ ' + n1(c.eq * c.R * c.pot) + ' 籌碼 ≈ ' + B(c.eq * c.R * c.pot) + '。';
+  }
+  if (c.k === 'checkOOP') {
+    return '你先過牌，他接著有 <b>' + P(c.PB) + '</b> 會下注（約 ' + c.b + '）。他下注的牌比較強，你對它們的勝率 ' + P(c.eqVB) + '，' + (c.callEV > 0 ? '跟下去還划算（平均 ' + B(c.callEV) + '），你就跟。' : '跟下去不划算，你就棄（這部分算 0）。')
+      + '他過牌（' + P(1 - c.PB) + '）時多半牌不強，你對它們的勝率 ' + P(c.eqVK) + '，實際拿得到約 ' + P(c.eqVK * c.Rk) + '。'
+      + '平均 ≈ ' + P(c.PB) + ' × ' + n(Math.max(0, c.callEV)) + ' ＋ ' + P(1 - c.PB) + ' × ' + P(c.eqVK * c.Rk) + ' × 底池 ' + n(c.pot) + ' ≈ ' + B(o.ev1 !== undefined ? o.ev1 : o.ev) + '。';
+  }
+  if (c.k === 'call') {
+    return '跟 ' + c.cost + ' 之後底池 ' + n(c.pot) + '。你的勝率 ' + P(c.eq)
+      + (c.sq > 0.01 ? '；後面的人有 ' + P(c.sq) + ' 會再加注，那時你多半要棄' : '')
+      + (c.R < 0.999 ? '；' + (c.allin ? '' : '之後還有下注，' + (c.ip ? '你有位置' : c.pre ? '你沒位置' : '') + '實際拿得到約 ' + R(c.R)) : '；' + (c.allin ? '跟了就全下，一定看到攤牌' : '河牌跟了就直接攤牌'))
+      + '。成功率 ≈ ' + (c.sq > 0.01 ? '（1 − ' + P(c.sq) + '）× ' + P(c.eq) + ' ＝ ' + P(o.win1 !== undefined ? o.win1 : o.win) : '勝率 ' + P(c.eq)) + '。'
+      + '平均 ≈ ' + (c.sq > 0.01 ? '（1 − ' + P(c.sq) + '）× ' : '') + P(c.eq) + ' ' + (c.R < 0.999 ? R(c.R) + ' ' : '') + '× ' + n(c.pot) + (c.imp ? '（＋聽牌的隱含賠率 ' + P(c.imp) + '）' : '') + ' − ' + c.cost + ' ≈ ' + B(o.ev1 !== undefined ? o.ev1 : o.ev) + '。';
+  }
+  if (c.k === 'raise') {
+    const all = c.multi || c.pre ? '大家都棄' : '他棄牌';
+    let h = '你要再放 ' + n(c.cost) + '。<ul class="cmath">'
+      + '<li>' + all + ' <b>' + P(c.F) + '</b>：你直接拿走現在的底池 ' + n(c.pot0) + '，不用亮牌。→ ' + P(c.F) + ' × ' + n(c.pot0) + ' ＝ ' + n1(c.evF) + '</li>';
+    if (c.pC > 0.005) h += '<li>被跟 <b>' + P(c.pC) + '</b>：你對「會跟的那些牌」的勝率 ' + P(c.eqC) + (c.R && c.R < 0.999 ? '，之後還有下注，實際約 ' + R(c.R) : '') + '，底池約 ' + n(c.potC) + '。→ ' + P(c.pC) + ' ×（' + P(c.eqC) + (c.R && c.R < 0.999 ? ' ' + R(c.R) : '') + ' × ' + n(c.potC) + ' − ' + n(c.cost) + '）＝ ' + n1(c.evC) + '</li>';
+    if (c.pR > 0.005) h += '<li>被再加注 <b>' + P(c.pR) + '</b>：' + (c.contR !== undefined && c.contR > -c.cost ? '你的牌夠強，跟下去' : '你多半只能棄，輸掉放進去的 ' + n(c.cost)) + '。→ ' + n1(c.evR) + '</li>';
+    h += '</ul>平均 ≈ ' + n1(c.evF) + (c.pC > 0.005 ? ' ' + (c.evC >= 0 ? '＋ ' : '− ') + fmt(Math.abs(c.evC), 1) : '') + (c.pR > 0.005 ? ' ' + (c.evR >= 0 ? '＋ ' : '− ') + fmt(Math.abs(c.evR), 1) : '') + ' ＝ ' + n1(c.evF + c.evC + c.evR) + ' 籌碼 ≈ ' + B(c.evF + c.evC + c.evR) + '。'
+      + '成功率 ≈ ' + P(c.F) + (c.pC > 0.005 ? ' ＋ ' + P(c.pC) + ' × ' + P(c.eqC) : '') + ' ≈ ' + P(o.win1 !== undefined ? o.win1 : o.win) + '。';
+    return h;
+  }
+  return '';
+}
+function champDeepHTML(adv, C) {
+  const bb = C.bb || 2, P = PCT0;
+  let h = '<h4>① 勝率、成功率、平均，有什麼不一樣？</h4><ul>';
+  h += '<li><b>勝率</b>：兩邊都打到最後亮牌比大小，你贏的比例。' + (C.eq !== undefined ? '照' + (C.read.length ? C.read.map((r) => esc(r.name) + '（' + esc(styleZh(r.style)) + '）').join('、') + '的風格和動作' : '動作') + '估' + (C.read.length > 1 ? '他們' : '他') + '的範圍，你的勝率約 <b>' + P(C.eq) + '</b>' + (C.rand !== undefined ? '；如果' + (C.read.length > 1 ? '他們' : '他') + '是隨便拿的牌是 ' + P(C.rand) + '——不是隨便拿牌，這個只是對照' : '') + '。' : '還沒人進池，勝率要看誰會跟（下面每個選項分開算）。') + '</li>';
+  h += '<li><b>打折後的勝率（實現率）</b>：勝率是「一定看到攤牌」的比例。之後還會下注，你沒中常常得棄牌，那部分就拿不到，所以要打折。</li>';
+  h += '<li><b>成功率</b>：照這個動作打，這一手最後你拿到底池的比例＝他棄牌的時候（不用亮牌）＋被跟時你贏的時候。下注、加注的成功率常比勝率高（多了他棄牌）；跟注、過牌最多就是勝率。</li>';
+  h += '<li><b>平均</b>：長期每做一次賺賠多少＝贏的時候拿到的 − 你要再放進去的，跟現在棄牌（0）比，正的才賺。冠軍選<b>平均最高</b>的，不是成功率最高的（例如全下成功率高，但輸的時候輸很多）。</li></ul>';
+  h += '<h4>② 每個選項怎麼算' + (C.sim ? '（先用一步估算）' : '') + '</h4>';
+  const shown = C.options.slice(0, 4);
+  for (const o of shown) h += '<p><b>' + (o === C.best ? '★ ' : '') + esc(o.label) + '</b>：' + champCalcHTML(o, bb) + '</p>';
+  if (C.options.length > shown.length) h += '<p class="note">其他選項平均都比較低，就不一一列出。</p>';
+  if (C.sim) {
+    h += '<h4>③ 整手模擬 ' + C.sim.n + ' 次</h4><p>上面是「只看下一步」的估算（之後的街用實現率打折）。整手模擬直接把這一手照每個人的出牌習慣打完 ' + C.sim.n + ' 次（對手的牌照他的範圍抽、之後的公牌隨機發），數最後的結果：</p>'
+      + '<table class="dtab"><tr><th>選項</th><th class="r">一步估算</th><th class="r">模擬：成功率</th><th class="r">模擬：平均</th></tr>'
+      + C.options.map((o) => '<tr><td>' + (o === C.best ? '★ ' : '') + esc(o.label) + '</td><td class="r">' + (o.ev1 !== undefined ? champBBtxt(o.ev1, bb) : '—') + '</td><td class="r">' + P(o.win) + '</td><td class="r">' + champBBtxt(o.ev, bb) + '</td></tr>').join('') + '</table>'
+      + '<p>兩個不一樣時以模擬為準：它把之後每一條街的下注、你被逼棄牌、他再付錢都算進去了。模擬也有誤差（次數有限），差一點點時冠軍維持原來的判斷。</p>';
+  }
+  if (adv.detail && C.baseEq !== undefined) {
+    h += '<h4>' + (C.sim ? '④' : '③') + ' 跟下面「穩健教練的算法」的關係</h4><p>下面是穩健教練的算法：它一律把對手當一般的緊凶玩家來估範圍，勝率 ' + P(C.baseEq)
+      + (C.baseEff !== undefined && C.baseEff < C.baseEq - 0.005 ? '、打折後 ' + P(C.baseEff) : '') + (C.baseNeed > 0 ? '，再跟「打平要的勝率」（底池賠率）' + P(C.baseNeed) + ' 比' : '') + '。'
+      + '冠軍照每個人實際的風格估範圍' + (C.eq !== undefined && Math.abs(C.eq - C.baseEq) > 0.02 ? '，所以勝率不一樣（' + P(C.eq) + '）' : '') + '，而且多算了他會不會棄牌、之後還會怎麼下注。</p>';
+  }
   return h;
 }
 /* ===== 出牌明細：每一張出牌、中了變成什麼、打不打折、機率、要不要賭 ===== */

@@ -142,8 +142,8 @@ function champOptionsPre(H, level, I, rng) {
     const ws = inPot.map((q) => rangeWeights(H, q.seat, CHAMP.styleRanges ? q.style : 'tag'));
     const eq = ws.length ? mcVsRanges(p.cards, [], ws, CHAMP.iters, rng).eq : 0.5;
     const R = ws.length > 1 ? CHAMP.rMulti * CHAMP.rPreOOP : CHAMP.rPreOOP;
-    opts.push({ act: { t: 'x' }, label: '過牌', ev: eq * R * pot0, win: eq, eq });
-  } else opts.push({ act: { t: 'f' }, label: '棄牌', ev: 0, win: 0 });
+    opts.push({ act: { t: 'x' }, label: '過牌', ev: eq * R * pot0, win: eq, eq, calc: { k: 'check', eq, R, pot: pot0, pre: true } });
+  } else opts.push({ act: { t: 'f' }, label: '棄牌', ev: 0, win: 0, calc: { k: 'fold' } });
   // 跟注（前面有人加注）
   if (!L.canCheck && raises > 0) {
     const ws = inPot.map((q) => rangeWeights(H, q.seat, CHAMP.styleRanges ? q.style : 'tag'));
@@ -153,7 +153,7 @@ function champOptionsPre(H, level, I, rng) {
     const ip = champIP(H, seat, inPot.map((q) => q.seat));
     const R = (ip ? CHAMP.rPreIP : CHAMP.rPreOOP) * (ws.length > 1 ? CHAMP.rMulti : 1);
     const potC = pot0 + L.callAmt;
-    opts.push({ act: { t: 'c' }, label: '跟注 ' + L.callAmt, ev: (1 - sq) * eq * R * potC - L.callAmt, win: (1 - sq) * eq, eq, sq });
+    opts.push({ act: { t: 'c' }, label: '跟注 ' + L.callAmt, ev: (1 - sq) * eq * R * potC - L.callAmt, win: (1 - sq) * eq, eq, sq, calc: { k: 'call', eq, R, pot: potC, cost: L.callAmt, sq, ip, pre: true } });
   }
   // 跛入（沒人加注時只跟大盲）：後面有人加注你就棄
   if (!L.canCheck && raises === 0) {
@@ -162,7 +162,8 @@ function champOptionsPre(H, level, I, rng) {
     const ws = inPot.map((q) => rangeWeights(H, q.seat, CHAMP.styleRanges ? q.style : 'tag')).concat(resp.filter((x) => x.c > 0.02).map((x) => x.wCall));
     const eq = ws.length ? mcVsRanges(p.cards, [], ws, CHAMP.iters, rng).eq : 0.5;
     const potF = pot0 + L.callAmt + resp.reduce((s, x) => s + x.c * (H.curBet - x.bet), 0);
-    opts.push({ act: { t: 'c' }, label: '跟注 ' + L.callAmt + '（跛入）', ev: (1 - pr) * eq * CHAMP.rPreOOP * (ws.length > 1 ? CHAMP.rMulti : 1) * potF - L.callAmt, win: (1 - pr) * eq, eq, sq: pr });
+    const Rl = CHAMP.rPreOOP * (ws.length > 1 ? CHAMP.rMulti : 1);
+    opts.push({ act: { t: 'c' }, label: '跟注 ' + L.callAmt + '（跛入）', ev: (1 - pr) * eq * Rl * potF - L.callAmt, win: (1 - pr) * eq, eq, sq: pr, calc: { k: 'call', eq, R: Rl, pot: potF, cost: L.callAmt, sq: pr, limp: true, pre: true } });
   }
   // 加注（開局、再加注）
   if (L.canRaise) {
@@ -174,24 +175,26 @@ function champOptionsPre(H, level, I, rng) {
     if (L.maxTo - to < (pot0 + to) * 0.3) to = L.maxTo;
     const resp = champPreResp(H, seat, { t: 'r', to }, level);
     const a = to - hb;
-    let reach = 1, ev = 0, win = 0;
+    let reach = 1, ev = 0, win = 0, pC = 0, pR = 0, evC = 0, evR = 0, eqCs = 0, potCs = 0;
     for (const x of resp) {
       if (x.c > 0.005) {
         const eqC = mcVsRanges(p.cards, [], [x.wCall], CHAMP.iters, rng).eq, ip = champIP(H, seat, [x.seat]);
         const potC = pot0 + a + Math.min(to, H.players[x.seat].bet + H.players[x.seat].stack) - x.bet;
-        ev += reach * x.c * (eqC * (ip ? CHAMP.rPreIP : CHAMP.rPreOOP) * potC - a); win += reach * x.c * eqC;
+        const e1 = reach * x.c * (eqC * (ip ? CHAMP.rPreIP : CHAMP.rPreOOP) * potC - a);
+        ev += e1; win += reach * x.c * eqC; evC += e1; pC += reach * x.c; eqCs += reach * x.c * eqC; potCs += reach * x.c * potC;
         x.eqC = eqC;
       }
       if (x.r > 0.005) {
         const eqR = mcVsRanges(p.cards, [], [x.wRaise], CHAMP.iters, rng).eq, Y = Math.min(x.raiseTo || to * 3, p.bet + p.stack);
         const potR = pot0 + (Y - hb) + (Y - x.bet), cont = eqR * CHAMP.rPreIP * potR - (Y - hb);
-        ev += reach * x.r * Math.max(-a, cont); win += reach * x.r * (cont > -a ? eqR : 0);
+        ev += reach * x.r * Math.max(-a, cont); win += reach * x.r * (cont > -a ? eqR : 0); evR += reach * x.r * Math.max(-a, cont); pR += reach * x.r;
         x.eqR = eqR;
       }
       reach *= x.f;
     }
     ev += reach * pot0; win += reach;
-    opts.push({ act: { t: 'r', to }, label: (L.isBet ? '下注 ' : to >= L.maxTo ? '全下 ' : '加注到 ') + to, ev, win, foldAll: reach, resp });
+    opts.push({ act: { t: 'r', to }, label: (L.isBet ? '下注 ' : to >= L.maxTo ? '全下 ' : '加注到 ') + to, ev, win, foldAll: reach, resp,
+      calc: { k: 'raise', pot0, cost: a, F: reach, pC, pR, eqC: pC ? eqCs / pC : 0, potC: pC ? potCs / pC : 0, evF: reach * pot0, evC, evR, pre: true } });
   }
   return opts;
 }
@@ -222,13 +225,16 @@ function champOptionsPost(H, level, I, rng) {
       const eqVB = avgEq(w, e, pb), eqVK = avgEq(w, e, notB), b = Math.min(o.stack, Math.max(H.bb, Math.round(pot0 * 0.65)));
       const callEV = eqVB * champReal(H, false, eqVB, false) * (pot0 + 2 * b) - b;
       const ev = PB * Math.max(0, callEV) + (1 - PB) * eqVK * champReal(H, true, eqVK, false) * pot0;
-      opts.push({ act: { t: 'x' }, label: '過牌', ev, win: PB * (callEV > 0 ? eqVB : 0) + (1 - PB) * eqVK, eq: est, pBet: PB, callVsBet: callEV > 0 });
-    } else opts.push({ act: { t: 'x' }, label: '過牌', ev: est * champReal(H, ip, est, opps.length > 1) * pot0, win: est, eq: est, closes: !nxt.length, nAfter: nxt.length, river });
+      opts.push({ act: { t: 'x' }, label: '過牌', ev, win: PB * (callEV > 0 ? eqVB : 0) + (1 - PB) * eqVK, eq: est, pBet: PB, callVsBet: callEV > 0,
+        calc: { k: 'checkOOP', PB, eqVB, b, callEV, eqVK, Rk: champReal(H, true, eqVK, false), pot: pot0 } });
+    } else opts.push({ act: { t: 'x' }, label: '過牌', ev: est * champReal(H, ip, est, opps.length > 1) * pot0, win: est, eq: est, closes: !nxt.length, nAfter: nxt.length, river, calc: { k: 'check', eq: est, R: champReal(H, ip, est, opps.length > 1), pot: pot0, closes: !nxt.length, river } });
   }
   else {
-    opts.push({ act: { t: 'f' }, label: '棄牌', ev: 0, win: 0 });
+    opts.push({ act: { t: 'f' }, label: '棄牌', ev: 0, win: 0, calc: { k: 'fold' } });
     const imp = I.draws && !river && p.stack > pot0 ? (H.street === 1 ? 0.04 : 0.02) : 0;
-    opts.push({ act: { t: 'c' }, label: (L.callAmt >= p.stack ? '全下跟注 ' : '跟注 ') + L.callAmt, ev: (est * (L.callAmt >= p.stack ? 1 : champReal(H, ip, est, opps.length > 1)) + imp) * (pot0 + L.callAmt) - L.callAmt, win: est, eq: est });
+    const Rc = L.callAmt >= p.stack ? 1 : champReal(H, ip, est, opps.length > 1);
+    opts.push({ act: { t: 'c' }, label: (L.callAmt >= p.stack ? '全下跟注 ' : '跟注 ') + L.callAmt, ev: (est * Rc + imp) * (pot0 + L.callAmt) - L.callAmt, win: est, eq: est,
+      calc: { k: 'call', eq: est, R: Rc, imp, pot: pot0 + L.callAmt, cost: L.callAmt, allin: L.callAmt >= p.stack, river } });
   }
   if (L.canRaise && live.length) {
     const wHero = champHeroAggRange(H, seat);
@@ -239,7 +245,7 @@ function champOptionsPost(H, level, I, rng) {
     const uniq = [...new Set(sizes)].filter((x) => x >= L.minTo && x <= L.maxTo);
     for (const X of uniq) {
       const a = X - hb;
-      let ev = 0, win = 0, reachAll = 1;
+      let ev = 0, win = 0, reachAll = 1, calcO = null;
       const detail = [];
       if (opps.length === 1) {
         const o = opps[0], w = ws[0], e = heq[0];
@@ -254,9 +260,11 @@ function champOptionsPost(H, level, I, rng) {
         const H1 = champClone(H); applyAction(H1, { t: 'r', to: X });
         const Y = H1.toAct >= 0 && H1.phase === 'bet' ? sizeTo(H1, legalActions(H1), 0.8) : X;
         const potR = pot0 + (Y - hb) + (Math.min(Y, o.bet + o.stack) - o.bet), contR = eqR * (river ? 1 : CHAMP.rIP) * potR - (Y - hb);
-        ev = F * pot0 + C * (eqC * champReal(H, ip, eqC, false) * potC - a) + Rr * Math.max(-a, contR);
+        const Rc = champReal(H, ip, eqC, false);
+        ev = F * pot0 + C * (eqC * Rc * potC - a) + Rr * Math.max(-a, contR);
         win = F + C * eqC + Rr * (contR > -a ? eqR : 0);
         reachAll = F;
+        calcO = { k: 'raise', pot0, cost: a, F, pC: C, pR: Rr, eqC, R: Rc, potC, evF: F * pot0, evC: C * (eqC * Rc * potC - a), evR: Rr * Math.max(-a, contR), Y, eqR, contR, river };
         detail.push({ seat: o.seat, name: o.name, style: o.style, f: F, c: C, r: Rr, eqC });
       } else {
         const conts = [];
@@ -274,11 +282,13 @@ function champOptionsPost(H, level, I, rng) {
           detail.push({ seat: o.seat, name: o.name, style: o.style, f: F, c: 1 - F, r: 0 });
         });
         const eqM = mcVsRanges(p.cards, H.board, conts, CHAMP.iters, rng).eq;
-        ev = reachAll * pot0 + (1 - reachAll) * (eqM * champReal(H, ip, eqM, true) * potC - a);
+        const Rm = champReal(H, ip, eqM, true);
+        ev = reachAll * pot0 + (1 - reachAll) * (eqM * Rm * potC - a);
         win = reachAll + (1 - reachAll) * eqM;
+        calcO = { k: 'raise', pot0, cost: a, F: reachAll, pC: 1 - reachAll, pR: 0, eqC: eqM, R: Rm, potC, evF: reachAll * pot0, evC: (1 - reachAll) * (eqM * Rm * potC - a), evR: 0, multi: true, river };
         detail.forEach((d) => { d.eqC = eqM; });
       }
-      opts.push({ act: { t: 'r', to: X }, label: (X >= L.maxTo ? '全下 ' : L.isBet ? '下注 ' : '加注到 ') + X, ev, win, foldAll: reachAll, resp: detail, frac: a / pot0 });
+      opts.push({ act: { t: 'r', to: X }, label: (X >= L.maxTo ? '全下 ' : L.isBet ? '下注 ' : '加注到 ') + X, ev, win, foldAll: reachAll, resp: detail, frac: a / pot0, calc: calcO });
     }
   }
   return { opts, est };
@@ -337,7 +347,8 @@ function champAdvice(H, rng, level) {
   adv.eq = est !== undefined ? est : base.eq; adv.eff = adv.eq;
   adv.reasons = champReasons(H, seat, best, opts, read, base);
   adv.more = base.reasons.length ? ['穩健教練（照書打）的看法：' + base.label + '。' + base.reasons.slice(-1)[0]] : [];
-  adv.champ = { read, options: opts.sort((a, b) => b.ev - a.ev), best, base: keep, same: best.act.t === base.act.t, bb: H.bb };
+  const eqOpt = read.length ? opts.find((o) => o.eq !== undefined && !(o.calc && o.calc.limp)) : null;   // 勝率：翻牌前只有已經有人進池時才講（對誰）
+  adv.champ = { read, options: opts.sort((a, b) => b.ev - a.ev), best, base: keep, same: best.act.t === base.act.t, bb: H.bb, eq: est !== undefined ? est : eqOpt ? eqOpt.eq : undefined, rand: read.length || H.street ? base.rand : undefined, baseEq: base.eq, baseEff: base.eff, baseNeed: base.need, street: H.street };
   return adv;
 }
 const CHAMP_STYLE_TIP = {
