@@ -2,6 +2,22 @@
 const E = require('./engine');
 let bad = 0, n = 0, nSim = 0;
 const ok = (c, m) => { if (!c) { bad++; console.log('錯：', m); } };
+/* 詳細解說印出來的算式要算得出表上的平均、成功率（跟 champCalcHTML 用同一套數字） */
+function calcOk(o) {
+  const c = o.calc, tol = Math.max(0.6, 0.01 * Math.abs(o.ev));
+  if (!c || c.k === 'fold') return true;
+  if (c.k === 'check') return Math.abs(c.eq * c.R * c.pot - o.ev) < tol;
+  if (c.k === 'checkOOP') return Math.abs(c.PB * Math.max(0, c.callEV) + (1 - c.PB) * c.eqVK * c.Rk * c.pot - o.ev) < tol;
+  if (c.k === 'call') return Math.abs((c.sq > 0.01 ? 1 - c.sq : 1) * (c.eq * c.R + (c.imp || 0)) * c.pot - c.cost - o.ev) < tol + (c.sq > 0 && c.sq <= 0.01 ? c.eq * c.pot * 0.011 : 0);
+  if (c.k === 'raise') {
+    if (Math.abs(c.evF + c.evC + c.evR - o.ev) > tol) return false;
+    if (Math.abs(c.F + c.pC * c.eqC + (c.winR || 0) - o.win) > 0.015) return false;
+    if (!c.avg && c.pC > 0.005 && Math.abs(c.pC * (c.eqC * (c.R !== undefined ? c.R : 1) * c.potC - (c.costC !== undefined ? c.costC : c.cost)) - c.evC) > tol) return false;
+    return true;
+  }
+  return true;
+}
+let nGradeAll = 0, nGradeMid = 0;
 const rng0 = E.makeRng(3), opp = E.makeOpponents(6, 2, rng0);
 const T = E.newTable({ n: 6, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level: 2 });
 const rng = E.makeRng(9);
@@ -22,6 +38,20 @@ for (let h = 0; h < 40; h++) {
       ok(adv.reasons.length >= 2 && adv.reasons.every((x) => typeof x === 'string' && x.length), '有原因');
       const L = E.legalActions(H);
       ok(C.options.every((o) => o.act.t !== 'r' || (o.act.to >= L.minTo && o.act.to <= L.maxTo)), '加注大小合法');
+      for (const o of C.options) ok(calcOk(o), '算式對得上：' + o.label + ' ' + JSON.stringify(o.calc) + ' ev ' + o.ev + ' win ' + o.win);
+      const rs = C.options.filter((o) => o.act.t === 'r').sort((a, b) => a.act.to - b.act.to), pot = E.potTotal(H);
+      if (rs.length) {
+        ok(rs[rs.length - 1].act.to === L.maxTo, '全下也算了');
+        const all = rs[rs.length - 1];
+        if (all !== C.best && all.ev < C.best.ev - Math.max(1.5 * H.bb, 0.1 * pot) - 1) {   // 全下明顯比較差：評分不能是 ✓
+          const g = E.champGrade(adv, { t: 'a', to: L.maxTo, potBefore: pot }); nGradeAll++;
+          ok(g.mark === 'bad', '亂全下要評 ✗：' + g.text);
+        }
+        if (rs.length >= 2) {                                          // 兩個算過的大小中間：照比例估，不能說「一樣」
+          const a = rs[rs.length - 2], b = rs[rs.length - 1], mid = Math.round((a.act.to + b.act.to) / 2);
+          if (b.act.to - a.act.to > 0.2 * pot + 4) { const g = E.champGrade(adv, { t: 'r', to: mid, potBefore: pot }); nGradeMid++; ok(!/一樣/.test(g.text) && /中間估/.test(g.text), '中間的大小：' + g.text); }
+        }
+      }
     }
     let use = adv;
     if (h % 4 === 0 && E.champNeedSim(adv)) {                         // 整手模擬（少量次數）：格式、不偷看、併回去
@@ -51,5 +81,10 @@ for (let h = 0; h < 40; h++) {
   ok(adv.act.t === 'r' && adv.champ.best.foldAll > 0.6, '按鈕對兩個岩石偷盲（' + adv.label + '，全部棄牌 ' + Math.round(adv.champ.best.foldAll * 100) + '%）');
   ok(E.coachAdvice(H, E.makeRng(1)).act.t === 'f', '穩健教練照圖表棄 94o');
 }
-console.log('冠軍教練 ' + n + ' 個決定（整手模擬 ' + nSim + ' 次）' + (bad ? '，錯 ' + bad : ' OK'));
+{ // 多下的沒人跟、退回：不算贏（成功率）；平分算一半
+  const res = { pots: [{ amt: 200, winners: [1], elig: [0, 1], refund: false }, { amt: 500, winners: [0], elig: [0], refund: true }], won: [500, 200] };
+  ok(E.champShare(res, 0) === 0 && E.champShare(res, 1) === 1, '退回的不算贏');
+  ok(E.champShare({ pots: [{ amt: 100, winners: [0, 1], elig: [0, 1], refund: false }], won: [50, 50] }, 0) === 0.5, '平分算一半');
+}
+console.log('冠軍教練 ' + n + ' 個決定（整手模擬 ' + nSim + ' 次；亂全下評分 ' + nGradeAll + '、中間大小 ' + nGradeMid + '）' + (bad ? '，錯 ' + bad : ' OK'));
 process.exit(bad ? 1 : 0);

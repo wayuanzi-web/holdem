@@ -160,7 +160,7 @@ function outsAdviceLines(T, ctx) {
     if (p >= need) L.push(head + ' ≥ ' + PCT0(need) + '，只靠出牌就夠，跟注划算。');
     else if (useRiver) L.push(head + ' < ' + PCT0(need) + '，只靠出牌不夠。');
     else {
-      const F = Math.max(0, Math.ceil((1 - p) * ctx.toCall / Math.max(p, 0.01) - ctx.pot));
+      const F = Math.max(0, Math.ceil((1 - p) * ctx.toCall / Math.max(p, 0.01) - ctx.pot - 1e-6));
       L.push(head + ' < ' + PCT0(need) + '，只靠出牌不夠：中了以後還要再從他那裡多贏 ' + F + ' 以上才不虧（隱含賠率）' + (ctx.oppStack > F * 1.5 ? '；他後面還有 ' + ctx.oppStack + '，有機會。' : '；他後面只剩 ' + ctx.oppStack + '，很難。'));
     }
   } else L.push('要不要賭：現在不用付錢。過牌＝免費看下一張（' + PCT0(T.pNextEff) + ' 會中）；下注＝半詐唬：他棄牌你直接贏，被跟還有 ' + PCT0(T.flop ? T.pRiverEff : T.pNextEff) + ' 會中。');
