@@ -275,7 +275,8 @@ function champOptionsPost(H, level, I, rng) {
         const H1 = champClone(H); applyAction(H1, { t: 'r', to: X });
         const Y = H1.toAct >= 0 && H1.phase === 'bet' ? sizeTo(H1, legalActions(H1), 0.8) : X;
         const potR = pot0 + (Y - hb) + (Math.min(Y, o.bet + o.stack) - o.bet), contR = eqR * (river ? 1 : CHAMP.rIP) * potR - (Y - hb);
-        const Rc = champReal(H, ip, eqC, false);                       // 被跟就全下也照樣打折（理由同翻牌前）
+        const allinC = X >= L.maxTo || callTo >= o.bet + o.stack;
+        const Rc = allinC ? Math.min(1, champReal(H, ip, eqC, false)) : champReal(H, ip, eqC, false);   // 被跟就全下也照樣打折（理由同翻牌前），但不會超過 1（之後沒得再收）
         ev = F * pot0 + C * (eqC * Rc * potC - aE) + Rr * Math.max(-a, contR);
         win = F + C * eqC + Rr * (contR > -a ? eqR : 0);
         reachAll = F;
@@ -283,7 +284,8 @@ function champOptionsPost(H, level, I, rng) {
         detail.push({ seat: o.seat, name: o.name, style: o.style, f: F, c: C, r: Rr, eqC });
       } else {
         const conts = [];
-        let potC = pot0 + a;
+        const capM = Math.min(X, Math.max(...live.map((o) => o.bet + o.stack))), aE = Math.max(0, capM - hb);   // 沒有人跟得滿：多的退回（不算成本，也不在底池裡）
+        let potC = pot0 + aE;
         opps.forEach((o, i) => {
           if (o.allin) { conts.push(ws[i]); return; }
           const resp = champBotPost(H, o.seat, X, hb, eqBot[i], level, nLive);
@@ -297,8 +299,7 @@ function champOptionsPost(H, level, I, rng) {
           detail.push({ seat: o.seat, name: o.name, style: o.style, f: F, c: 1 - F, r: 0 });
         });
         const eqM = mcVsRanges(p.cards, H.board, conts, itM, rng).eq;
-        const Rm = champReal(H, ip, eqM, true);
-        const capM = Math.min(X, Math.max(...live.map((o) => o.bet + o.stack))), aE = Math.max(0, capM - hb);   // 沒有人跟得滿：多的退回
+        const Rm = X >= L.maxTo || capM < X ? Math.min(1, champReal(H, ip, eqM, true)) : champReal(H, ip, eqM, true);
         ev = reachAll * pot0 + (1 - reachAll) * (eqM * Rm * potC - aE);
         win = reachAll + (1 - reachAll) * eqM;
         calcO = { k: 'raise', pot0, cost: a, costC: aE, F: reachAll, pC: 1 - reachAll, pR: 0, eqC: eqM, R: Rm, potC, evF: reachAll * pot0, evC: (1 - reachAll) * (eqM * Rm * potC - aE), evR: 0, winR: 0, multi: true, river };
@@ -399,7 +400,8 @@ function champReasons(H, seat, best, opts, read, base) {
     const callers = best.resp.filter((x) => x.c + x.r >= 0.15).sort((a, b) => b.c + b.r - a.c - a.r);
     R.push((preflopRaises(H) ? '再加注搶底池' : '偷盲') + '：後面的人 ' + PCT0(best.foldAll) + ' 的時候全部棄牌' + (callers.length ? '；最可能不棄的是 ' + callers.slice(0, 2).map((x) => x.name + '（' + styleZh(x.style) + '，' + PCT0(x.c + x.r) + '）').join('、') : '') + '。');
   } else if (H.street > 0 && best.act.t === 'r' && best.resp && best.resp.length === 1) {
-    const x = best.resp[0];
+    const x0 = best.resp[0], sm = best.nx && best.nx.n >= 10 && !best.nx.next ? best.nx : null;
+    const x = sm ? { f: sm.f, c: sm.c, eqC: x0.eqC } : x0;              // 整手模擬算好：他棄、跟的比例用模擬的（跟表上、上一行一樣）
     R.push(x.f >= 0.45 ? '他有 ' + PCT0(x.f) + ' 的時候會棄牌：就算你沒有最好的牌，下注也賺。'
       : x.eqC >= 0.5 ? '他多半會跟（' + PCT0(x.c) + '），但你對他會跟的牌勝率 ' + PCT0(x.eqC) + '：下注是收錢（價值下注）。'
       : '他常會跟（' + PCT0(x.c) + '），被跟時你多半落後（對他會跟的牌勝率 ' + PCT0(x.eqC) + '）：這是詐唬，' + (best.nx ? '整手模擬算下來（之後的街還能再下注逼他棄牌）平均還是賺。' : '靠他棄牌的部分賺回來。'));
@@ -429,17 +431,20 @@ function champGrade(adv, ev) {
     m = rs.reduce((a, b) => (Math.abs(b.act.to - ev.to) < Math.abs(a.act.to - ev.to) ? b : a));
     if (Math.abs(m.act.to - ev.to) > tol) {
       const lo = rs.filter((o) => o.act.to < ev.to).pop(), hi = rs.find((o) => o.act.to > ev.to);
-      if (lo && hi) { const t = (ev.to - lo.act.to) / (hi.act.to - lo.act.to); m = { act: { t: 'r', to: ev.to }, label: ev.to, ev: lo.ev + t * (hi.ev - lo.ev), win: lo.win + t * (hi.win - lo.win), between: [lo.label, hi.label], wide: hi.act.to - lo.act.to > 2 * pot, loEv: Math.max(lo.ev, hi.ev) }; }
+      if (lo && hi) { const t = (ev.to - lo.act.to) / (hi.act.to - lo.act.to); m = { act: { t: 'r', to: ev.to }, label: ev.to, ev: lo.ev + t * (hi.ev - lo.ev), win: lo.win + t * (hi.win - lo.win), between: [lo.label, hi.label], wide: hi.act.to - lo.act.to > 2 * pot, loEv: Math.max(lo.ev, hi.ev), extra: !!(lo.extra || hi.extra) }; }
+      else m = Object.assign({}, m, { near: m.label });                // 比算過的都小（或都大）：照最接近的估，不能說「一樣」
     }
   }
   if (!m) return { mark: 'ok', text: '冠軍教練沒有算這個動作。建議：' + adv.label + '。', src: 'champ' };
-  const loss = Math.max(0, best.ev - m.ev), lbb = fmt1(loss / bb);
-  const est = m.between ? '（這個大小沒直接算，照' + m.between[0] + '和' + m.between[1] + '中間估）' : '';
+  const trust = !m.extra || (C.sim && C.street === 3);                 // 全下的估算：只有河牌的整手模擬才信（一步估算、河牌以前的模擬都偏樂觀）
+  const mev = trust ? m.ev : Math.min(m.ev, best.ev);
+  const loss = Math.max(0, best.ev - mev), lbb = fmt1(loss / bb);
+  const est = m.between ? '（這個大小沒直接算，照' + m.between[0] + '和' + m.between[1] + '中間估）' : m.near ? '（這個大小沒直接算，照最接近的「' + m.near + '」估）' : '';
   if (m === best) return { mark: 'good', text: '跟冠軍的打法一樣（成功率 ' + PCT0(best.win) + '）。', src: 'champ' };
-  if (m.ev > best.ev + 0.3 * bb && !(m.extra && !C.sim)) return { mark: 'good', text: '可以：算出來平均還比冠軍的打法「' + best.label + '」多 ' + fmt1((m.ev - best.ev) / bb) + ' 個大盲' + est + '（' + (m.extra && !(C.sim && C.street === 3) ? '全下在河牌以前冠軍只拿來評分、不主動建議' : '差距在估算的誤差內，冠軍維持原來的判斷') + '）。', src: 'champ' };
-  if (loss <= Math.max(0.3 * bb, 0.025 * pot)) return { mark: 'good', text: '差不多：跟冠軍的打法只差一點點' + est + '。', src: 'champ' };
+  if (trust && m.ev > best.ev + 0.3 * bb) return { mark: 'good', text: '可以：算出來平均還比冠軍的打法「' + best.label + '」多 ' + fmt1((m.ev - best.ev) / bb) + ' 個大盲' + est + '（差距在估算的誤差內，冠軍維持原來的判斷）。', src: 'champ' };
+  if (loss <= Math.max(0.3 * bb, 0.025 * pot)) return { mark: 'good', text: '差不多：跟冠軍的打法只差一點點' + est + (!trust && m.ev > best.ev ? '（全下算出來比較多，但這種估算對全下偏樂觀，冠軍在河牌以前不主動建議全下）' : '') + '。', src: 'champ' };
   const okMax = Math.max(1.5 * bb, 0.1 * pot);
-  if (loss <= okMax || (m.wide && best.ev - m.loEv <= okMax)) return { mark: 'ok', text: '可以，但平均少賺 ' + lbb + ' 個大盲' + est + '（成功率 ' + PCT0(m.win) + '，冠軍的打法「' + best.label + '」' + PCT0(best.win) + '）。', src: 'champ' };
+  if (loss <= okMax || (m.wide && best.ev - m.loEv <= okMax && loss <= 2 * okMax)) return { mark: 'ok', text: '可以，但平均少賺 ' + lbb + ' 個大盲' + est + '（成功率 ' + PCT0(m.win) + '，冠軍的打法「' + best.label + '」' + PCT0(best.win) + '）。', src: 'champ' };
   return { mark: 'bad', text: '平均少賺 ' + lbb + ' 個大盲' + est + '：成功率 ' + PCT0(m.win) + '，冠軍的打法「' + best.label + '」' + PCT0(best.win) + '。', src: 'champ' };
 }
 
@@ -569,12 +574,15 @@ function champMerge(adv, sim, H) {
     if (m > need && m > (o.extra ? CHAMP.allinSe : 1) * se && m > bestD) { bestD = m; o.dSe = se; o.d = m; best.swapTo = o; }
   }
   if (best.swapTo) { const x = best.swapTo; delete best.swapTo; best = x; }
+  let simWhy = '';                                                     // ★ 不是平均最高時：是門檻（主動要多賺）還是誤差
+  { const top = opts.filter((o) => !o.extra || (CHAMP.simAllin && H.street === 3)).reduce((a, b) => (b.ev > a.ev ? b : a), best);
+    if (top !== best) simWhy = top.d === undefined && (top.ev - best.ev) <= (top.act.t === 'r' && best.act.t !== 'r' ? (H.street ? CHAMP.margin : CHAMP.marginPre) : 0.1) * bb ? 'margin' : 'se'; }
   if (best.act.t === 'c' && best.ev < 0) best = opts.find((o) => o.act.t === 'f') || best;
   for (const o of opts) { o.bb = o.ev / bb; delete o.xs; }
   const out = Object.assign({}, adv);
   out.act = best.act; out.label = best.label;
   const unsim = C.options.filter((o) => !by.has(key(o.act)) && !o.extra).map((o) => ({ label: o.label, ev: o.ev, win: o.win }));   // 沒模擬的大小：表上照一步估算列著（灰色），不拿來比
-  out.champ = Object.assign({}, C, { options: opts.sort((a, b) => b.ev - a.ev), best, sim: { n: sim.n, ms: sim.ms }, same: best.act.t === C.base.act.t, oneStep: { label: C.best.label }, unsim });
+  out.champ = Object.assign({}, C, { options: opts.sort((a, b) => b.ev - a.ev), best, sim: { n: sim.n, ms: sim.ms, why: simWhy }, same: best.act.t === C.base.act.t, oneStep: { label: C.best.label }, unsim });
   out.reasons = champReasons(H, H.toAct, best, opts, C.read, { reasons: adv.reasons.slice(0, 1), act: C.base.act, label: C.base.label });
   out.reasons.splice(1 + Math.min(2, C.read.length), 0, '整手模擬 ' + sim.n + ' 次：每個選項都照每個人的出牌習慣把這一手打完（對手的牌照他的範圍抽），看最後平均輸贏。');
   return out;

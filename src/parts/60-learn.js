@@ -588,7 +588,7 @@ function initLearn() {
     else if (a === 'practice') startQs('practice');
     else if (a === 'exam') { const l = lessonById(b.dataset.id); if (l && l.exam) { LN.ret = l; newGame('exam', l.exam); } }
     else if (a === 'gradw') startTest('grad');
-    else if (a === 'resume') { LN.ret = LN.lesson; showView('table'); G.lastRender = null; renderCur(); scheduleAuto(); }
+    else if (a === 'resume') { LN.ret = LN.lesson; showView('table'); G.lastRender = null; renderSpeedChip(); renderCur(); scheduleAuto(); }
     else if (a === 'cert') openLearn('cert');
     else if (a === 'lens') { LN.ret = LN.lesson; const acts = {}; (b.dataset.acts || '').split(',').forEach((x) => { const m = x.split(':'); if (m[1]) acts[+m[0]] = m[1]; }); lensLoad({ spot: b.dataset.spot || undefined, hero: b.dataset.hero ? parseCards(b.dataset.hero) : [], board: b.dataset.board ? parseCards(b.dataset.board) : [], acts, narrow: b.dataset.narrow || 'coach' }); }
     else if (a === 'studio') LN.ret = LN.lesson, studioLoad(presetSpot('river'), '大師之路 8-3：河牌範例（K♦5♣6♥9♥2♦，大盲跟注 vs 按鈕開牌的範圍）。算完點格子看每一種牌怎麼打；看完按上面的「大師之路」回課程。', true);

@@ -79,8 +79,8 @@ function statsHTML() {
   if (Fw && Fw.yes[0] + Fw.no[0]) {
     const avg = (a) => (a[0] ? (a[1] / a[0] >= 0 ? '+' : '') + fmt(a[1] / a[0], 2) + ' 大盲／手' : '—');
     h += '<h3 class="sth" style="margin-top:14px">照冠軍教練打的成績</h3><table class="stt">'
-      + '<tr><td>每個決定都評 ✓ 的手（照冠軍打，或只差一點點）</td><td class="r num">' + Fw.yes[0] + ' 手</td><td class="r num"><b>' + avg(Fw.yes) + '</b></td></tr>'
-      + '<tr><td>有 △ 或 ✗ 的手</td><td class="r num">' + Fw.no[0] + ' 手</td><td class="r num"><b>' + avg(Fw.no) + '</b></td></tr></table>'
+      + '<tr><td>冠軍評的決定都 ✓ 的手（照冠軍打，或只差一點點）</td><td class="r num">' + Fw.yes[0] + ' 手</td><td class="r num"><b>' + avg(Fw.yes) + '</b></td></tr>'
+      + '<tr><td>冠軍評的決定有 △ 或 ✗ 的手</td><td class="r num">' + Fw.no[0] + ' 手</td><td class="r num"><b>' + avg(Fw.no) + '</b></td></tr></table>'
       + '<p class="note">只算冠軍教練有給建議的手。手數少時運氣影響很大，幾百手以後比較準。</p>';
   }
   h += '<h3 class="sth" style="margin-top:14px">累計輸贏（大盲，最近 ' + S.hist.length + ' 手）</h3>' + statsChart(S.hist);
