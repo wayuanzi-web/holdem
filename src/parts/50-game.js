@@ -489,7 +489,7 @@ function heroHTML(st, S) {
 }
 /* ===== 冠軍教練：每個選項的成功率、平均賺賠、他會怎麼回應 ===== */
 function champBBtxt(ev, bb) { const x = ev / (bb || 2); return (x >= 0.05 ? '+' : x <= -0.05 ? '−' : '') + fmt(Math.abs(x), 1) + ' 大盲'; }
-/* 表上要列的選項：多算的全下只拿來評分（一步估算對全下太樂觀，冠軍不拿它當建議），不列 */
+/* 表上要列的選項：多算的全下只拿來評分（一步估算對全下太樂觀；只有河牌整手模擬明顯更好才會變成建議），不是建議就不列 */
 function champShown(C) { return C.options.filter((o) => !o.extra || o === C.best); }
 function champTableHTML(C) {
   let h = '<table class="champt"><tr><th>動作</th><th class="r">成功率</th><th class="r">平均</th><th>他們會</th></tr>';
@@ -516,7 +516,7 @@ function champTableHTML(C) {
     + (list[0] !== C.best ? (C.sim ? '★ 不是平均最高的那一個：差距還在模擬的誤差內（每次模擬結果會有一點不同），冠軍維持原來的判斷。'
       : C.pick === 'chart' ? '★ 不是平均最高的那一個：這手牌照圖表要加注，冠軍只會比圖表多打、不會少打（加注平均不到 −0.3 個大盲就照圖表）；整手模擬算完會再確認。'
       : '★ 不是平均最高的那一個：主動下注、加注要多賺一點（' + (C.street ? '0.25' : '0.3') + ' 個大盲以上）才值得冒險，只差一點點就選比較穩的。') : '')
-    + (list.length < C.options.length ? '全下也算了，只用來評分，沒列出來。' : '') + '</p>';
+    + (list.length < C.options.length ? '全下也算了（拿來評分；河牌整手模擬明顯更好才會建議），沒列出來。' : '') + '</p>';
   return h;
 }
 /* ===== 冠軍教練的詳細解說：勝率、成功率、平均是什麼，每個選項怎麼算出來的 ===== */
