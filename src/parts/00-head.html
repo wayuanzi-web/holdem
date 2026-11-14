@@ -601,6 +601,9 @@ body.intable .brand p { display: none; }
 .acts2 button:hover { border-color: var(--brass); }
 .acts2 button.rec { border-color: var(--brass); box-shadow: inset 0 0 0 2px var(--brass); }
 .acts2 button.rec::after { content: '建議'; position: absolute; top: -10px; right: 10px; background: var(--brass); color: #1b1608; font-size: 11px; padding: 0 7px; border-radius: 6px; font-weight: 700; }
+.acts2 button.rec.tent { box-shadow: none; border-style: dashed; }
+.acts2 button.rec.tent::after { content: '建議（模擬中）'; opacity: .85; }
+.champt tr.unsim td { color: var(--muted, #8a8170); }
 .acts2 button.fold { background: #1d3550; }
 .acts2 button:disabled { opacity: .45; cursor: default; border-color: var(--line); box-shadow: none; }
 .acts2 button { transition: opacity .15s; }
@@ -638,7 +641,7 @@ body.intable .brand p { display: none; }
 .cname { font-family: var(--serif); font-weight: 900; font-size: 19px; }
 .coach .note { color: #7a6c48; }
 .coach .tog { margin-left: auto; }
-.ctogs { margin-left: auto; display: flex; gap: 12px; font-size: 13.5px; }
+.ctogs { margin-left: auto; display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 13.5px; }
 .ctogs label { white-space: nowrap; cursor: pointer; }
 .ctogs label[hidden] { display: none; }
 /* 深入說明：可以點的名詞、白話欄、怎麼算的 */

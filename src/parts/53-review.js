@@ -14,7 +14,7 @@ function reviewDecisions(steps) {
   return out;
 }
 /* 一個對手：當時估的範圍 vs 他實際的牌 */
-function reviewOpp(o, hero, board, H) {
+function reviewOpp(o, hero, board, H, styled) {
   const p = H.players[o.seat], cards = p.cards.slice(), k = comboOf(cards[0], cards[1]);
   const w = parseRange(o.range), weight = w[k] || 0, stats = lensStats(w, 1);
   let stronger = 0, tot = 0;
@@ -35,7 +35,7 @@ function reviewOpp(o, hero, board, H) {
   let why = '';
   if (hit === 'miss' || hit === 'edge') {
     const c = board.length >= 3 ? handCategory(cards[0], cards[1], board) : -1;
-    if (st.loose >= 1.4) why = '他是' + st.zh + '：會用比估計更差的牌' + (agg ? '加注' : '跟注') + '。教練一律照緊凶估範圍（實測比照風格估還穩），所以鬆的對手常常「不在範圍裡」。';
+    if (st.loose >= 1.4) why = '他是' + st.zh + '：會用比估計更差的牌' + (agg ? '加注' : '跟注') + '。' + (styled ? '冠軍教練已經照他的風格把範圍放寬，他這次還是比估計更鬆。' : '穩健教練一律照緊凶估範圍（實測比照風格估還穩），所以鬆的對手常常「不在範圍裡」。');
     else if (c >= 13 && agg) why = '他在詐唬：沒中卻' + (agg ? '加注' : '下注') + '。估計把這種牌的份量壓得很低，但不是零——GTO 也會帶一些詐唬。';
     else if (c >= 0 && c <= 5 && !agg) why = '他慢打：很強的牌只過牌或跟注，估計以為他沒那麼強。';
     else if (st.aggr <= 0.35 && agg) why = '他是' + st.zh + '，很少主動下注；一旦下注，牌比估計的更強。';
@@ -64,8 +64,8 @@ function reviewLesson(adv, street, hero) {
   return ids.map((id) => lessonById(id)).filter((l) => l && l.ready).slice(0, 2);
 }
 /* 份量怎麼來的：從 100% 開始，他每做一個動作就乘一次（跟教練估範圍用的是同一套：rangeWeights） */
-function reviewTrail(S, seat, k) {
-  const style = typeof COACH_STYLE_AWARE !== 'undefined' && COACH_STYLE_AWARE ? S.players[seat].style : 'tag';
+function reviewTrail(S, seat, k, style) {
+  style = style || (typeof COACH_STYLE_AWARE !== 'undefined' && COACH_STYLE_AWARE ? S.players[seat].style : 'tag');
   const out = [];
   let prev = 1;
   S.log.forEach((ev, i) => {
@@ -80,14 +80,50 @@ function reviewTrail(S, seat, k) {
   });
   return out;
 }
+const revPct = (x) => (x > 0 && x < 0.005 ? '不到 1%' : Math.round(x * 100) + '%');
 function reviewTrailHTML(r) {
+  if (r.shove) return '<details class="revtrail"><summary>份量 ' + revPct(r.weight) + ' 怎麼算的？</summary><p>他是短碼全下：範圍照推牌表估（他這個位置、這個籌碼會推的前 ' + Math.round(r.top * 100) + '% 的牌），在裡面就是 100%、不在就是 0%，不是一步一步乘。</p></details>';
   if (!r.trail || !r.trail.length) return '';
-  const pct = (x) => Math.round(x * 100) + '%';
+  const pct = revPct;
   return '<details class="revtrail"><summary>份量 ' + pct(r.weight) + ' 怎麼算的？</summary><p>一開始每手牌都是 100%。他每做一個動作，教練就照「拿這手牌會不會這樣做」乘一個數：</p><p class="trailrow">100%'
     + r.trail.map((t) => ' → ' + STREET_NAME[t.street] + '<b>' + t.word + '</b> ×' + t.f.toFixed(2)).join('') + ' ＝ <b>' + pct(r.trail[r.trail.length - 1].w) + '</b></p>'
-    + '<p class="note">×1.00＝拿這手牌一定會這樣做；×0.30＝三成的時候會這樣做；×0.04＝幾乎不會。翻牌前看這手牌在不在他這個位置、這種動作的範圍裡；翻牌後看這手牌在這個公牌上有多強（越強越會下注、加注，越弱越常過牌或棄牌）。份量 50% 以上算「猜到了」，1%～49% 是「範圍邊緣」，0% 是「沒猜到」。</p></details>';
+    + '<p class="note">×1.00＝拿這手牌一定會這樣做；×0.30＝三成的時候會這樣做；×0.04＝幾乎不會。翻牌前看這手牌在不在他這個位置、這種動作的範圍裡；翻牌後看這手牌在這個公牌上有多強（越強越會下注、加注，越弱越常過牌或棄牌）。份量 50% 以上算「猜到了」，比 0 大、不到 50% 是「範圍邊緣」，0% 是「沒猜到」。</p></details>';
 }
 /* 結局：你最後一個決定之後發生的事、攤牌、輸贏是決定還是運氣 */
+/* 你最後一個決定時，對還在的人實際的牌：每個人的勝率（剩 1–2 張公牌精確算，翻牌前抽 4,000 次；平手照人數分） */
+function reviewEqAll(hands, board) {
+  const used = new Uint8Array(52);
+  for (const h of hands) for (const c of h) used[c] = 1;
+  for (const c of board) used[c] = 1;
+  const deck = [];
+  for (let c = 0; c < 52; c++) if (!used[c]) deck.push(c);
+  const need = 5 - board.length, eq = new Float64Array(hands.length);
+  let n = 0;
+  const score = (b) => {
+    let best = -1, win = [];
+    hands.forEach((h, i) => { const v = evalCards(h.concat(b)); if (v > best) { best = v; win = [i]; } else if (v === best) win.push(i); });
+    for (const i of win) eq[i] += 1 / win.length;
+    n++;
+  };
+  if (need === 0) score(board);
+  else if (need === 1) for (const c of deck) score(board.concat([c]));
+  else if (need === 2) { for (let i = 0; i < deck.length; i++) for (let j = i + 1; j < deck.length; j++) score(board.concat([deck[i], deck[j]])); }
+  else {
+    const rng = makeRng(12345);
+    for (let t = 0; t < 4000; t++) {
+      const d = deck.slice();
+      for (let x = 0; x < need; x++) { const y = x + ((rng() * (d.length - x)) | 0); const tmp = d[x]; d[x] = d[y]; d[y] = tmp; }
+      score(board.concat(d.slice(0, need)));
+    }
+  }
+  return Array.from(eq, (x) => x / n);
+}
+/* 底池裡你拿到多少（不算多出來退回給你的） */
+function revWon(res, seat) {
+  let r = 0;
+  for (const p of res.pots) if (p.refund && p.winners[0] === seat) r += p.amt;
+  return { won: res.won[seat] - r, refund: r };
+}
 function reviewEndHTML(H, R, D, lastEq) {
   const last = D[D.length - 1], after = R.steps.slice(last.i + 1).filter((st) => st.title && st.kind !== 'hero' && st.kind !== 'summary');
   const res = H.result, net = res ? res.net[0] : 0;
@@ -95,16 +131,18 @@ function reviewEndHTML(H, R, D, lastEq) {
   if (H.board.length) h += '<div class="revrow"><span class="lbl">最後的公牌</span>' + H.board.map((c) => cardHTML(c, 'sm')).join('') + '</div>';
   if (after.length) h += '<ol class="revafter">' + after.map((st) => '<li>' + rich(st.title) + '</li>').join('') + '</ol>';
   if (res && !res.uncontested) {
-    h += '<p><b>攤牌</b></p>' + H.players.filter((p) => !p.folded).map((p) => '<div class="revrow"><span class="lbl">' + esc(p.seat === 0 ? '你' : p.name) + '</span>' + sortedCards(p.cards).map((c) => cardHTML(c, 'sm')).join('') + '<span>' + esc(describeHand(evalCards(p.cards.concat(H.board)))) + (res.won[p.seat] > 0 ? '　<b>贏 ' + res.won[p.seat] + '</b>' : '') + '</span></div>').join('');
+    h += '<p><b>攤牌</b></p>' + H.players.filter((p) => !p.folded).map((p) => { const w = revWon(res, p.seat); return '<div class="revrow"><span class="lbl">' + esc(p.seat === 0 ? '你' : p.name) + '</span>' + sortedCards(p.cards).map((c) => cardHTML(c, 'sm')).join('') + '<span>' + esc(describeHand(evalCards(p.cards.concat(H.board)))) + (w.won > 0 ? '　<b>贏 ' + w.won + '</b>' : '') + (w.refund > 0 ? '（多下的 ' + w.refund + ' 沒人跟，退回）' : '') + '</span></div>'; }).join('');
   } else if (res) {
     const w = H.players.find((p) => res.won[p.seat] > 0);
     h += '<p>' + (w ? (w.seat === 0 ? '其他人都棄牌，你不用亮牌就贏了 ' + res.won[0] + '。' : esc(w.name) + ' 不用亮牌就贏了（其他人都棄牌）。') : '') + '</p>';
   }
   h += '<p><b>這一手你' + (net > 0 ? '贏了 ' + net : net < 0 ? '輸了 ' + (-net) : '沒輸沒贏') + '。</b>';
-  if (lastEq !== null && res && !res.uncontested && !H.players[0].folded) {
-    const e = Math.round(lastEq.eq * 100);
-    h += '你最後一個決定時，對' + esc(lastEq.name) + '實際的牌勝率 <b>' + e + '%</b>（同樣的情況打 100 次，你大約贏 ' + e + ' 次）。'
-      + (net < 0 && lastEq.eq >= 0.5 ? '這次輸是運氣不好：後面的牌幫了他。長期這樣打是賺的，不用改。' : net > 0 && lastEq.eq < 0.5 ? '這次贏是運氣好：後面的牌幫了你。長期這樣打不一定賺，看上面每一步的評分。' : net < 0 ? '他的牌本來就比較大，輸是正常的；要看的是前面該不該把錢放進去。' : '你的牌本來就比較大，贏是應該的。');
+  if (lastEq && res && !res.uncontested && !H.players[0].folded) {
+    const e = Math.round(lastEq.eq * 100), multi = lastEq.names.length > 1, fav = lastEq.fav;
+    const split = res.pots.some((p) => !p.refund && p.winners.length > 1 && p.winners.includes(0));
+    const who = multi ? '還在的 ' + lastEq.names.length + ' 個人（' + lastEq.names.map(esc).join('、') + '）' : esc(lastEq.names[0]);
+    h += '你最後一個決定時，對' + who + '實際的牌，你的勝率 <b>' + e + '%</b>（同樣的情況打 100 次，你大約贏 ' + e + ' 次' + (multi ? '；' + (fav ? '你是最可能贏的人' : '有人比你更可能贏') : '') + '）。'
+      + (split || net === 0 ? '這次' + (split ? '平分底池' : '打平') + (split && net !== 0 ? '（' + (net > 0 ? '多' : '少') + '的 ' + Math.abs(net) + ' 是邊池或零頭）' : '') + '。' : net < 0 && fav ? '這次輸是運氣不好：後面的牌幫了' + (multi ? '別人' : '他') + '。長期這樣打是賺的，不用改。' : net > 0 && !fav ? '這次贏是運氣好：後面的牌幫了你。長期這樣打不一定賺，看上面每一步的評分。' : net < 0 ? (multi ? '你本來就不是最大的牌' : '他的牌本來就比較大') + '，輸是正常的；要看的是前面該不該把錢放進去。' : '你的牌本來就比較大，贏是應該的。');
   }
   h += '</p></div>';
   return h;
@@ -119,7 +157,7 @@ function reviewHTML(R) {
   const good = marks.filter((m) => m === 'good').length, bad = marks.filter((m) => m === 'bad').length;
   let head = '<p class="revsum"><b>' + (net > 0 ? '贏了 ' + net : net < 0 ? '輸了 ' + (-net) : '沒輸沒贏') + '</b>・' + D.length + ' 個決定：✓ ' + good + '、△ ' + (D.length - good - bad) + '、✗ ' + bad + '。'
     + (net < 0 && bad === 0 ? '沒有錯的決定還是輸：這很正常，對的決定是「長期」賺錢，單一手的輸贏大部分是牌運。' : net > 0 && bad > 0 ? '贏了但有決定是錯的：這種贏長期會還回去，檢討看決定，不看結果。' : '') + '</p>';
-  let h = '', guessN = 0, guessHit = 0, idx = 0, lastEq = null;
+  let h = '', guessN = 0, guessHit = 0, guessEdge = 0, idx = 0, lastEq = null;
   for (const { st, hs } of D) {
     idx++;
     const S = hs.snap, adv = hs.adv, board = S.board.slice(), hero = S.players[0].cards.slice(), pot = potTotal(S), L = legalSnapshot(S);
@@ -130,28 +168,39 @@ function reviewHTML(R) {
     const CH = adv.champ && adv.champ.options && adv.champ.options.length ? adv.champ : null;
     c += glossify('<p><b>你：' + esc(actWord(st.ev, H).replace(/^你/, '')) + '</b>　' + (CH ? '冠軍教練：' : '教練建議：') + esc(adv.label) + (g.src === 'GTO' ? '　<span class="srcg">GTO 評分</span>' : '') + '<br><span class="' + (g.mark === 'good' ? 'ok' : 'no') + '">' + esc(g.text) + '</span></p>', used);
     // 當時猜的範圍 vs 他實際的牌
-    const opps = adv.detail && adv.detail.opps ? adv.detail.opps : [];
+    const champR = CH && CH.read.length && CH.read.every((r) => r.range !== undefined);   // 冠軍教練：照他自己估的範圍（照每個人的風格）檢討，數字跟當時教練框一樣
+    const opps = champR ? CH.read : adv.detail && adv.detail.opps ? adv.detail.opps : [];
+    const estAll = champR && CH.eq !== undefined ? CH.eq : adv.detail ? adv.detail.est : 0;
     if (opps.length) {
-      c += '<div class="revg"><b>當時猜他有什麼</b>';
+      c += '<div class="revg"><b>當時猜他有什麼</b>' + (champR ? '<span class="note">（冠軍教練照每個人的風格估）</span>' : '');
       opps.forEach((o, oi) => {
-        const r = reviewOpp(o, hero, board, H);
-        r.trail = o.seat !== undefined ? reviewTrail(S, o.seat, comboOf(r.cards[0], r.cards[1])) : [];
-        guessN++; if (r.hit !== 'miss') guessHit++;
-        if (!H.players[o.seat].folded && (!lastEq || r.eqActual < lastEq.eq)) lastEq = { eq: r.eqActual, name: r.name };   // 結局：跟最後還在、對你最不利的那個人比
+        const r = reviewOpp(o, hero, board, H, champR);
+        r.shove = !champR && adv.short && o.act === 'shove';
+        r.trail = o.seat !== undefined && !r.shove ? reviewTrail(S, o.seat, comboOf(r.cards[0], r.cards[1]), champR ? o.rstyle : undefined) : [];
+        if (r.trail.length) {                                          // 份量用算出來的（不用範圍文字四捨五入過的），跟下面的「怎麼算的」一致
+          const w0 = r.trail[r.trail.length - 1].w, h0 = w0 >= 0.5 ? 'hit' : w0 > 1e-4 ? 'edge' : 'miss';
+          r.weight = w0; if (h0 === 'hit') r.why = ''; r.hit = h0;
+        }
+        guessN++; if (r.hit === 'hit') guessHit++; else if (r.hit === 'edge') guessEdge++;
         const w = parseRange(o.range);
         let bd = '';
         if (board.length >= 3) { const B = lensBoard(w, board, hero); bd = '；這個公牌上頂對以上 ' + Math.round(B.strongShare * 100) + '%'; }
-        const wp = Math.round(r.weight * 100);
-        const verdict = r.hit === 'hit' ? '✓ 猜到了：這手牌在估計範圍裡（份量 ' + wp + '%），範圍裡比它強的牌佔 ' + Math.round(r.pctStronger * 100) + '%。'
-          : r.hit === 'edge' ? '△ 在範圍邊緣：份量 ' + wp + '%——照估計，他拿這手牌大約只有 ' + wp + '% 的時候會一路這樣打（其他時候會棄牌或換打法），算「可能、但不是主要的牌」。'
+        const wp = revPct(r.weight);
+        const verdict = r.hit === 'hit' ? '✓ 猜到了：這手牌在估計範圍裡（份量 ' + wp + '），範圍裡比它強的牌佔 ' + Math.round(r.pctStronger * 100) + '%。'
+          : r.hit === 'edge' ? '△ 在範圍邊緣：份量 ' + wp + '——照估計，他拿這手牌大約只有 ' + wp + ' 的時候會一路這樣打（其他時候會棄牌或換打法），算「可能、但不是主要的牌」。'
           : '✗ 沒猜到：照估計，他拿這手牌幾乎不會這樣打（份量 0%）。';
-        c += '<div class="revo">' + glossify('<div>' + esc(r.name) + '（' + esc(styleZh(r.style)) + '）' + (o.act && REV_ACT_ZH[o.act] ? REV_ACT_ZH[o.act] + '：' : '：') + '估他是前 <b>' + Math.round(o.top * 100) + '%</b> 的牌（約 ' + Math.round(r.combos) + ' 個組合）' + bd + '。你對這個範圍的勝率 <b>' + Math.round(adv.detail.est * 100) + '%</b>。</div>', used)
+        c += '<div class="revo">' + glossify('<div>' + esc(r.name) + '（' + esc(styleZh(r.style)) + '）' + (o.act && REV_ACT_ZH[o.act] ? REV_ACT_ZH[o.act] + '：' : '：') + '估他是前 <b>' + Math.round(o.top * 100) + '%</b> 的牌（約 ' + Math.round(r.combos) + ' 個組合）' + bd + '。你對' + (opps.length > 1 ? '他們的範圍' : '這個範圍') + '的勝率 <b>' + Math.round(estAll * 100) + '%</b>。</div>', used)
           + '<div class="revact"><span class="lbl">他實際</span>' + sortedCards(r.cards).map((x) => cardHTML(x, 'sm')).join('') + '<span>' + glossify(esc(r.cat), used) + (r.folded ? '（後來棄牌）' : '') + '</span></div>'
-          + glossify('<div class="revverdict ' + r.hit + '">' + verdict + (r.why ? ' ' + esc(r.why) : '') + ' 你對他實際這手牌的勝率 <b>' + Math.round(r.eqActual * 100) + '%</b>（對估計範圍 ' + Math.round(adv.detail.est * 100) + '%）。</div>', used)
+          + glossify('<div class="revverdict ' + r.hit + '">' + verdict + (r.why ? ' ' + esc(r.why) : '') + ' 你對他實際這手牌的勝率 <b>' + Math.round(r.eqActual * 100) + '%</b>' + (opps.length > 1 ? '' : '（對估計範圍 ' + Math.round(estAll * 100) + '%）') + '。</div>', used)
           + reviewTrailHTML(r) + '</div>';
       });
       c += '</div>';
-    } else if (adv.chart) c += glossify('<p class="note">翻牌前照圖表（' + esc(adv.chart.name) + '）決定，不用猜對手的牌。</p>', used);
+    }
+    if (idx === D.length) {                                              // 結局用：最後一個決定時還在、最後也沒棄牌的人，實際的牌
+      const alive = S.players.filter((q) => q.seat !== 0 && !q.folded && !H.players[q.seat].folded);
+      if (alive.length) { const eqs = reviewEqAll([hero].concat(alive.map((q) => H.players[q.seat].cards)), board); lastEq = { eq: eqs[0], fav: eqs[0] >= Math.max(...eqs.slice(1)), names: alive.map((q) => q.name) }; }
+    }
+    if (!opps.length && adv.chart) c += glossify('<p class="note">翻牌前照圖表（' + esc(adv.chart.name) + '）決定，不用猜對手的牌。</p>', used);
     // 為什麼（標題不加名詞按鈕：點了會收合）
     c += '<details class="revwhy"><summary>為什麼建議「' + esc(adv.label) + '」' + (CH ? '（每個選項的成功率）' : '') + '</summary>' + glossify('<ol>' + adv.reasons.map((x) => '<li>' + rich(x) + '</li>').join('') + '</ol>', used) + (CH ? champTableHTML(CH) : '') + (adv.more && adv.more.length ? glossify(adv.more.map((x) => '<p class="note">' + rich(x) + '</p>').join(''), used) : '') + '</details>';
     const ls = reviewLesson(adv, st.ev.street, hero);
@@ -159,7 +208,7 @@ function reviewHTML(R) {
     c += '</div>';
     h += c;
   }
-  if (guessN) head = head.replace('</p>', '　猜對手的牌：' + guessHit + '／' + guessN + ' 次在估計範圍裡。</p>');
+  if (guessN) head = head.replace('</p>', '　猜對手的牌：' + guessHit + '／' + guessN + ' 次猜到' + (guessEdge ? '、' + guessEdge + ' 次在範圍邊緣' : '') + '。</p>');
   h = head + h + reviewEndHTML(H, R, D, lastEq);
   h += glossify('<p class="note">「猜」＝教練照對手的位置、動作估的範圍（機率分布），不是猜一手牌；猜對的標準是他的牌在範圍裡（份量 50% 以上）。對手實際的牌是結束後才看得到（棄牌的也會顯示）。虛線底的詞可以點開看解釋。</p>', new Set());
   return h;

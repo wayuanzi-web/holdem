@@ -95,7 +95,8 @@ function champHeroAggRange(H, seat) {
   return w;
 }
 /* 翻牌前：你做了動作以後，後面每個人會怎麼回應（直接用電腦的出牌規則，每種起手牌試 K 次；假設前面的人都棄牌） */
-function champPreResp(H, heroSeat, act, level) {
+function champPreResp(H, heroSeat, act, level, K) {
+  K = K || CHAMP.K;
   const H1 = champClone(H);
   applyAction(H1, act);
   const out = [], cls = champCls(), hero = H.players[heroSeat].cards;
@@ -112,17 +113,17 @@ function champPreResp(H, heroSeat, act, level) {
       if (!wg) continue;
       pj.cards = [COMBO_A[rep], COMBO_B[rep]];
       let f = 0, c = 0, r = 0;
-      for (let s = 0; s < CHAMP.K; s++) {
+      for (let s = 0; s < K; s++) {
         const a = aiDecide(H1, rng, level);
         if (a.t === 'r' && a.to > H1.curBet) { r++; rtS += a.to * wg; } else if (a.t === 'f') f++; else c++;
       }
-      res.f += wg * f / CHAMP.K; res.c += wg * c / CHAMP.K; res.r += wg * r / CHAMP.K;
-      for (const k of cls[g]) if (wPrior[k] > 0 && !hero.includes(COMBO_A[k]) && !hero.includes(COMBO_B[k])) { res.wCall[k] = wPrior[k] * c / CHAMP.K; res.wRaise[k] = wPrior[k] * r / CHAMP.K; }
+      res.f += wg * f / K; res.c += wg * c / K; res.r += wg * r / K;
+      for (const k of cls[g]) if (wPrior[k] > 0 && !hero.includes(COMBO_A[k]) && !hero.includes(COMBO_B[k])) { res.wCall[k] = wPrior[k] * c / K; res.wRaise[k] = wPrior[k] * r / K; }
       W += wg;
     }
     pj.cards = save;
     if (W > 0) { res.f /= W; res.c /= W; res.r /= W; }
-    res.raiseTo = res.r > 0 ? Math.round(rtS / (res.r * W * CHAMP.K)) : 0;
+    res.raiseTo = res.r > 0 ? Math.round(rtS / (res.r * W * K)) : 0;
     out.push(res);
     applyAction(H1, { t: 'f' });
   }
@@ -141,8 +142,9 @@ function champOptionsPre(H, level, I, rng) {
   if (L.canCheck) {
     const ws = inPot.map((q) => rangeWeights(H, q.seat, CHAMP.styleRanges ? q.style : 'tag'));
     const eq = ws.length ? mcVsRanges(p.cards, [], ws, CHAMP.iters, rng).eq : 0.5;
-    const R = ws.length > 1 ? CHAMP.rMulti * CHAMP.rPreOOP : CHAMP.rPreOOP;
-    opts.push({ act: { t: 'x' }, label: '過牌', ev: eq * R * pot0, win: eq, eq, calc: { k: 'check', eq, R, pot: pot0, pre: true } });
+    const ipX = champIP(H, seat, H.players.filter((q) => q.seat !== seat && !q.folded).map((q) => q.seat));
+    const R = (ipX ? CHAMP.rPreIP : CHAMP.rPreOOP) * (ws.length > 1 ? CHAMP.rMulti : 1);
+    opts.push({ act: { t: 'x' }, label: '過牌', ev: eq * R * pot0, win: eq, eq, closes: true, calc: { k: 'check', eq, R, pot: pot0, pre: true, closes: true, ip: ipX } });
   } else opts.push({ act: { t: 'f' }, label: '棄牌', ev: 0, win: 0, calc: { k: 'fold' } });
   // 跟注（前面有人加注）
   if (!L.canCheck && raises > 0) {
@@ -151,9 +153,10 @@ function champOptionsPre(H, level, I, rng) {
     const behind = champPreResp(H, seat, { t: 'c' }, level);
     const sq = 1 - behind.reduce((a, b) => a * (1 - b.r), 1);       // 後面有人再加注（擠壓），你多半要棄
     const ip = champIP(H, seat, inPot.map((q) => q.seat));
-    const R = (ip ? CHAMP.rPreIP : CHAMP.rPreOOP) * (ws.length > 1 ? CHAMP.rMulti : 1);
+    const allin = L.callAmt >= p.stack, noMore = !allin && inPot.length > 0 && inPot.every((q) => q.allin);   // 跟了之後沒人能再下注：勝率不打折
+    const R = allin || noMore ? 1 : (ip ? CHAMP.rPreIP : CHAMP.rPreOOP) * (ws.length > 1 ? CHAMP.rMulti : 1);
     const potC = pot0 + L.callAmt;
-    opts.push({ act: { t: 'c' }, label: '跟注 ' + L.callAmt, ev: (1 - sq) * eq * R * potC - L.callAmt, win: (1 - sq) * eq, eq, sq, calc: { k: 'call', eq, R, pot: potC, cost: L.callAmt, sq, ip, pre: true } });
+    opts.push({ act: { t: 'c' }, label: (allin ? '全下跟注 ' : '跟注 ') + L.callAmt, ev: (1 - sq) * eq * R * potC - L.callAmt, win: (1 - sq) * eq, eq, sq, calc: { k: 'call', eq, R, pot: potC, cost: L.callAmt, sq, ip, pre: true, allin, noMore } });
   }
   // 跛入（沒人加注時只跟大盲）：後面有人加注你就棄
   if (!L.canCheck && raises === 0) {
@@ -162,8 +165,9 @@ function champOptionsPre(H, level, I, rng) {
     const ws = inPot.map((q) => rangeWeights(H, q.seat, CHAMP.styleRanges ? q.style : 'tag')).concat(resp.filter((x) => x.c > 0.02).map((x) => x.wCall));
     const eq = ws.length ? mcVsRanges(p.cards, [], ws, CHAMP.iters, rng).eq : 0.5;
     const potF = pot0 + L.callAmt + resp.reduce((s, x) => s + x.c * (H.curBet - x.bet), 0);
-    const Rl = CHAMP.rPreOOP * (ws.length > 1 ? CHAMP.rMulti : 1);
-    opts.push({ act: { t: 'c' }, label: '跟注 ' + L.callAmt + '（跛入）', ev: (1 - pr) * eq * Rl * potF - L.callAmt, win: (1 - pr) * eq, eq, sq: pr, calc: { k: 'call', eq, R: Rl, pot: potF, cost: L.callAmt, sq: pr, limp: true, pre: true } });
+    const ipL = champIP(H, seat, H.players.filter((q) => q.seat !== seat && !q.folded).map((q) => q.seat));
+    const Rl = (ipL ? CHAMP.rPreIP : CHAMP.rPreOOP) * (ws.length > 1 ? CHAMP.rMulti : 1);
+    opts.push({ act: { t: 'c' }, label: '跟注 ' + L.callAmt + '（跛入）', ev: (1 - pr) * eq * Rl * potF - L.callAmt, win: (1 - pr) * eq, eq, sq: pr, calc: { k: 'call', eq, R: Rl, pot: potF, cost: L.callAmt, sq: pr, limp: true, pre: true, ip: ipL } });
   }
   // 加注（開局、再加注）
   if (L.canRaise) {
@@ -173,28 +177,33 @@ function champOptionsPre(H, level, I, rng) {
     else to = Math.round(H.curBet * 2.4);
     to = Math.max(L.minTo, Math.min(L.maxTo, to));
     if (L.maxTo - to < (pot0 + to) * 0.3) to = L.maxTo;
-    const resp = champPreResp(H, seat, { t: 'r', to }, level);
-    const a = to - hb;
-    let reach = 1, ev = 0, win = 0, pC = 0, pR = 0, evC = 0, evR = 0, eqCs = 0, potCs = 0;
-    for (const x of resp) {
-      if (x.c > 0.005) {
-        const eqC = mcVsRanges(p.cards, [], [x.wCall], CHAMP.iters, rng).eq, ip = champIP(H, seat, [x.seat]);
-        const potC = pot0 + a + Math.min(to, H.players[x.seat].bet + H.players[x.seat].stack) - x.bet;
-        const e1 = reach * x.c * (eqC * (ip ? CHAMP.rPreIP : CHAMP.rPreOOP) * potC - a);
-        ev += e1; win += reach * x.c * eqC; evC += e1; pC += reach * x.c; eqCs += reach * x.c * eqC; potCs += reach * x.c * potC;
-        x.eqC = eqC;
+    const sizes = [to];
+    if (to < L.maxTo) sizes.push(L.maxTo);                              // 全下也算（不一定列在表上）：評分要知道你全下好不好
+    for (const X of sizes) {
+      const resp = champPreResp(H, seat, { t: 'r', to: X }, level, X === to ? CHAMP.K : 3);   // 多算的全下：面對全下的決定比較單純，少抽幾次
+      const a = X - hb;
+      let reach = 1, ev = 0, win = 0, pC = 0, pR = 0, evC = 0, evR = 0, eqCs = 0, potCs = 0, Rs = 0, costCs = 0, winR = 0, nC = 0;
+      for (const x of resp) {
+        if (x.c > 0.005) {
+          const eqC = mcVsRanges(p.cards, [], [x.wCall], CHAMP.iters, rng).eq, ip = champIP(H, seat, [x.seat]);
+          const cap = Math.min(X, H.players[x.seat].bet + H.players[x.seat].stack), aE = Math.max(0, cap - hb);   // 他籌碼不夠跟滿：多的退回給你
+          const potC = pot0 + aE + cap - x.bet, Rx = ip ? CHAMP.rPreIP : CHAMP.rPreOOP;   // 被跟就全下也照樣打折：一步估算算不到小一點的注之後還能多贏，不打折會太愛全下（模擬：每百手少贏 7–13 大盲）
+          const e1 = reach * x.c * (eqC * Rx * potC - aE);
+          ev += e1; win += reach * x.c * eqC; evC += e1; pC += reach * x.c; eqCs += reach * x.c * eqC; potCs += reach * x.c * potC; Rs += reach * x.c * Rx; costCs += reach * x.c * aE; nC++;
+          x.eqC = eqC;
+        }
+        if (x.r > 0.005) {
+          const eqR = mcVsRanges(p.cards, [], [x.wRaise], CHAMP.iters, rng).eq, Y = Math.min(x.raiseTo || X * 3, p.bet + p.stack);
+          const potR = pot0 + (Y - hb) + (Y - x.bet), cont = eqR * CHAMP.rPreIP * potR - (Y - hb);
+          ev += reach * x.r * Math.max(-a, cont); win += reach * x.r * (cont > -a ? eqR : 0); winR += reach * x.r * (cont > -a ? eqR : 0); evR += reach * x.r * Math.max(-a, cont); pR += reach * x.r;
+          x.eqR = eqR;
+        }
+        reach *= x.f;
       }
-      if (x.r > 0.005) {
-        const eqR = mcVsRanges(p.cards, [], [x.wRaise], CHAMP.iters, rng).eq, Y = Math.min(x.raiseTo || to * 3, p.bet + p.stack);
-        const potR = pot0 + (Y - hb) + (Y - x.bet), cont = eqR * CHAMP.rPreIP * potR - (Y - hb);
-        ev += reach * x.r * Math.max(-a, cont); win += reach * x.r * (cont > -a ? eqR : 0); evR += reach * x.r * Math.max(-a, cont); pR += reach * x.r;
-        x.eqR = eqR;
-      }
-      reach *= x.f;
+      ev += reach * pot0; win += reach;
+      opts.push({ act: { t: 'r', to: X }, label: (L.isBet ? '下注 ' : X >= L.maxTo ? '全下 ' : '加注到 ') + X, ev, win, foldAll: reach, resp, extra: X !== to,
+        calc: { k: 'raise', pot0, cost: a, F: reach, pC, pR, eqC: pC ? eqCs / pC : 0, potC: pC ? potCs / pC : 0, R: pC ? Rs / pC : 1, costC: pC ? costCs / pC : a, avg: nC > 1, evF: reach * pot0, evC, evR, winR, pre: true } });
     }
-    ev += reach * pot0; win += reach;
-    opts.push({ act: { t: 'r', to }, label: (L.isBet ? '下注 ' : to >= L.maxTo ? '全下 ' : '加注到 ') + to, ev, win, foldAll: reach, resp,
-      calc: { k: 'raise', pot0, cost: a, F: reach, pC, pR, eqC: pC ? eqCs / pC : 0, potC: pC ? potCs / pC : 0, evF: reach * pot0, evC, evR, pre: true } });
   }
   return opts;
 }
@@ -205,9 +214,10 @@ function champOptionsPost(H, level, I, rng) {
   const nLive = opps.length + 1;
   const ws = opps.map((q) => rangeWeights(H, q.seat, CHAMP.styleRanges ? q.style : 'tag'));
   const heroW = champOne(p.cards);
-  const heq = ws.map((w) => { const e = champEqPer(H.board, w, heroW, CHAMP.runs, rng); for (let k = 0; k < NCOMBO; k++) if (e[k] >= 0) e[k] = 1 - e[k]; return e; });
+  const heq = opps.length === 1 ? ws.map((w) => { const e = champEqPer(H.board, w, heroW, CHAMP.runs, rng); for (let k = 0; k < NCOMBO; k++) if (e[k] >= 0) e[k] = 1 - e[k]; return e; }) : [];   // 你對他每個組合的勝率：只有單挑用得到
+  const itM = opps.length >= 3 ? 400 : CHAMP.iters;                    // 三人以上：一步估算少抽一點（整手模擬會再算），手機上不卡
   const avgEq = (w, e, x) => { let s = 0, t = 0; for (let k = 0; k < NCOMBO; k++) if (e[k] >= 0 && w[k] > 0) { const ww = w[k] * (x ? x[k] : 1); s += ww * e[k]; t += ww; } return t > 0 ? s / t : 0; };
-  const est = opps.length === 1 ? avgEq(ws[0], heq[0]) : mcVsRanges(p.cards, H.board, ws, CHAMP.iters, rng).eq;
+  const est = opps.length === 1 ? avgEq(ws[0], heq[0]) : mcVsRanges(p.cards, H.board, ws, itM, rng).eq;
   const ip = champIP(H, seat, opps.map((q) => q.seat)), river = H.street === 3;
   const R = river ? 1 : (ip ? CHAMP.rIP : CHAMP.rOOP) * (opps.length > 1 ? CHAMP.rMulti : 1);
   const opts = [];
@@ -232,9 +242,11 @@ function champOptionsPost(H, level, I, rng) {
   else {
     opts.push({ act: { t: 'f' }, label: '棄牌', ev: 0, win: 0, calc: { k: 'fold' } });
     const imp = I.draws && !river && p.stack > pot0 ? (H.street === 1 ? 0.04 : 0.02) : 0;
-    const Rc = L.callAmt >= p.stack ? 1 : champReal(H, ip, est, opps.length > 1);
-    opts.push({ act: { t: 'c' }, label: (L.callAmt >= p.stack ? '全下跟注 ' : '跟注 ') + L.callAmt, ev: (est * Rc + imp) * (pot0 + L.callAmt) - L.callAmt, win: est, eq: est,
-      calc: { k: 'call', eq: est, R: Rc, imp, pot: pot0 + L.callAmt, cost: L.callAmt, allin: L.callAmt >= p.stack, river } });
+    const allin = L.callAmt >= p.stack, noMore = !allin && !live.length;   // 對手都全下了：跟了就直接看到攤牌，不打折
+    const Rc = allin || noMore ? 1 : champReal(H, ip, est, opps.length > 1);
+    const impC = noMore ? 0 : imp;
+    opts.push({ act: { t: 'c' }, label: (allin ? '全下跟注 ' : '跟注 ') + L.callAmt, ev: (est * Rc + impC) * (pot0 + L.callAmt) - L.callAmt, win: est, eq: est,
+      calc: { k: 'call', eq: est, R: Rc, imp: impC, pot: pot0 + L.callAmt, cost: L.callAmt, allin, noMore, river } });
   }
   if (L.canRaise && live.length) {
     const wHero = champHeroAggRange(H, seat);
@@ -242,7 +254,9 @@ function champOptionsPost(H, level, I, rng) {
     const sizes = [];
     if (L.isBet) for (const fr of [0.33, 0.5, 0.75, 1]) sizes.push(sizeTo(H, L, fr));
     else for (const fr of [0.7, 1]) sizes.push(sizeTo(H, L, fr));
-    const uniq = [...new Set(sizes)].filter((x) => x >= L.minTo && x <= L.maxTo);
+    const norm = new Set(sizes.filter((x) => x >= L.minTo && x <= L.maxTo));
+    const uniq = [...norm];
+    if (!norm.has(L.maxTo)) uniq.push(L.maxTo);                         // 全下也算（不一定列在表上）：評分要知道你全下好不好
     for (const X of uniq) {
       const a = X - hb;
       let ev = 0, win = 0, reachAll = 1, calcO = null;
@@ -256,15 +270,15 @@ function champOptionsPost(H, level, I, rng) {
         if (!W) continue;
         F /= W; C /= W; Rr /= W;
         const eqC = avgEq(w, e, resp.c), eqR = avgEq(w, e, resp.r);
-        const callTo = Math.min(X, o.bet + o.stack), potC = pot0 + a + (callTo - o.bet);
+        const callTo = Math.min(X, o.bet + o.stack), aE = Math.max(0, callTo - hb), potC = pot0 + aE + (callTo - o.bet);   // 他籌碼不夠跟滿：多的退回給你
         const H1 = champClone(H); applyAction(H1, { t: 'r', to: X });
         const Y = H1.toAct >= 0 && H1.phase === 'bet' ? sizeTo(H1, legalActions(H1), 0.8) : X;
         const potR = pot0 + (Y - hb) + (Math.min(Y, o.bet + o.stack) - o.bet), contR = eqR * (river ? 1 : CHAMP.rIP) * potR - (Y - hb);
-        const Rc = champReal(H, ip, eqC, false);
-        ev = F * pot0 + C * (eqC * Rc * potC - a) + Rr * Math.max(-a, contR);
+        const Rc = champReal(H, ip, eqC, false);                       // 被跟就全下也照樣打折（理由同翻牌前）
+        ev = F * pot0 + C * (eqC * Rc * potC - aE) + Rr * Math.max(-a, contR);
         win = F + C * eqC + Rr * (contR > -a ? eqR : 0);
         reachAll = F;
-        calcO = { k: 'raise', pot0, cost: a, F, pC: C, pR: Rr, eqC, R: Rc, potC, evF: F * pot0, evC: C * (eqC * Rc * potC - a), evR: Rr * Math.max(-a, contR), Y, eqR, contR, river };
+        calcO = { k: 'raise', pot0, cost: a, costC: aE, F, pC: C, pR: Rr, eqC, R: Rc, potC, evF: F * pot0, evC: C * (eqC * Rc * potC - aE), evR: Rr * Math.max(-a, contR), winR: Rr * (contR > -a ? eqR : 0), Y, eqR, contR, river };
         detail.push({ seat: o.seat, name: o.name, style: o.style, f: F, c: C, r: Rr, eqC });
       } else {
         const conts = [];
@@ -281,14 +295,15 @@ function champOptionsPost(H, level, I, rng) {
           conts.push(wc);
           detail.push({ seat: o.seat, name: o.name, style: o.style, f: F, c: 1 - F, r: 0 });
         });
-        const eqM = mcVsRanges(p.cards, H.board, conts, CHAMP.iters, rng).eq;
+        const eqM = mcVsRanges(p.cards, H.board, conts, itM, rng).eq;
         const Rm = champReal(H, ip, eqM, true);
-        ev = reachAll * pot0 + (1 - reachAll) * (eqM * Rm * potC - a);
+        const capM = Math.min(X, Math.max(...live.map((o) => o.bet + o.stack))), aE = Math.max(0, capM - hb);   // 沒有人跟得滿：多的退回
+        ev = reachAll * pot0 + (1 - reachAll) * (eqM * Rm * potC - aE);
         win = reachAll + (1 - reachAll) * eqM;
-        calcO = { k: 'raise', pot0, cost: a, F: reachAll, pC: 1 - reachAll, pR: 0, eqC: eqM, R: Rm, potC, evF: reachAll * pot0, evC: (1 - reachAll) * (eqM * Rm * potC - a), evR: 0, multi: true, river };
+        calcO = { k: 'raise', pot0, cost: a, costC: aE, F: reachAll, pC: 1 - reachAll, pR: 0, eqC: eqM, R: Rm, potC, evF: reachAll * pot0, evC: (1 - reachAll) * (eqM * Rm * potC - aE), evR: 0, winR: 0, multi: true, river };
         detail.forEach((d) => { d.eqC = eqM; });
       }
-      opts.push({ act: { t: 'r', to: X }, label: (X >= L.maxTo ? '全下 ' : L.isBet ? '下注 ' : '加注到 ') + X, ev, win, foldAll: reachAll, resp: detail, frac: a / pot0, calc: calcO });
+      opts.push({ act: { t: 'r', to: X }, label: (X >= L.maxTo ? '全下 ' : L.isBet ? '下注 ' : '加注到 ') + X, ev, win, foldAll: reachAll, resp: detail, frac: a / pot0, calc: calcO, extra: !norm.has(X) });
     }
   }
   return { opts, est };
@@ -307,7 +322,9 @@ function champRead(H, seat) {
       byCls[CLASS_OF[k]] += w[k]; tot += w[k];
     }
     const top = [...byCls.keys()].filter((g) => byCls[g] > 0).sort((a, b) => byCls[b] - byCls[a]).slice(0, 4).map((g) => ({ g, share: byCls[g] / tot }));
-    const r = { seat: q.seat, name: q.name, style: q.style, pos: q.pos, top: rangeTopPct(w), combos: tot, likely: top };
+    const lastPre = H.log.filter((e) => e.k === 'act' && e.street === 0 && e.seat === q.seat).pop();
+    const r = { seat: q.seat, name: q.name, style: q.style, pos: q.pos, top: rangeTopPct(w), combos: tot, likely: top, range: rangeText(w), rstyle: CHAMP.styleRanges ? q.style : 'tag',
+      act: H.street === 0 && lastPre ? preflopActKind(lastPre, H) : undefined };
     if (H.board.length >= 3) {                                           // 只要比例：不傳你的牌（傳了會每一類都算勝率，很慢），撞到你的牌先拿掉
       const w2 = Float32Array.from(w);
       for (let k = 0; k < NCOMBO; k++) if (hero.includes(COMBO_A[k]) || hero.includes(COMBO_B[k])) w2[k] = 0;
@@ -335,20 +352,22 @@ function champAdvice(H, rng, level) {
   else { const r = champOptionsPost(H, level, I, rng); opts = r.opts; est = r.est; }
   if (!opts.length) { base.champ = { read, options: [], base: keep, same: true }; return base; }
   for (const o of opts) o.bb = champBB(H, o.ev);
-  const passive = opts.filter((o) => o.act.t !== 'r'), aggr = opts.filter((o) => o.act.t === 'r');
+  const passive = opts.filter((o) => o.act.t !== 'r'), aggr = opts.filter((o) => o.act.t === 'r' && !o.extra);   // 多算的全下只拿來評分，不當建議（一步估算對超額下注太樂觀：模擬每百手少贏約 150 大盲）
   const bestP = passive.reduce((a, b) => (b.ev > a.ev ? b : a), passive[0]);
   const bestA = aggr.length ? aggr.reduce((a, b) => (b.ev > a.ev ? b : a), aggr[0]) : null;
-  let best = bestP;
+  let best = bestP, pick = '';
   if (bestA && (!bestP || bestA.ev > bestP.ev + (H.street ? CHAMP.margin : CHAMP.marginPre) * H.bb)) best = bestA;
-  if (best.act.t === 'c' && best.ev < 0) best = opts.find((o) => o.act.t === 'f') || best;
-  if (H.street === 0 && base.act.t === 'r' && best.act.t !== 'r' && bestA && bestA.ev > -CHAMP.keepChart * H.bb) best = bestA;   // 圖表會加注的牌照樣加注（冠軍只會比圖表多偷，不會少開）
+  else if (bestA && bestP && bestA.ev > bestP.ev) pick = 'margin';
+  if (best.act.t === 'c' && best.ev < 0) { best = opts.find((o) => o.act.t === 'f') || best; pick = 'fold'; }
+  if (H.street === 0 && base.act.t === 'r' && best.act.t !== 'r' && bestA && bestA.ev > -CHAMP.keepChart * H.bb) { best = bestA; pick = 'chart'; }   // 圖表會加注的牌照樣加注（冠軍只會比圖表多偷，不會少開）
   const adv = Object.assign({}, base);
   adv.act = best.act; adv.label = best.label;
   adv.eq = est !== undefined ? est : base.eq; adv.eff = adv.eq;
   adv.reasons = champReasons(H, seat, best, opts, read, base);
   adv.more = base.reasons.length ? ['穩健教練（照書打）的看法：' + base.label + '。' + base.reasons.slice(-1)[0]] : [];
   const eqOpt = read.length ? opts.find((o) => o.eq !== undefined && !(o.calc && o.calc.limp)) : null;   // 勝率：翻牌前只有已經有人進池時才講（對誰）
-  adv.champ = { read, options: opts.sort((a, b) => b.ev - a.ev), best, base: keep, same: best.act.t === base.act.t, bb: H.bb, eq: est !== undefined ? est : eqOpt ? eqOpt.eq : undefined, rand: read.length || H.street ? base.rand : undefined, baseEq: base.eq, baseEff: base.eff, baseNeed: base.need, street: H.street };
+  adv.champ = { read, options: opts.sort((a, b) => b.ev - a.ev), best, base: keep, same: best.act.t === base.act.t, bb: H.bb, eq: est !== undefined ? est : eqOpt ? eqOpt.eq : undefined, rand: read.length || H.street ? base.rand : undefined, baseEq: base.eq, baseEff: base.eff, baseNeed: base.need, street: H.street,
+    nOpp: H.players.filter((q) => q.seat !== seat && !q.folded).length, pick, maxTo: L.maxTo };
   return adv;
 }
 const CHAMP_STYLE_TIP = {
@@ -372,7 +391,7 @@ function champReasons(H, seat, best, opts, read, base) {
   let line = '冠軍的打法：' + best.label + '。成功率 ' + PCT0(best.win);
   if (best.act.t === 'r' && best.foldAll !== undefined) line += '（' + (best.resp && best.resp.length === 1 ? '他' : '大家都') + '棄牌 ' + PCT0(best.foldAll) + (best.foldAll < 0.98 ? '＋被跟時你贏的機會' : '') + '）';
   line += '，平均 ' + bb(best.ev) + '。';
-  const alt = opts.filter((o) => o !== best).sort((a, b) => b.ev - a.ev)[0];
+  const alt = opts.filter((o) => o !== best && !o.extra).sort((a, b) => b.ev - a.ev)[0];   // 多算的全下只拿來評分，不當「其次」
   if (alt) line += '其次是' + alt.label + '（平均 ' + bb(alt.ev) + '）。';
   R.push(line);
   if (H.street === 0 && best.act.t === 'r' && best.resp && best.foldAll >= 0.4) {
@@ -380,10 +399,12 @@ function champReasons(H, seat, best, opts, read, base) {
     R.push((preflopRaises(H) ? '再加注搶底池' : '偷盲') + '：後面的人 ' + PCT0(best.foldAll) + ' 的時候全部棄牌' + (callers.length ? '；最可能不棄的是 ' + callers.slice(0, 2).map((x) => x.name + '（' + styleZh(x.style) + '，' + PCT0(x.c + x.r) + '）').join('、') : '') + '。');
   } else if (H.street > 0 && best.act.t === 'r' && best.resp && best.resp.length === 1) {
     const x = best.resp[0];
-    R.push(x.f >= 0.45 ? '他有 ' + PCT0(x.f) + ' 的時候會棄牌：就算你沒有最好的牌，下注也賺。' : '他多半會跟（' + PCT0(x.c) + '），但你對他會跟的牌勝率 ' + PCT0(x.eqC) + '：下注是收錢（價值下注）。');
+    R.push(x.f >= 0.45 ? '他有 ' + PCT0(x.f) + ' 的時候會棄牌：就算你沒有最好的牌，下注也賺。'
+      : x.eqC >= 0.5 ? '他多半會跟（' + PCT0(x.c) + '），但你對他會跟的牌勝率 ' + PCT0(x.eqC) + '：下注是收錢（價值下注）。'
+      : '他常會跟（' + PCT0(x.c) + '），被跟時你多半落後（對他會跟的牌勝率 ' + PCT0(x.eqC) + '）：這是詐唬，' + (best.nx ? '整手模擬算下來（之後的街還能再下注逼他棄牌）平均還是賺。' : '靠他棄牌的部分賺回來。'));
   }
   if ((best.act.t === 'x' || best.act.t === 'c') && best.nx && best.nx.n >= 10) {
-    const x = best.nx, who = read.length > 1 ? '下一個人' : '他', when = x.next > 0.5 ? '下一條街' : '接著';
+    const x = best.nx, who = H.players.filter((q) => q.seat !== seat && !q.folded).length > 1 ? '下一個人' : '他', when = x.next > 0.5 ? '下一條街' : '接著';
     R.push('你' + (best.act.t === 'x' ? '過牌' : '跟注') + '以後，' + who + when + '下注 ' + PCT0(x.r) + '、過牌 ' + PCT0(x.x) + (x.f >= 0.02 ? '、棄牌 ' + PCT0(x.f) : '') + '：'
       + (x.r >= 0.4 ? '讓他自己下注（他的牌有不少是在詐唬或拿差一點的牌下注），你再跟比你先下注賺得多。'
         : x.r < 0.25 ? (best.act.t === 'x' ? '他多半也不下注：便宜看下一張、控制底池，不讓比你大的牌加注把你趕走。' : '跟了之後他常常不再下注，你可以便宜看牌。')
@@ -400,13 +421,25 @@ function champGrade(adv, ev) {
   const C = adv.champ, opts = C.options, bb = C.bb || 2, best = C.best;
   const fam = (t) => (t === 'f' ? 'f' : t === 'x' ? 'x' : t === 'c' ? 'c' : 'r');
   const et = ev.t === 'a' ? (ev.callAll ? 'c' : 'r') : ev.t;
-  let mine = opts.filter((o) => fam(o.act.t) === fam(et));
-  if (fam(et) === 'r' && mine.length > 1) mine = [mine.reduce((a, b) => (Math.abs(b.act.to - ev.to) < Math.abs(a.act.to - ev.to) ? b : a))];
-  if (!mine.length) return { mark: 'ok', text: '冠軍教練沒有算這個動作。建議：' + adv.label + '。', src: 'champ' };
-  const m = mine[0], loss = Math.max(0, best.ev - m.ev), pot = ev.potBefore || 1, lbb = fmt1(loss / bb);
-  if (m === best || loss <= Math.max(0.3 * bb, 0.05 * pot)) return { mark: 'good', text: m === best ? '跟冠軍的打法一樣（成功率 ' + PCT0(best.win) + '）。' : '差不多：跟冠軍的打法只差一點點。', src: 'champ' };
-  if (loss <= Math.max(1.5 * bb, 0.15 * pot)) return { mark: 'ok', text: '可以，但平均少賺 ' + lbb + ' 個大盲（成功率 ' + PCT0(m.win) + '，冠軍的打法 ' + PCT0(best.win) + '）。', src: 'champ' };
-  return { mark: 'bad', text: '平均少賺 ' + lbb + ' 個大盲：成功率 ' + PCT0(m.win) + '，冠軍的打法「' + best.label + '」' + PCT0(best.win) + '。', src: 'champ' };
+  const pot = ev.potBefore || 1;
+  let mine = opts.filter((o) => fam(o.act.t) === fam(et)), m = mine[0];
+  if (fam(et) === 'r' && mine.length > 1 && ev.to !== undefined) {   // 加注大小：最接近的那個；夾在兩個算過的大小中間就照比例估
+    const rs = mine.slice().sort((a, b) => a.act.to - b.act.to), tol = Math.max(1, 0.04 * pot);
+    m = rs.reduce((a, b) => (Math.abs(b.act.to - ev.to) < Math.abs(a.act.to - ev.to) ? b : a));
+    if (Math.abs(m.act.to - ev.to) > tol) {
+      const lo = rs.filter((o) => o.act.to < ev.to).pop(), hi = rs.find((o) => o.act.to > ev.to);
+      if (lo && hi) { const t = (ev.to - lo.act.to) / (hi.act.to - lo.act.to); m = { act: { t: 'r', to: ev.to }, label: ev.to, ev: lo.ev + t * (hi.ev - lo.ev), win: lo.win + t * (hi.win - lo.win), between: [lo.label, hi.label], wide: hi.act.to - lo.act.to > 2 * pot, loEv: Math.max(lo.ev, hi.ev) }; }
+    }
+  }
+  if (!m) return { mark: 'ok', text: '冠軍教練沒有算這個動作。建議：' + adv.label + '。', src: 'champ' };
+  const loss = Math.max(0, best.ev - m.ev), lbb = fmt1(loss / bb);
+  const est = m.between ? '（這個大小沒直接算，照' + m.between[0] + '和' + m.between[1] + '中間估）' : '';
+  if (m === best) return { mark: 'good', text: '跟冠軍的打法一樣（成功率 ' + PCT0(best.win) + '）。', src: 'champ' };
+  if (m.ev > best.ev + 0.3 * bb && !(m.extra && !C.sim)) return { mark: 'good', text: '可以：算出來平均還比冠軍的打法「' + best.label + '」多 ' + fmt1((m.ev - best.ev) / bb) + ' 個大盲' + est + '（' + (m.extra ? '全下冠軍只拿來評分、不主動建議' : '差距在估算的誤差內，冠軍維持原來的判斷') + '）。', src: 'champ' };
+  if (loss <= Math.max(0.3 * bb, 0.025 * pot)) return { mark: 'good', text: '差不多：跟冠軍的打法只差一點點' + est + '。', src: 'champ' };
+  const okMax = Math.max(1.5 * bb, 0.1 * pot);
+  if (loss <= okMax || (m.wide && best.ev - m.loEv <= okMax)) return { mark: 'ok', text: '可以，但平均少賺 ' + lbb + ' 個大盲' + est + '（成功率 ' + PCT0(m.win) + '，冠軍的打法「' + best.label + '」' + PCT0(best.win) + '）。', src: 'champ' };
+  return { mark: 'bad', text: '平均少賺 ' + lbb + ' 個大盲' + est + '：成功率 ' + PCT0(m.win) + '，冠軍的打法「' + best.label + '」' + PCT0(best.win) + '。', src: 'champ' };
 }
 
 /* ===== 整手模擬（10/25 升級）：每個選項把這一手打完很多次 =====
@@ -462,8 +495,18 @@ function champPlay(H, seat, act, world, lvF) {
     const ev = applyAction(H1, aiDecide(H1, rng, lvF));
     if (!first && ev.seat !== seat) first = { t: ev.t === 'f' ? 'f' : ev.t === 'x' ? 'x' : ev.t === 'c' || (ev.t === 'a' && ev.callAll) ? 'c' : 'r', next: H1.street !== st0 };   // 你動作之後，對手的第一個動作
   }
-  if (!H1.result) return { ev: 0, won: false, first: null, allFold: false };
-  return { ev: H1.result.net[seat] + before, won: H1.result.won[seat] > 0, first, allFold: H1.result.uncontested && H1.result.won[seat] > 0 && H1.street === st0 };
+  if (!H1.result) return { ev: 0, won: 0, first: null, allFold: false };
+  return { ev: H1.result.net[seat] + before, won: champShare(H1.result, seat), first, allFold: H1.result.uncontested && H1.result.won[seat] > 0 && H1.street === st0 };
+}
+/* 這一手你拿到多少底池（0–1）：只算有人跟你爭的底池（多出來退回的不算），平分算一份 */
+function champShare(res, seat) {
+  let tot = 0, got = 0;
+  for (const p of res.pots) {
+    if (p.refund || !p.elig.includes(seat)) continue;
+    tot += p.amt;
+    if (p.winners.includes(seat)) got += p.amt / p.winners.length;
+  }
+  return tot > 0 ? got / tot : 0;
 }
 /* cands：[{ act, label }]；回傳每個選項的平均賺賠、成功率、標準誤，和每個世界的結果（配對比較用） */
 function champRollout(H, seat, level, cands, opt) {
@@ -477,7 +520,7 @@ function champRollout(H, seat, level, cands, opt) {
     for (const r of res) {
       if (r.act.t === 'f') { r.xs.push(0); continue; }
       const o = champPlay(H, seat, r.act, worlds[i], lvF);
-      r.xs.push(o.ev); if (o.won) r.wins++;
+      r.xs.push(o.ev); r.wins += o.won;
       if (o.first) { r.nx[o.first.t]++; r.nx.n++; if (o.first.next) r.nx.next++; }
       if (o.allFold) r.nx.allFold++;
     }
@@ -502,20 +545,21 @@ function champNeedSim(adv) {
 /* 要模擬的選項：棄／過、跟，加注最多 3 種大小（一步估算最好的那幾個） */
 function champSimCands(adv) {
   const o = adv.champ.options, pas = o.filter((x) => x.act.t !== 'r'), ag = o.filter((x) => x.act.t === 'r').sort((a, b) => b.ev - a.ev).slice(0, 3);
-  return pas.concat(ag).map((x) => ({ act: x.act, label: x.label }));
+  const all = o.find((x) => x.act.t === 'r' && x.act.to >= adv.champ.maxTo && !ag.includes(x));   // 全下也模擬（打完很快）：評分要用
+  return pas.concat(ag, all ? [all] : []).map((x) => ({ act: x.act, label: x.label }));
 }
 /* 模擬的結果併回建議：選項的平均和成功率換成模擬的，重新挑最好的 */
 function champMerge(adv, sim, H) {
   const C = adv.champ, bb = C.bb || 2;
   const key = (a) => a.t + ':' + (a.to || 0);
   const by = new Map(sim.res.map((r) => [key(r.act), r]));
-  const opts = C.options.filter((o) => by.has(key(o.act))).map((o) => { const r = by.get(key(o.act)); return Object.assign({}, o, { ev1: o.ev, win1: o.win, ev: r.ev, win: r.win, se: r.se, xs: r.xs, nx: r.nx }); });
+  const opts = C.options.filter((o) => by.has(key(o.act))).map((o) => { const r = by.get(key(o.act)); return Object.assign({}, o, { ev1: o.ev, win1: o.win, ev: r.ev, win: r.win, se: r.se, xs: r.xs, nx: r.nx, foldAll1: o.foldAll, foldAll: o.act.t === 'r' && r.nx ? r.nx.allFold : o.foldAll }); });
   if (!opts.length) return adv;
   // 先照一步估算的選擇；模擬（同一批世界配對比較）明顯更好的才換：多賺要超過門檻，也要超過 1 個標準誤（模擬次數有限，有雜訊）
   let best = opts.find((o) => key(o.act) === key(C.best.act)) || opts[0];
   let bestD = 0;
   for (const o of opts) {
-    if (o === best) continue;
+    if (o === best || o.extra) continue;                               // 多算的全下：只拿來評分
     const n = Math.min(o.xs.length, best.xs.length);
     let s = 0, s2 = 0;
     for (let i = 0; i < n; i++) { const d = o.xs[i] - best.xs[i]; s += d; s2 += d * d; }
@@ -528,7 +572,8 @@ function champMerge(adv, sim, H) {
   for (const o of opts) { o.bb = o.ev / bb; delete o.xs; }
   const out = Object.assign({}, adv);
   out.act = best.act; out.label = best.label;
-  out.champ = Object.assign({}, C, { options: opts.sort((a, b) => b.ev - a.ev), best, sim: { n: sim.n, ms: sim.ms }, same: best.act.t === C.base.act.t, oneStep: { label: C.best.label } });
+  const unsim = C.options.filter((o) => !by.has(key(o.act)) && !o.extra).map((o) => ({ label: o.label, ev: o.ev, win: o.win }));   // 沒模擬的大小：表上照一步估算列著（灰色），不拿來比
+  out.champ = Object.assign({}, C, { options: opts.sort((a, b) => b.ev - a.ev), best, sim: { n: sim.n, ms: sim.ms }, same: best.act.t === C.base.act.t, oneStep: { label: C.best.label }, unsim });
   out.reasons = champReasons(H, H.toAct, best, opts, C.read, { reasons: adv.reasons.slice(0, 1), act: C.base.act, label: C.base.label });
   out.reasons.splice(1 + Math.min(2, C.read.length), 0, '整手模擬 ' + sim.n + ' 次：每個選項都照每個人的出牌習慣把這一手打完（對手的牌照他的範圍抽），看最後平均輸贏。');
   return out;

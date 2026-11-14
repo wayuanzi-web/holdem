@@ -78,7 +78,7 @@ function gtoHeroTurn(refresh) {
     if (G.gto !== g || !G.waitingHero || g.path.length !== pathLen) return;
     if (m.none) { if (m.why !== 'notready') { g.heroFail = true; if (G.steps[G.view]) renderCtrl(G.steps[G.view]); } return; }
     G.gtoAdv = { pathLen, acts: m.acts, freq: m.freq, ev: m.ev, pct: m.pct, t: m.t, done: m.done, eq: m.eq, street: g.street };
-    if (G.view === view || atHead()) { renderCtrl(G.steps[G.view]); if (G.steps[G.view].kind === 'hero') renderCoach(G.steps[G.view]); }
+    if (G.view === view || atHead()) { renderCtrl(G.steps[G.view]); if (G.steps[G.view].kind === 'hero') { G.keepCoach = true; renderCoach(G.steps[G.view]); } }   // 解越算越準時更新數字：看的地方不跳
   });
 }
 /* GTO 的建議夠不夠準可以拿來用、評分 */
