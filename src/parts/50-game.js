@@ -439,8 +439,12 @@ function renderLog() {
   box.scrollTop = box.scrollHeight;
 }
 /* 教練框重畫前後（整手模擬算好、換數字）：記住捲到哪、哪些說明打開、哪些名詞解釋開著，重畫後還原，看的地方不會跳走 */
-const COACH_ANCHORS = '.adv > .rec, .adv > ol > li, .champt, .outsbox, #cBody > details, #cBody > p';
-const coachAKey = (a) => (a.tagName === 'LI' ? 'li:' + a.textContent.slice(0, 24) : a.className + '|' + a.tagName);
+const COACH_ANCHORS = '.adv > .rec, .adv > ol > li, .champt, .outsbox, .adv details > summary, .adv details[open] h4, .adv details[open] p, .adv details[open] li';
+const coachAKey = (a) => {                                             // 有字的就照字找（數字拿掉：模擬算好數字會變）；表、方塊照樣式找
+  const t = a.tagName;
+  if (t === 'LI' || t === 'P' || t === 'H4' || t === 'SUMMARY') return t + ':' + (t === 'SUMMARY' ? a.parentNode.className + ':' : '') + a.textContent.replace(/[0-9０-９①-⑩.,+−\-%×＝≈ ]+/g, '#').slice(0, 28);
+  return a.className + '|' + t;
+};
 function coachUIState() {
   const B = $('cBody'), br = B.getBoundingClientRect(), vTop = Math.max(0, br.top), vBot = Math.min(window.innerHeight, br.bottom);
   const ds = [...B.querySelectorAll('details')], key = (d, i) => d.className + '#' + ds.filter((x, j) => j < i && x.className === d.className).length;
@@ -448,8 +452,9 @@ function coachUIState() {
   const defs = [...B.querySelectorAll('.gdef')].map((g) => g.dataset.term);
   const as = [...B.querySelectorAll(COACH_ANCHORS)];
   const vis = (a) => { const r = a.getBoundingClientRect(); return r.top >= vTop - 2 && r.top < vBot; };
-  let ai = as.findIndex((a) => a.tagName !== 'LI' && vis(a));          // 看得到開頭的第一個區塊（表、說明）：重畫後一定找得到
-  if (ai < 0) ai = as.findIndex(vis);                                  // 只看得到原因：照那一行的文字找
+  const stable = (a) => a.tagName === 'TABLE' || a.tagName === 'SUMMARY' || a.tagName === 'H4' || a.classList.contains('outsbox') || a.classList.contains('rec');
+  let ai = as.findIndex((a) => stable(a) && vis(a));                   // 看得到開頭的第一個固定的區塊（表、說明的標題）：重畫後一定找得到
+  if (ai < 0) ai = as.findIndex(vis);                                  // 只看得到文字：照那一行的文字找
   if (ai < 0) ai = as.findIndex((a) => a.getBoundingClientRect().bottom > vTop + 4);
   return { open, defs, scroll: B.scrollTop, ai, aTop: ai >= 0 ? as[ai].getBoundingClientRect().top : 0, aKey: ai >= 0 ? coachAKey(as[ai]) : '' };
 }
@@ -459,7 +464,8 @@ function coachUIRestore(K) {
   for (const t of K.defs) { const b = B.querySelector('button.term[data-term="' + t + '"]'); if (b) b.click(); }
   B.scrollTop = K.scroll;
   if (K.ai < 0) return;
-  const as = [...B.querySelectorAll(COACH_ANCHORS)], a = as.find((x) => coachAKey(x) === K.aKey) || (K.aKey.startsWith('li:') ? null : as[K.ai]);
+  const same = (k) => k === K.aKey || (k.length >= 8 && K.aKey.length >= 8 && (k.startsWith(K.aKey) || K.aKey.startsWith(k)));   // 標題後面可能多一段（「（先用一步估算）」）
+  const as = [...B.querySelectorAll(COACH_ANCHORS)], a = as.find((x) => coachAKey(x) === K.aKey) || as.find((x) => same(coachAKey(x))) || (/^(LI|P|H4|SUMMARY):/.test(K.aKey) ? null : as[K.ai]);
   if (!a) return;
   const d = a.getBoundingClientRect().top - K.aTop;
   if (Math.abs(d) < 1) return;
@@ -513,7 +519,7 @@ function champTableHTML(C) {
   }
   for (const o of C.unsim || []) h += '<tr class="unsim"><td>' + esc(o.label) + '</td><td class="r">' + PCT0(o.win) + '</td><td class="r">' + champBBtxt(o.ev, C.bb) + '</td><td><small>沒模擬（一步估算比較低）</small></td></tr>';
   h += '</table><p class="note">成功率＝贏下這個底池的機會（他棄牌，加上被跟時你贏）。平均＝長期每做一次賺賠幾個大盲（跟現在棄牌比）。「他們會」＝你這樣做之後對手的下一個動作' + (C.sim ? '（整手模擬裡實際發生的比例）' : '（照每個人的風格估）') + '。'
-    + (list[0] !== C.best ? (C.sim ? '★ 不是平均最高的那一個：差距還在模擬的誤差內（每次模擬結果會有一點不同），冠軍維持原來的判斷。'
+    + (list[0] !== C.best ? (C.sim ? (C.sim.why === 'margin' ? '★ 不是平均最高的那一個：' + (C.street ? '主動下注、加注' : '換成更積極的打法') + '要多賺一點（' + (C.street ? '0.25' : '0.3') + ' 個大盲以上；其他 0.1）才換，只差一點點就照原來的判斷。' : '★ 不是平均最高的那一個：差距還在模擬的誤差內（每次模擬結果會有一點不同），冠軍維持原來的判斷。')
       : C.pick === 'chart' ? '★ 不是平均最高的那一個：這手牌照圖表要加注，冠軍只會比圖表多打、不會少打（加注平均不到 −0.3 個大盲就照圖表）；整手模擬算完會再確認。'
       : '★ 不是平均最高的那一個：主動下注、加注要多賺一點（' + (C.street ? '0.25' : '0.3') + ' 個大盲以上）才值得冒險，只差一點點就選比較穩的。') : '')
     + (list.length < C.options.length ? '全下也算了（拿來評分；河牌整手模擬明顯更好才會建議），沒列出來。' : '') + '</p>';
@@ -572,7 +578,7 @@ function champDeepHTML(adv, C) {
   let h = '<h4>① 勝率、成功率、平均，有什麼不一樣？</h4><ul>';
   h += '<li><b>勝率</b>：兩邊都打到最後亮牌比大小，你贏的比例。' + (C.eq !== undefined ? '照' + (C.read.length ? C.read.map((r) => esc(r.name) + '（' + esc(styleZh(r.style)) + '）').join('、') + '的風格和動作' : '動作') + '估' + (C.read.length > 1 ? '他們' : '他') + '的範圍，你的勝率約 <b>' + P(C.eq) + '</b>' + (C.rand !== undefined ? '；如果' + (C.read.length > 1 ? '他們' : '他') + '是隨便拿的牌是 ' + P(C.rand) + '——不是隨便拿牌，這個只是對照' : '') + '。' : '還沒人進池，勝率要看誰會跟（下面每個選項分開算）。') + '</li>';
   h += '<li><b>打折後的勝率（實現率）</b>：勝率是「一定看到攤牌」的比例。之後還會下注，你沒中常常得棄牌，那部分就拿不到，所以要打折。</li>';
-  h += '<li><b>成功率</b>：照這個動作打，這一手最後你拿到底池的比例＝他棄牌的時候（不用亮牌）＋被跟時你贏的時候（平分算一半）。下注、加注的成功率常比勝率高（多了他棄牌）；跟注、過牌只看這一步時就是勝率' + (C.sim ? '，整手模擬裡之後你還可能下注把他趕走，所以也可能比勝率高' : '') + '。</li>';
+  h += '<li><b>成功率</b>：照這個動作打，這一手最後你拿到底池的比例＝他棄牌的時候（不用亮牌）＋被跟時你贏的時候（平分照人數分）。下注、加注的成功率常比勝率高（多了他棄牌）；跟注、過牌只看這一步時就是勝率' + (C.sim ? '，整手模擬裡之後你還可能下注把他趕走，所以也可能比勝率高' : '') + '。</li>';
   h += '<li><b>平均</b>：長期每做一次賺賠多少＝贏的時候拿到的 − 你要再放進去的，跟現在棄牌（0）比，正的才賺。冠軍選<b>平均最高</b>的，不是成功率最高的（例如全下成功率高，但輸的時候輸很多）。</li></ul>';
   h += '<h4>② 每個選項怎麼算' + (C.sim ? '（先用一步估算）' : '') + '</h4>';
   const shown = champShown(C).slice(0, 4);
@@ -887,6 +893,7 @@ W.on('calc', (m) => { if (m.token !== G.oddsTok) return; ODDS_RES = m; setOdds(o
 W.on('calcmc', (m) => { if (m.token !== G.oddsTok || !ODDS_RES) return; setOdds(oddsHTML(ODDS_RES, m)); });
 
 function renderCur() {
+  if (syncCoach()) G.lastRender = null;                               // 換了教練（不管從哪裡換）回到這一步：照現在的教練重算
   const st = G.steps[G.view];
   if (!st) return;
   renderTable(st);
@@ -954,7 +961,7 @@ function initGame() {
   $('nHome').addEventListener('click', () => showView('home'));
   $('bHomeSeal').addEventListener('click', () => showView('home'));
   $('nTools').addEventListener('click', () => showView('tools'));
-  $('nGame').addEventListener('click', () => { showView('table'); G.lastRender = null; renderCur(); scheduleAuto(); });
+  $('nGame').addEventListener('click', () => { showView('table'); G.lastRender = null; renderSpeedChip(); renderCur(); scheduleAuto(); });
   $('bResetTips').addEventListener('click', () => { GS.seen = []; if (G.ctx) G.ctx.seen = new Set(); gsSave(); $('bResetTips').textContent = '好了，下一手開始會再說明一次'; });
   $('nRanks').addEventListener('click', () => { renderRanks(); $('ranksModal').hidden = false; $('ranksClose').focus(); });
   $('ranksClose').addEventListener('click', () => { $('ranksModal').hidden = true; });

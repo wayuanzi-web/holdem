@@ -1,5 +1,5 @@
 /* ===== 53-review：一手結束的逐步檢討——每個決定當時猜的範圍、他實際的牌有沒有猜到、你的決定對在哪裡／錯在哪裡、該去看哪一課 ===== */
-const REV_ACT_ZH = { shove: '全下', open: '加注開局', reraise: '再加注', callRaise: '跟注加注', limp: '跛入', check: '過牌' };
+const REV_ACT_ZH = { shove: '全下', open: '加注開局', reraise: '再加注', callRaise: '跟注加注', limp: '跛入', check: '過牌', bet: '下注', raise: '加注', call: '跟注' };
 /* 這一手你做過的決定：每個「輪到你」的步驟和你按的那一步 */
 function reviewDecisions(steps) {
   const out = [];
@@ -31,7 +31,7 @@ function reviewOpp(o, hero, board, H, styled) {
   else { const wa = new Float32Array(NCOMBO); wa[comboOf(hero[0], hero[1])] = 1; const wb = new Float32Array(NCOMBO); wb[k] = 1; eqActual = rangeVsRange([], wa, wb, { iters: 2000 }).total; }
   const cat = board.length >= 3 ? CATG[handCategory(cards[0], cards[1], board)] : clsWords(CLASS_OF[k]);
   const hit = weight >= 0.5 ? 'hit' : weight > 0 ? 'edge' : 'miss';
-  const st = STYLES[p.style] || STYLES.tag, agg = o.act === 'open' || o.act === 'reraise' || o.act === 'shove';
+  const st = STYLES[p.style] || STYLES.tag, agg = o.act === 'open' || o.act === 'reraise' || o.act === 'shove' || o.act === 'bet' || o.act === 'raise';
   let why = '';
   if (hit === 'miss' || hit === 'edge') {
     const c = board.length >= 3 ? handCategory(cards[0], cards[1], board) : -1;
@@ -82,7 +82,13 @@ function reviewTrail(S, seat, k, style) {
 }
 const revPct = (x) => (x > 0 && x < 0.005 ? '不到 1%' : Math.round(x * 100) + '%');
 function reviewTrailHTML(r) {
-  if (r.shove) return '<details class="revtrail"><summary>份量 ' + revPct(r.weight) + ' 怎麼算的？</summary><p>他是短碼全下：範圍照推牌表估（他這個位置、這個籌碼會推的前 ' + Math.round(r.top * 100) + '% 的牌），在裡面就是 100%、不在就是 0%，不是一步一步乘。</p></details>';
+  if (r.shove) {
+    const t = Math.round(r.top * 100) + '%';
+    const how = r.shove === 'push' ? '他是短碼全下：範圍照推牌表估（他這個位置、這個籌碼會推的前 ' + t + ' 的牌）'
+      : r.shove === 'reraise' ? '這是再加注以上' + (r.act === 'shove' ? '的全下' : '') + '：教練一律估成前 ' + t + ' 的強牌'
+      : (r.act === 'shove' ? '他籌碼很深還全下' : '你是短碼、他加注') + '：教練一律估成前 ' + t + ' 的強牌';
+    return '<details class="revtrail"><summary>份量 ' + revPct(r.weight) + ' 怎麼算的？</summary><p>' + how + '（你的籌碼短，只能推或棄，教練用固定的估法），在裡面就是 100%、不在就是 0%，不是一步一步乘。</p></details>';
+  }
   if (!r.trail || !r.trail.length) return '';
   const pct = revPct;
   return '<details class="revtrail"><summary>份量 ' + pct(r.weight) + ' 怎麼算的？</summary><p>一開始每手牌都是 100%。他每做一個動作，教練就照「拿這手牌會不會這樣做」乘一個數：</p><p class="trailrow">100%'
@@ -138,11 +144,11 @@ function reviewEndHTML(H, R, D, lastEq) {
   }
   h += '<p><b>這一手你' + (net > 0 ? '贏了 ' + net : net < 0 ? '輸了 ' + (-net) : '沒輸沒贏') + '。</b>';
   if (lastEq && res && !res.uncontested && !H.players[0].folded) {
-    const e = Math.round(lastEq.eq * 100), multi = lastEq.names.length > 1, fav = lastEq.fav;
+    const e = Math.round(lastEq.eq * 100), multi = lastEq.names.length > 1, fav = lastEq.fav, even = lastEq.even;
     const split = res.pots.some((p) => !p.refund && p.winners.length > 1 && p.winners.includes(0));
     const who = multi ? '還在的 ' + lastEq.names.length + ' 個人（' + lastEq.names.map(esc).join('、') + '）' : esc(lastEq.names[0]);
-    h += '你最後一個決定時，對' + who + '實際的牌，你的勝率 <b>' + e + '%</b>（同樣的情況打 100 次，你大約贏 ' + e + ' 次' + (multi ? '；' + (fav ? '你是最可能贏的人' : '有人比你更可能贏') : '') + '）。'
-      + (split || net === 0 ? '這次' + (split ? '平分底池' : '打平') + (split && net !== 0 ? '（' + (net > 0 ? '多' : '少') + '的 ' + Math.abs(net) + ' 是邊池或零頭）' : '') + '。' : net < 0 && fav ? '這次輸是運氣不好：後面的牌幫了' + (multi ? '別人' : '他') + '。長期這樣打是賺的，不用改。' : net > 0 && !fav ? '這次贏是運氣好：後面的牌幫了你。長期這樣打不一定賺，看上面每一步的評分。' : net < 0 ? (multi ? '你本來就不是最大的牌' : '他的牌本來就比較大') + '，輸是正常的；要看的是前面該不該把錢放進去。' : '你的牌本來就比較大，贏是應該的。');
+    h += '你最後一個決定時，對' + who + '實際的牌，你的勝率 <b>' + e + '%</b>（同樣的情況打 100 次，你大約贏 ' + e + ' 次' + (multi ? '；' + (even ? '你跟機會最大的人差不多' : fav ? '你是最可能贏的人' : '有人比你更可能贏') : '') + '）。'
+      + (split || net === 0 ? '這次' + (split ? '平分底池' : '打平') + (split && net !== 0 ? '（' + (net > 0 ? '多贏的 ' + net + ' 是棄牌的人留在底池裡的錢、邊池或零頭' : '少的 ' + (-net) + ' 是你沒分到的邊池或零頭') + '）' : '') + '。' : even ? '你們的機會本來就差不多，這次' + (net > 0 ? '贏' : '輸') + '是運氣。' : net < 0 && fav ? '這次輸是運氣不好：後面的牌幫了' + (multi ? '別人' : '他') + '。長期這樣打是賺的，不用改。' : net > 0 && !fav ? '這次贏是運氣好：後面的牌幫了你。長期這樣打不一定賺，看上面每一步的評分。' : net < 0 ? (multi ? '你本來就不是最大的牌' : '他的牌本來就比較大') + '，輸是正常的；要看的是前面該不該把錢放進去。' : '你的牌本來就比較大，贏是應該的。');
   }
   h += '</p></div>';
   return h;
@@ -174,8 +180,15 @@ function reviewHTML(R) {
     if (opps.length) {
       c += '<div class="revg"><b>當時猜他有什麼</b>' + (champR ? '<span class="note">（冠軍教練照每個人的風格估）</span>' : '');
       opps.forEach((o, oi) => {
-        const r = reviewOpp(o, hero, board, H, champR);
-        r.shove = !champR && adv.short && o.act === 'shove';
+        let oo = o;
+        if (board.length >= 3 && !o.act) {                             // 翻牌後：照他到這一步為止的動作（有沒有主動下注、加注）
+          const evs = S.log.filter((e) => e.k === 'act' && e.seat === o.seat && e.street > 0);
+          const ag = evs.filter((e) => e.t === 'b' || e.t === 'r' || (e.t === 'a' && !e.callAll)).pop(), lastE = evs[evs.length - 1];
+          const kind = (e) => (e.t === 'b' ? 'bet' : e.t === 'r' || e.t === 'a' ? (e.t === 'a' && e.callAll ? 'call' : 'raise') : e.t === 'c' ? 'call' : e.t === 'x' ? 'check' : undefined);
+          if (ag || lastE) oo = Object.assign({}, o, { act: kind(ag || lastE) });
+        }
+        const r = reviewOpp(oo, hero, board, H, champR);
+        r.shove = !champR && adv.short && o.src ? o.src : false;
         r.trail = o.seat !== undefined && !r.shove ? reviewTrail(S, o.seat, comboOf(r.cards[0], r.cards[1]), champR ? o.rstyle : undefined) : [];
         if (r.trail.length) {                                          // 份量用算出來的（不用範圍文字四捨五入過的），跟下面的「怎麼算的」一致
           const w0 = r.trail[r.trail.length - 1].w, h0 = w0 >= 0.5 ? 'hit' : w0 > 1e-4 ? 'edge' : 'miss';
@@ -189,7 +202,7 @@ function reviewHTML(R) {
         const verdict = r.hit === 'hit' ? '✓ 猜到了：這手牌在估計範圍裡（份量 ' + wp + '），範圍裡比它強的牌佔 ' + Math.round(r.pctStronger * 100) + '%。'
           : r.hit === 'edge' ? '△ 在範圍邊緣：份量 ' + wp + '——照估計，他拿這手牌大約只有 ' + wp + ' 的時候會一路這樣打（其他時候會棄牌或換打法），算「可能、但不是主要的牌」。'
           : '✗ 沒猜到：照估計，他拿這手牌幾乎不會這樣打（份量 0%）。';
-        c += '<div class="revo">' + glossify('<div>' + esc(r.name) + '（' + esc(styleZh(r.style)) + '）' + (o.act && REV_ACT_ZH[o.act] ? REV_ACT_ZH[o.act] + '：' : '：') + '估他是前 <b>' + Math.round(o.top * 100) + '%</b> 的牌（約 ' + Math.round(r.combos) + ' 個組合）' + bd + '。你對' + (opps.length > 1 ? '他們的範圍' : '這個範圍') + '的勝率 <b>' + Math.round(estAll * 100) + '%</b>。</div>', used)
+        c += '<div class="revo">' + glossify('<div>' + esc(r.name) + '（' + esc(styleZh(r.style)) + '）' + (r.act && REV_ACT_ZH[r.act] ? REV_ACT_ZH[r.act] + '：' : '：') + '估他是前 <b>' + Math.round(o.top * 100) + '%</b> 的牌（約 ' + Math.round(r.combos) + ' 個組合）' + bd + '。你對' + (opps.length > 1 ? '他們的範圍' : '這個範圍') + '的勝率 <b>' + Math.round(estAll * 100) + '%</b>。</div>', used)
           + '<div class="revact"><span class="lbl">他實際</span>' + sortedCards(r.cards).map((x) => cardHTML(x, 'sm')).join('') + '<span>' + glossify(esc(r.cat), used) + (r.folded ? '（後來棄牌）' : '') + '</span></div>'
           + glossify('<div class="revverdict ' + r.hit + '">' + verdict + (r.why ? ' ' + esc(r.why) : '') + ' 你對他實際這手牌的勝率 <b>' + Math.round(r.eqActual * 100) + '%</b>' + (opps.length > 1 ? '' : '（對估計範圍 ' + Math.round(estAll * 100) + '%）') + '。</div>', used)
           + reviewTrailHTML(r) + '</div>';
@@ -198,7 +211,7 @@ function reviewHTML(R) {
     }
     if (idx === D.length) {                                              // 結局用：最後一個決定時還在、最後也沒棄牌的人，實際的牌
       const alive = S.players.filter((q) => q.seat !== 0 && !q.folded && !H.players[q.seat].folded);
-      if (alive.length) { const eqs = reviewEqAll([hero].concat(alive.map((q) => H.players[q.seat].cards)), board); lastEq = { eq: eqs[0], fav: eqs[0] >= Math.max(...eqs.slice(1)), names: alive.map((q) => q.name) }; }
+      if (alive.length) { const eqs = reviewEqAll([hero].concat(alive.map((q) => H.players[q.seat].cards)), board), top = Math.max(...eqs.slice(1)); lastEq = { eq: eqs[0], fav: eqs[0] > top + 0.005, even: Math.abs(eqs[0] - top) <= 0.005, names: alive.map((q) => q.name) }; }
     }
     if (!opps.length && adv.chart) c += glossify('<p class="note">翻牌前照圖表（' + esc(adv.chart.name) + '）決定，不用猜對手的牌。</p>', used);
     // 為什麼（標題不加名詞按鈕：點了會收合）

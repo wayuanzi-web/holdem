@@ -42,7 +42,7 @@ for (let h = 0; h < HANDS; h++) {
   for (const s of T.seats) s.stack = 200;
   const H = E.newHand(T, E.makeRng(SEED * 100003 + h * 7919));
   const brng = E.makeRng(SEED * 7777 + h * 31 + 5);
-  let d = 0;
+  let d = 0, seen = false;                                            // 一手只算第一個不一樣的決定（之後的決定在新規則下根本不會遇到）
   while (H.phase !== 'done') {
     const r = E.gameStep(H);
     if (r.need === undefined) continue;
@@ -54,9 +54,10 @@ for (let h = 0; h < HANDS; h++) {
       const sim = E.champRollout(H, 0, LEVEL, E.champSimCands(adv), { N: NS, seed: SEED * 31 + h * 7 + d });
       C.simAllin = false; base = E.champMerge(adv, sim, H).act;
       C.simAllin = true; C.allinSe = SE; const a = E.champMerge(adv, sim, H).act; C.simAllin = false;
-      if (key(a) !== key(base)) {
+      if (key(a) !== key(base) && !seen) {
+        seen = true;
         const x = trueEV(H, a, h, d), y = trueEV(H, base, h, d), dd = (x.m - y.m) / H.bb;
-        D.push({ d: dd, v: (x.v + y.v) / H.bb / H.bb, txt: `h${h} ${['pre', 'flop', 'turn', 'river'][H.street]} ${key(base)}→${key(a)} ${dd.toFixed(2)} ±${(Math.sqrt(x.v + y.v) / H.bb).toFixed(2)}` });
+        D.push({ h, d: dd, v: (x.v + y.v) / H.bb / H.bb, txt: `h${h} ${['pre', 'flop', 'turn', 'river'][H.street]} ${key(base)}→${key(a)} ${dd.toFixed(2)} ±${(Math.sqrt(x.v + y.v) / H.bb).toFixed(2)}` });
       }
     }
     E.applyAction(H, base);
@@ -64,6 +65,7 @@ for (let h = 0; h < HANDS; h++) {
   E.endHand(T, H);
   if ((h + 1) % 500 === 0) { const s = D.reduce((a, b) => a + b.d, 0); console.error(`${h + 1} hands, ${D.length} diffs, per100 ${(s / (h + 1) * 100).toFixed(2)}, ${Math.round((Date.now() - t0) / 1000)}s`); }
 }
-const s = D.reduce((a, b) => a + b.d, 0), s2 = D.reduce((a, b) => a + b.d * b.d, 0);
-console.log(JSON.stringify({ hands: HANDS, seed: SEED, level: LEVEL, se: SE, dec: nDec, sec: Math.round((Date.now() - t0) / 1000), n: D.length, per100: +(s / HANDS * 100).toFixed(2), se100: +(Math.sqrt(s2) / HANDS * 100).toFixed(2) }));
+const s = D.reduce((a, b) => a + b.d, 0), mean = s / HANDS;            // 標準誤照每一手算（沒有不一樣的手算 0）
+const s2 = D.reduce((a, b) => a + (b.d - mean) * (b.d - mean), 0) + (HANDS - D.length) * mean * mean;
+console.log(JSON.stringify({ hands: HANDS, seed: SEED, level: LEVEL, se: SE, dec: nDec, sec: Math.round((Date.now() - t0) / 1000), n: D.length, per100: +(mean * 100).toFixed(2), se100: +(Math.sqrt(s2 / (HANDS - 1) / HANDS) * 100).toFixed(2) }));
 console.log(D.map((x) => x.txt).join('\n'));

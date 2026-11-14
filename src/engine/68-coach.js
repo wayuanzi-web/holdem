@@ -200,7 +200,7 @@ function coachAdvice(H, rng) {
       const last = H.players[lastAggressorSeat(H)], w = new Float32Array(NCOMBO);
       for (let k = 0; k < NCOMBO; k++) w[k] = PRE_PCT[CLASS_OF[k]] < sh.v ? 1 : 0;
       adv.detail = { street: 0, call: sh.toCall, pot: sh.pot, need: sh.need, est: sh.eq, rand: adv.rand, iters: 40000, eff: sh.eq, fac: [], allin: true, implied: 0, lookup: true,
-        opps: last ? [{ seat: last.seat, name: last.name, style: last.style, top: sh.v, act: 'shove', range: rangeText(w) }] : [], behind: [], cards: p.cards.slice(), board: [] };
+        opps: last ? [{ seat: last.seat, name: last.name, style: last.style, top: sh.v, act: last.allin ? 'shove' : sh.raises >= 2 ? 'reraise' : 'open', src: sh.src, range: rangeText(w) }] : [], behind: [], cards: p.cards.slice(), board: [] };
     } else delete adv.detail;                                    // 推、再推：照推牌表，不是底池賠率
     return adv;
   }

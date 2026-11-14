@@ -280,5 +280,5 @@ function shortSpot(H, seat) {
   if (opp >= 2) eq = Math.pow(eq, 1 + 0.7 * (opp - 1));       // 多人：粗略打折
   let pct = 0;                                                 // 照這個賠率，大約前幾 % 的牌可以跟
   for (let h = 0; h < 169; h++) { let e = eqVsTop(h, v); if (opp >= 2) e = Math.pow(e, 1 + 0.7 * (opp - 1)); if (e >= need) pct += classSize(h); }
-  return { kind: 'call', eq, need, v, opp, pct: pct / NCOMBO, eff, toCall, pot };
+  return { kind: 'call', eq, need, v, opp, pct: pct / NCOMBO, eff, toCall, pot, src: raises.length >= 2 ? 'reraise' : shoveBB > 25 ? 'deep' : 'push', oppAllin: !!rp.allin, raises: raises.length };
 }
