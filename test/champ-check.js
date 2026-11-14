@@ -17,7 +17,7 @@ function calcOk(o) {
   }
   return true;
 }
-let nGradeAll = 0, nGradeMid = 0;
+let nGradeAll = 0, nGradeMid = 0, nAllin = 0;
 const rng0 = E.makeRng(3), opp = E.makeOpponents(6, 2, rng0);
 const T = E.newTable({ n: 6, names: ['你'].concat(opp.map((o) => o.name)), styles: ['tag'].concat(opp.map((o) => o.style)), level: 2 });
 const rng = E.makeRng(9);
@@ -62,6 +62,17 @@ for (let h = 0; h < 40; h++) {
       ok(sim.n === 30 && sim.res.every((r) => Number.isFinite(r.ev) && r.win >= 0 && r.win <= 1), '整手模擬的結果是數字');
       use = E.champMerge(adv, sim, H);
       ok(use.champ.sim && use.champ.options.includes(use.champ.best) && use.act === use.champ.best.act, '模擬併回：最好的選項＝建議');
+      ok(!use.champ.best.extra || H.street === 3, '多算的全下只有河牌才會變成建議');
+      { // 河牌：多算的全下在模擬裡明顯更好（每個世界都多贏 10 個大盲）就換；翻牌不換
+        const all = sim.res.find((r) => r.act.t === 'r' && r.act.to >= adv.champ.maxTo), bestR = sim.res.find((r) => r.act.t === use.champ.best.act.t && (r.act.to || 0) === (use.champ.best.act.to || 0));
+        const ex = adv.champ.options.find((o) => o.extra);
+        if (all && ex && bestR && !use.champ.best.extra) {
+          const fake = { n: sim.n, ms: 0, res: sim.res.map((r) => (r === all ? Object.assign({}, r, { xs: bestR.xs.map((x) => x + 10 * H.bb), ev: bestR.ev + 10 * H.bb }) : r)) };
+          const u2 = E.champMerge(adv, fake, H);
+          ok(H.street === 3 ? u2.champ.best.extra : !u2.champ.best.extra, '全下明顯更好：河牌換、河牌以前不換（街 ' + H.street + '）');
+          nAllin++;
+        }
+      }
       nSim++;
     }
     const ev = E.applyAction(H, use.act);
@@ -86,5 +97,5 @@ for (let h = 0; h < 40; h++) {
   ok(E.champShare(res, 0) === 0 && E.champShare(res, 1) === 1, '退回的不算贏');
   ok(E.champShare({ pots: [{ amt: 100, winners: [0, 1], elig: [0, 1], refund: false }], won: [50, 50] }, 0) === 0.5, '平分算一半');
 }
-console.log('冠軍教練 ' + n + ' 個決定（整手模擬 ' + nSim + ' 次；亂全下評分 ' + nGradeAll + '、中間大小 ' + nGradeMid + '）' + (bad ? '，錯 ' + bad : ' OK'));
+console.log('冠軍教練 ' + n + ' 個決定（整手模擬 ' + nSim + ' 次；亂全下評分 ' + nGradeAll + '、中間大小 ' + nGradeMid + '、模擬換全下 ' + nAllin + '）' + (bad ? '，錯 ' + bad : ' OK'));
 process.exit(bad ? 1 : 0);

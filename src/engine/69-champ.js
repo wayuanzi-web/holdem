@@ -6,6 +6,7 @@
 const CHAMP = {
   rIP: 0.95, rOOP: 0.82, rPreIP: 0.9, rPreOOP: 0.75, rMulti: 0.85,   // 實現率：有位置、沒位置、多人
   runs: 14, K: 6, iters: 700, margin: 0.25, marginPre: 0.3,        // margin：翻牌後主動的動作要比被動的多賺這麼多個大盲才選（少冒險）
+  simAllin: true, allinSe: 1,                                       // 河牌：整手模擬明顯更好就換成全下（河牌之後沒有下注，模擬算得準）
   styleRanges: true, keepChart: 0.3,                                                   // 估對手範圍時照他的風格（false：一律當緊凶）
 };
 let CHAMP_CLS = null;                                                  // 每一種起手牌的組合編號
@@ -435,7 +436,7 @@ function champGrade(adv, ev) {
   const loss = Math.max(0, best.ev - m.ev), lbb = fmt1(loss / bb);
   const est = m.between ? '（這個大小沒直接算，照' + m.between[0] + '和' + m.between[1] + '中間估）' : '';
   if (m === best) return { mark: 'good', text: '跟冠軍的打法一樣（成功率 ' + PCT0(best.win) + '）。', src: 'champ' };
-  if (m.ev > best.ev + 0.3 * bb && !(m.extra && !C.sim)) return { mark: 'good', text: '可以：算出來平均還比冠軍的打法「' + best.label + '」多 ' + fmt1((m.ev - best.ev) / bb) + ' 個大盲' + est + '（' + (m.extra ? '全下冠軍只拿來評分、不主動建議' : '差距在估算的誤差內，冠軍維持原來的判斷') + '）。', src: 'champ' };
+  if (m.ev > best.ev + 0.3 * bb && !(m.extra && !C.sim)) return { mark: 'good', text: '可以：算出來平均還比冠軍的打法「' + best.label + '」多 ' + fmt1((m.ev - best.ev) / bb) + ' 個大盲' + est + '（' + (m.extra && !(C.sim && C.street === 3) ? '全下在河牌以前冠軍只拿來評分、不主動建議' : '差距在估算的誤差內，冠軍維持原來的判斷') + '）。', src: 'champ' };
   if (loss <= Math.max(0.3 * bb, 0.025 * pot)) return { mark: 'good', text: '差不多：跟冠軍的打法只差一點點' + est + '。', src: 'champ' };
   const okMax = Math.max(1.5 * bb, 0.1 * pot);
   if (loss <= okMax || (m.wide && best.ev - m.loEv <= okMax)) return { mark: 'ok', text: '可以，但平均少賺 ' + lbb + ' 個大盲' + est + '（成功率 ' + PCT0(m.win) + '，冠軍的打法「' + best.label + '」' + PCT0(best.win) + '）。', src: 'champ' };
@@ -559,13 +560,13 @@ function champMerge(adv, sim, H) {
   let best = opts.find((o) => key(o.act) === key(C.best.act)) || opts[0];
   let bestD = 0;
   for (const o of opts) {
-    if (o === best || o.extra) continue;                               // 多算的全下：只拿來評分
+    if (o === best || (o.extra && !(CHAMP.simAllin && H.street === 3))) continue;   // 多算的全下：只有河牌、整手模擬明顯更好才換（前面幾條街模擬裡你之後照電腦打，會低估不全下的打法：配對實驗翻牌前、翻牌換全下反而輸）
     const n = Math.min(o.xs.length, best.xs.length);
     let s = 0, s2 = 0;
     for (let i = 0; i < n; i++) { const d = o.xs[i] - best.xs[i]; s += d; s2 += d * d; }
     const m = s / n, se = Math.sqrt(Math.max(0, s2 / n - m * m) / Math.max(1, n - 1));
     const need = (o.act.t === 'r' && best.act.t !== 'r' ? (H.street ? CHAMP.margin : CHAMP.marginPre) : 0.1) * bb;
-    if (m > need && m > se && m > bestD) { bestD = m; o.dSe = se; o.d = m; best.swapTo = o; }
+    if (m > need && m > (o.extra ? CHAMP.allinSe : 1) * se && m > bestD) { bestD = m; o.dSe = se; o.d = m; best.swapTo = o; }
   }
   if (best.swapTo) { const x = best.swapTo; delete best.swapTo; best = x; }
   if (best.act.t === 'c' && best.ev < 0) best = opts.find((o) => o.act.t === 'f') || best;
